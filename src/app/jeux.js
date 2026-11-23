@@ -127,6 +127,17 @@ function keyGame($view) {
    (ni son, ni métronome, ni décompte : la latence des appareils rend toute référence trompeuse). On compare ensuite la FORME de ce qu'il a tapé (les écarts
    entre ses frappes, de la première à la dernière) à celle du motif, quelle que soit sa vitesse : voir rythme-eval.js.
    Quatre paliers : le motif commence court (4 noires) et s'allonge à mesure que la précision progresse. */
+/** Schéma qui superpose le motif et les frappes du joueur remises à l'échelle du motif (commun aux deux jeux de rythme). */
+function compareSvg(expected, taps, res) {
+  const m = Math.min(taps.length, expected.length), W = 400, x0 = 20, span = W - 2 * x0;
+  const exp = expected.map((t) => x0 + ((t - expected[0]) / (expected[expected.length - 1] - expected[0])) * span);
+  const usr = taps.slice(0, m).map((t) => x0 + ((t - taps[0]) / Math.max(1e-6, taps[m - 1] - taps[0])) * span);
+  const col = (i) => (i === 0 ? 'var(--fg)' : res.intervals[i - 1]?.grade === 'good' ? 'var(--sage)' : res.intervals[i - 1]?.grade === 'mid' ? 'var(--accent-deep)' : 'var(--brick)');
+  return `<svg viewBox="0 0 ${W} 84" style="width:100%;max-width:420px;display:block;margin:14px auto 0" role="img" aria-label="Comparaison du motif et de tes frappes">
+    <text x="${x0}" y="12" font-size="11" fill="var(--fg-soft)">Motif</text>${exp.map((x) => `<circle cx="${x.toFixed(1)}" cy="28" r="6" fill="var(--fg)"/>`).join('')}
+    <text x="${x0}" y="60" font-size="11" fill="var(--fg-soft)">Toi (remis à l'échelle du motif)</text>${usr.map((x, i) => `<circle cx="${x.toFixed(1)}" cy="76" r="6" fill="${col(i)}"/>`).join('')}</svg>`;
+}
+
 const LEVELS = [
   { beats: 4, minPairs: 0, maxPairs: 0, label: 'Niveau 1 : 4 temps, des noires' },
   { beats: 4, minPairs: 1, maxPairs: 2, label: 'Niveau 2 : 4 temps, avec des croches (6 notes au plus)' },
@@ -139,7 +150,7 @@ function rhythmGame($view) {
   $view.innerHTML = `
     ${crumb('#/jeux', 'Tous les jeux')}
     <div class="game-shell">
-      <div class="section-head"><h2>Jeu de rythme</h2></div>
+      <div class="section-head"><h2>Rythme à l'oreille</h2></div>
       <p class="game-intro">Écoute le motif (un décompte de 4 temps, puis les notes surlignées), puis retape-le de mémoire, à ton propre rythme, sans repère ni métronome. On compare la forme de ce que tu as tapé, de ta première à ta dernière frappe, à celle du motif, quelle que soit ta vitesse. Appuie sur le pavé (ou la barre espace) à chaque note.</p>
       <div class="game-hud">
         <div class="hud-stat"><b id="rg-level">1</b>niveau</div>
@@ -158,7 +169,7 @@ function rhythmGame($view) {
   const beatsEl = $('rg-beats'), tapBtn = $('rg-tap'), hitsEl = $('rg-hits'), compareEl = $('rg-compare'), replayBtn = $('rg-replay');
   const feedback = $('rg-feedback'), scoreEl = $('rg-score'), levelEl = $('rg-level'), levelsEl = $('rg-levels'), tempoEl = $('rg-bpm');
   const BPM = 88, beatDur = 60 / BPM;
-  let pattern = [], expected = [], taps = [], phase = 'idle', audioCtx = null, timeouts = [], idleTimer = 0;
+  let pattern = [], expected = [], taps = [], phase = 'idle', audioCtx = null, timeouts = [], idleTimer = 0, sources = [];
 
   const setLevel = (l) => {
     level = l; levelEl.textContent = String(l);
@@ -166,7 +177,7 @@ function rhythmGame($view) {
     try { localStorage.setItem('solfege_rythme_niveau', String(l)); } catch (e) { /* ignoré */ }
   };
   const later = (fn, ms) => timeouts.push(setTimeout(fn, Math.max(0, ms)));
-  const clearAll = () => { timeouts.forEach(clearTimeout); timeouts = []; clearTimeout(idleTimer); };
+  const clearAll = () => { timeouts.forEach(clearTimeout); timeouts = []; clearTimeout(idleTimer); sources.forEach((o) => { try { o.stop(); } catch (e) { /* déjà arrêté */ } }); sources = []; };
   const wait = (t) => (t - audioCtx.currentTime) * 1000; // millisecondes jusqu'à l'instant t de l'horloge audio
   const setPad = (text, disabled = false) => { tapBtn.textContent = text; tapBtn.disabled = disabled; };
 
@@ -190,7 +201,7 @@ function rhythmGame($view) {
     const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
     osc.frequency.value = freq;
     gain.gain.setValueAtTime(0.0001, time); gain.gain.exponentialRampToValueAtTime(vol, time + 0.002); gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
-    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(time); osc.stop(time + 0.06);
+    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(time); osc.stop(time + 0.06); sources.push(osc);
   }
 
   function start(samePattern) {
@@ -219,22 +230,13 @@ function rhythmGame($view) {
     if (taps.length >= expected.length) { setTimeout(endRound, 250); phase = 'wait'; }
     else idleTimer = setTimeout(endRound, 2600);
   }
-  function compareSvg(res) {
-    const m = Math.min(taps.length, expected.length), W = 400, x0 = 20, span = W - 2 * x0;
-    const exp = expected.map((t) => x0 + (t / expected[expected.length - 1]) * span);
-    const usr = taps.slice(0, m).map((t) => x0 + ((t - taps[0]) / Math.max(1e-6, taps[m - 1] - taps[0])) * span);
-    const col = (i) => (i === 0 ? 'var(--fg)' : res.intervals[i - 1]?.grade === 'good' ? 'var(--sage)' : res.intervals[i - 1]?.grade === 'mid' ? 'var(--accent-deep)' : 'var(--brick)');
-    return `<svg viewBox="0 0 ${W} 84" style="width:100%;max-width:420px;display:block;margin:14px auto 0" role="img" aria-label="Comparaison du motif et de tes frappes">
-      <text x="${x0}" y="12" font-size="11" fill="var(--fg-soft)">Motif</text>${exp.map((x) => `<circle cx="${x.toFixed(1)}" cy="28" r="6" fill="var(--fg)"/>`).join('')}
-      <text x="${x0}" y="60" font-size="11" fill="var(--fg-soft)">Toi (remis à l'échelle du motif)</text>${usr.map((x, i) => `<circle cx="${x.toFixed(1)}" cy="76" r="6" fill="${col(i)}"/>`).join('')}</svg>`;
-  }
   function endRound() {
     clearTimeout(idleTimer);
     if (phase === 'done') return;
     phase = 'done'; setPad('Nouveau motif'); replayBtn.hidden = false;
     const beat = beatDur, res = evaluateRhythm(expected, taps, beat);
     hitsEl.querySelectorAll('.hit').forEach((h, i) => { h.classList.remove('mid'); h.style.background = ''; h.classList.add(i === 0 ? 'good' : res.intervals[i - 1].grade); });
-    compareEl.innerHTML = compareSvg(res);
+    compareEl.innerHTML = compareSvg(expected, taps, res);
     scoreEl.textContent = res.pct + '%';
     tempoEl.textContent = res.tempo ? Math.round(BPM * res.tempo) : '—';
     const parts = [];
@@ -256,13 +258,132 @@ function rhythmGame($view) {
   const onSpace = (e) => { if (e.code === 'Space' && !e.repeat) { e.preventDefault(); if (phase === 'tap') registerTap(e.timeStamp); else if (phase === 'idle' || phase === 'done') start(false); } };
   window.addEventListener('keydown', onSpace);
   setLevel(level); genPattern(); drawPattern();
-  return () => { clearAll(); window.removeEventListener('keydown', onSpace); };
+  return () => { clearAll(); window.removeEventListener('keydown', onSpace); if (audioCtx) { audioCtx.close().catch(() => {}); audioCtx = null; } }; // quitter la page coupe aussi les sons déjà programmés
+}
+
+/* ---------- Rythme à vue ---------- (le motif est écrit en notation, jamais joué avant la frappe : le joueur le lit, puis le tape à son rythme, sans repère)
+   Même évaluation que le jeu à l'oreille (forme des écarts entre frappes, vitesse libre : rythme-eval.js). Après la manche, on peut écouter le motif pour comparer. */
+const SIGHT_LEVELS = [
+  { measures: 1, pool: ['q', 'q', 'h'], label: 'Niveau 1 : une mesure, noires et blanches' },
+  { measures: 1, pool: ['q', 'ee', 'h'], label: 'Niveau 2 : une mesure, avec des croches' },
+  { measures: 1, pool: ['q', 'ee', 'qr', 'dqe', 'h'], label: 'Niveau 3 : une mesure, avec silences et rythmes pointés' },
+  { measures: 2, pool: ['q', 'ee', 'qr', 'dqe', 'ssss', 'h'], label: 'Niveau 4 : deux mesures, avec doubles croches' },
+];
+// morceaux d'une mesure à 4 temps : longueur en temps, événements de la partition (une note sur le Si 4 : seul le rythme compte), instants des frappes dans le morceau
+const NOTE = (d, dots = 0) => ({ n: ['B4'], d, dots });
+const PIECES = {
+  q: { len: 1, ev: () => [NOTE('quarter')], on: [0] },
+  h: { len: 2, ev: () => [NOTE('half')], on: [0] },
+  ee: { len: 1, ev: () => [NOTE('eighth'), NOTE('eighth')], on: [0, 0.5] },
+  qr: { len: 1, ev: () => [{ rest: true, d: 'quarter', dots: 0 }], on: [] },
+  dqe: { len: 3, ev: () => [NOTE('quarter', 1), NOTE('eighth'), NOTE('quarter')], on: [0, 1.5, 2] }, // noire pointée + croche + noire : 3 temps
+  ssss: { len: 1, ev: () => [NOTE('sixteenth'), NOTE('sixteenth'), NOTE('sixteenth'), NOTE('sixteenth')], on: [0, 0.25, 0.5, 0.75] },
+};
+/** Un motif au hasard : { desc (partition), expected (instants des frappes, en temps), measures }. Au moins 3 notes à taper (5 pour deux mesures). */
+export function sightPattern(levelIndex, rnd = Math.random) {
+  const L = SIGHT_LEVELS[levelIndex], names = [...new Set(L.pool)];
+  for (let essai = 0; essai < 200; essai++) {
+    const measures = []; const expected = []; let t = 0;
+    for (let m = 0; m < L.measures; m++) {
+      const events = []; let left = 4;
+      while (left > 0) {
+        const ok = names.filter((k) => PIECES[k].len <= left), k = ok[Math.floor(rnd() * ok.length)], pc = PIECES[k];
+        events.push(...pc.ev()); pc.on.forEach((o) => expected.push(t + (4 - left) + o)); left -= pc.len;
+      }
+      measures.push(events); t += 4;
+    }
+    if (expected.length >= (L.measures === 1 ? 3 : 5)) return { desc: { clef: 'treble', key: 0, time: [4, 4], bpm: 88, scale: 1.15, measures }, expected, measures: L.measures };
+  }
+  throw new Error('Aucun motif trouvé');
+}
+
+function rhythmSightGame($view) {
+  let level = 1;
+  try { level = Math.min(SIGHT_LEVELS.length, Math.max(1, Number(localStorage.getItem('solfege_rythme_vue_niveau')) || 1)); } catch (e) { /* ignoré */ }
+  $view.innerHTML = `
+    ${crumb('#/jeux', 'Tous les jeux')}
+    <div class="game-shell">
+      <div class="section-head"><h2>Rythme à vue</h2></div>
+      <p class="game-intro">Lis le rythme écrit, puis tape-le à ton rythme, sans l'entendre avant : commence quand tu veux, sans repère ni métronome. On compare la forme de ce que tu as tapé (les durées les unes par rapport aux autres), pas la vitesse. Un silence se « tape » en n'appuyant pas. Après la manche, tu peux écouter le motif.</p>
+      <div class="game-hud">
+        <div class="hud-stat"><b id="rv-level">1</b>niveau</div>
+        <div class="hud-stat"><b id="rv-score">—</b>précision</div>
+        <div class="hud-stat"><b id="rv-bpm">—</b>ton tempo</div>
+      </div>
+      <div class="answers" id="rv-levels" role="group" aria-label="Niveau de difficulté">${SIGHT_LEVELS.map((l, i) => `<button class="ans-btn" data-l="${i + 1}" title="${l.label}" aria-pressed="false">Niveau ${i + 1}</button>`).join('')}</div>
+      <div class="staff-box"><div class="abc-notation" id="rv-score-host"></div></div>
+      <button class="tap-pad" id="rv-tap">Tape le rythme (6 notes)</button>
+      <div class="hit-row" id="rv-hits"></div>
+      <div id="rv-compare" aria-hidden="true"></div>
+      <div class="answers" style="margin-top:14px"><button class="ans-btn" id="rv-listen" hidden>▶ Écouter le motif</button></div>
+      <div class="feedback" id="rv-feedback" role="status" aria-live="polite">&nbsp;</div>
+    </div>`;
+  configurePlayer({ sounds: new URLSearchParams(location.search).get('sounds') || undefined, onStatus: () => {} });
+  const $ = (id) => document.getElementById(id);
+  const tapBtn = $('rv-tap'), hitsEl = $('rv-hits'), compareEl = $('rv-compare'), listenBtn = $('rv-listen'), feedback = $('rv-feedback'), scoreEl = $('rv-score'), levelEl = $('rv-level'), levelsEl = $('rv-levels'), tempoEl = $('rv-bpm'), host = $('rv-score-host');
+  let cur = null, taps = [], phase = 'tap', idleTimer = 0;
+
+  const setLevel = (l) => {
+    level = l; levelEl.textContent = String(l);
+    levelsEl.querySelectorAll('.ans-btn').forEach((b) => { const on = Number(b.dataset.l) === l; b.setAttribute('aria-pressed', String(on)); b.style.borderColor = on ? 'var(--accent-deep)' : ''; b.style.fontWeight = on ? '700' : ''; });
+    try { localStorage.setItem('solfege_rythme_vue_niveau', String(l)); } catch (e) { /* ignoré */ }
+  };
+  function newPattern() {
+    stopAll(); clearTimeout(idleTimer);
+    cur = sightPattern(level - 1); taps = []; phase = 'tap';
+    const w = Math.min(520, Math.max(240, ($view.clientWidth || 360) - 40));
+    mountScore(host, { ...cur.desc, width: w }, { ink: 'currentColor', label: 'Rythme à taper', withPlay: false });
+    hitsEl.innerHTML = cur.expected.map(() => '<div class="hit"></div>').join(''); compareEl.innerHTML = '';
+    listenBtn.hidden = true; feedback.innerHTML = '&nbsp;'; feedback.className = 'feedback';
+    tapBtn.textContent = `Tape le rythme (${cur.expected.length} notes)`; tapBtn.disabled = false;
+  }
+  // temps d'attente avant de conclure une manche : assez long pour un silence ou une blanche, même si le joueur tape lentement
+  function patience() {
+    const m = taps.length, exp = cur.expected; let longest = 1; for (let i = 1; i < exp.length; i++) longest = Math.max(longest, exp[i] - exp[i - 1]);
+    const perBeat = m >= 2 ? (taps[m - 1] - taps[0]) / Math.max(1e-6, exp[m - 1] - exp[0]) : 1.5;
+    return Math.max(2600, longest * perBeat * 1000 * 1.8);
+  }
+  function registerTap(timeStamp) {
+    if (phase !== 'tap') return;
+    taps.push(timeStamp / 1000);
+    const i = Math.min(taps.length - 1, hitsEl.children.length - 1);
+    hitsEl.children[i].classList.add('mid'); hitsEl.children[i].style.background = 'var(--rule-strong)';
+    clearTimeout(idleTimer);
+    if (taps.length >= cur.expected.length) { phase = 'wait'; idleTimer = setTimeout(endRound, 250); }
+    else idleTimer = setTimeout(endRound, patience());
+  }
+  function endRound() {
+    clearTimeout(idleTimer);
+    if (phase === 'done') return;
+    phase = 'done'; tapBtn.textContent = 'Nouveau motif'; listenBtn.hidden = false;
+    const expected = cur.expected, res = evaluateRhythm(expected, taps, 1);
+    hitsEl.querySelectorAll('.hit').forEach((h, i) => { h.classList.remove('mid'); h.style.background = ''; h.classList.add(i === 0 ? 'good' : res.intervals[i - 1].grade); });
+    compareEl.innerHTML = compareSvg(expected, taps, res);
+    scoreEl.textContent = res.pct + '%';
+    tempoEl.textContent = res.tempo ? Math.round(60 * res.tempo) : '—'; // frappes par minute au rythme du joueur : un temps = une noire
+    const parts = [];
+    if (!res.complete) parts.push(`Il manquait ${expected.length - taps.length} frappe${expected.length - taps.length > 1 ? 's' : ''}.`);
+    parts.push(res.pct >= 85 ? 'Excellent, le rythme est bien lu.' : res.pct >= 60 ? "Pas mal, continue à t'entraîner." : 'Compare tes frappes au motif, puis écoute-le.');
+    if (res.regularity != null && res.complete) parts.push(res.regularity < 0.1 ? 'Frappes bien régulières.' : res.regularity < 0.2 ? 'Régularité moyenne.' : 'Frappes irrégulières.');
+    if (res.pct >= 85 && level < SIGHT_LEVELS.length) { setLevel(level + 1); parts.push(`Niveau suivant : ${level}.`); }
+    feedback.className = 'feedback ' + (res.pct >= 70 ? 'ok' : 'no'); feedback.textContent = parts.join(' ');
+    recordScore('rythme-vue', res.pct, 100);
+  }
+  tapBtn.addEventListener('pointerdown', (e) => { if (phase === 'tap') { e.preventDefault(); registerTap(e.timeStamp); } });
+  tapBtn.addEventListener('click', (e) => { if (phase === 'done') newPattern(); else if (phase === 'tap' && e.detail === 0) registerTap(e.timeStamp); });
+  listenBtn.addEventListener('click', () => { import('../music/player.js').then((m) => m.play({ ...cur.desc, width: undefined }, { button: listenBtn, host })); });
+  levelsEl.addEventListener('click', (e) => { const b = e.target.closest('.ans-btn'); if (!b || phase === 'wait') return; setLevel(Number(b.dataset.l)); newPattern(); });
+  const onSpace = (e) => { if (e.code === 'Space' && !e.repeat) { e.preventDefault(); if (phase === 'tap') registerTap(e.timeStamp); else if (phase === 'done') newPattern(); } };
+  window.addEventListener('keydown', onSpace);
+  setLevel(level); newPattern();
+  return () => { clearTimeout(idleTimer); stopAll(); window.removeEventListener('keydown', onSpace); };
 }
 
 export function renderJeu($view, id) {
   if (id === 'clef-sol') return noteGame($view, 'treble');
   if (id === 'clef-fa') return noteGame($view, 'bass');
   if (id === 'rythme') return rhythmGame($view);
+  if (id === 'rythme-vue') return rhythmSightGame($view);
   if (id === 'tonalites') return keyGame($view);
   if (poolGames[id]) return poolGame($view, id);
   $view.innerHTML = '<p>Jeu introuvable.</p>'; return null;

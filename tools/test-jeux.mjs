@@ -1,4 +1,4 @@
-// Les 8 jeux : affichage, boutons de réponse, retour, score, nouvelle question (un seul bouton ▶), son, rythme. Usage : node tools/test-jeux.mjs <url> [dossier de captures]
+// Les jeux : affichage, boutons de réponse, retour, score, nouvelle question (un seul bouton ▶), son, rythme. Usage : node tools/test-jeux.mjs <url> [dossier de captures]
 import { chromium } from 'playwright-core';
 import fs from 'node:fs';
 setTimeout(() => { console.log('ARRET FORCE'); process.exit(2); }, 170000);

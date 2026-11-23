@@ -5,7 +5,7 @@ import fs from 'node:fs';
 setTimeout(() => { console.log('ARRET FORCE'); process.exit(2); }, 560000);
 const url = process.argv[2] || 'http://localhost:8123/', tout = process.argv.includes('--tout');
 const axe = fs.readFileSync(new URL('../node_modules/axe-core/axe.min.js', import.meta.url), 'utf8');
-const PAGES = [...(process.argv.includes('--lecons') ? (await import('../src/app/data/catalogue.js')).CATALOGUE.lessons.map((l) => '#/cours/' + l.id) : []), '#/', '#/cours', '#/cours/portee-cles', '#/jeux', '#/jeux/clef-sol', '#/jeux/rythme', '#/outils', '#/outils/metronome', '#/outils/accordeur', '#/outils/piano', '#/oreille'].slice(process.argv.includes('--lecons') ? 0 : 0);
+const PAGES = [...(process.argv.includes('--lecons') ? (await import('../src/app/data/catalogue.js')).CATALOGUE.lessons.map((l) => '#/cours/' + l.id) : []), '#/', '#/cours', '#/cours/portee-cles', '#/jeux', '#/jeux/clef-sol', '#/jeux/rythme', '#/jeux/rythme-vue', '#/outils', '#/outils/metronome', '#/outils/accordeur', '#/outils/piano', '#/oreille'].slice(process.argv.includes('--lecons') ? 0 : 0);
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
 let total = 0; const vus = new Map();
 for (const [w, theme] of [[390, 'light'], [768, 'dark'], [1200, 'contrast'], ...(tout ? [[390, 'dark'], [390, 'contrast'], [768, 'light'], [768, 'contrast'], [1200, 'light'], [1200, 'dark']] : [])]) {

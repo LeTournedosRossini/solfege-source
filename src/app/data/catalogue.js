@@ -165,8 +165,13 @@ export const CATALOGUE = {
   },
   {
    "id": "rythme",
-   "title": "Jeu de rythme",
-   "summary": "Écoute la pulsation et tape en rythme au bon moment."
+   "title": "Rythme à l'oreille",
+   "summary": "Écoute un motif rythmique, puis retape-le de mémoire."
+  },
+  {
+   "id": "rythme-vue",
+   "title": "Rythme à vue",
+   "summary": "Lis un rythme écrit, puis tape-le sans l'avoir entendu."
   },
   {
    "id": "tonalites",
