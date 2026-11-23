@@ -18,7 +18,11 @@ Cette copie sert de base technique à l'application Solfège (rendu SVG de parti
 
 ## Changements locaux
 
-*(aucun)*
+*(aucun : les fichiers copiés sont identiques à l'origine)*
+
+## Correctifs appliqués à la compilation (`tools/build-app.mjs`, sans toucher aux fichiers copiés)
+
+- `src/note/edit.js` : le bouton « double croche » de l'éditeur de note envoie la durée `16th` alors que le modèle l'appelle `sixteenth` ; toucher la portée répond « Impossible ici ». Le build remplace ces deux endroits (et échoue si la copie change). À signaler à l'origine, qui n'a pas été modifiée.
 
 ## Dépendances à figer
 

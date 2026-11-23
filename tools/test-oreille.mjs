@@ -116,6 +116,14 @@ await p.click('#createBtn'); await p.waitForSelector('scorsaire-note'); await p.
 await p.locator('scorsaire-note [data-act="close"]').click(); await p.waitForTimeout(300);
 check('éditeur : « Fermer » abandonne sans rien enregistrer', await p.locator('scorsaire-note').count() === 0 && await p.locator('#nameSheet.open').count() === 0);
 await p.click('#createBtn'); await p.waitForSelector('scorsaire-note'); await p.waitForTimeout(800);
+for (const dur of ['16th', 'eighth', 'half', 'whole']) {
+  await p.locator(`scorsaire-note [data-dur="${dur}"]`).click(); const av = await tetes(); await taper(1, 0);
+  const pressed = await p.locator(`scorsaire-note [data-dur="${dur}"]`).getAttribute('aria-pressed');
+  check(`éditeur : durée « ${dur} » choisie, note posée, bouton enfoncé`, (await tetes()) > av && pressed === 'true', `${av} → ${await tetes()}, pressed=${pressed}`);
+  await p.locator('scorsaire-note [data-act="undo"]').click(); await p.waitForTimeout(150);
+}
+await p.locator('scorsaire-note [data-act="close"]').click(); await p.waitForTimeout(300);
+await p.click('#createBtn'); await p.waitForSelector('scorsaire-note'); await p.waitForTimeout(800);
 await taper(4);
 check('éditeur : quatre notes posées en touchant la portée', await tetes() === 4, String(await tetes()));
 await p.locator('scorsaire-note textarea').fill('Ma petite phrase'); await p.waitForTimeout(500);

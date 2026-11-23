@@ -20,6 +20,14 @@ const pure = {
   name: 'pure-src',
   setup(b) {
     b.onLoad({ filter: /src[\\/]model[\\/]icon-library\.js$/ }, () => ({ contents: 'export const LIBRARY = {}; export const RETAINED = {}; export const CUSTOM_RETAINED = {}; export const INSTRUMENT_ICON_OVERRIDES = {};', loader: 'js' }));
+    // Correctif appliqué à la compilation (le fichier copié reste intact, voir VENDOR.md) : la palette de l'éditeur de note envoie « 16th » au modèle, qui nomme la double croche « sixteenth »
+    // (toucher la portée avec la double croche choisie répond « Impossible ici »).
+    b.onLoad({ filter: /src[\\/]note[\\/]edit\.js$/ }, async (a) => {
+      let t = fs.readFileSync(a.path, 'utf8');
+      const reps = [['{ base: b.dataset.dur, dots', "{ base: b.dataset.dur === '16th' ? 'sixteenth' : b.dataset.dur, dots"], ['aria-pressed="${e.duration.base === id}"', 'aria-pressed="${e.duration.base === (id === \'16th\' ? \'sixteenth\' : id)}"']];
+      for (const [from, to] of reps) { if (!t.includes(from)) throw new Error(`Correctif de la double croche : motif introuvable dans edit.js (${from}) — la copie de Scorsaire a changé`); t = t.replace(from, to); }
+      return { contents: t, loader: 'js', resolveDir: path.dirname(a.path) };
+    });
     b.onResolve({ filter: /^\.\.?\// }, async (a) => {
       if (a.pluginData?.skip) return undefined;
       const r = await b.resolve(a.path, { resolveDir: a.resolveDir, kind: a.kind, importer: a.importer, pluginData: { skip: true } });
