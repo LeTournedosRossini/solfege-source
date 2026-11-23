@@ -92,7 +92,7 @@ await p.waitForTimeout(1500);
 await p.locator('#worksSubtabs .subtab2-btn[data-sub="ecoute"]').click();
 await p.setInputFiles('#importFile', doc); await p.waitForTimeout(500);
 check('import : message de réussite', (await p.locator('#importNote').textContent()).includes('3 phrases importées'), await p.locator('#importNote').textContent());
-await p.click('#worksPickerBtn'); const imp = p.locator('#worksList .phrase-item'); check('import : 3 phrases dans « Importées »', await imp.count() === 3, String(await imp.count()));
+await p.click('#worksPickerBtn'); const imp = p.locator('#worksList .phrase-item'); check('import : 3 phrases dans « Mes phrases »', await imp.count() === 3, String(await imp.count()));
 await imp.nth(1).click(); await p.waitForTimeout(300);
 check('import : le mouvement (8 notes) est dessiné', await heads('#worksStaffWrap') === 8);
 await p.click('#worksPlay'); await p.waitForTimeout(700);
@@ -101,7 +101,41 @@ await p.click('#worksPlay');
 await p.setInputFiles('#importFile', { name: 'faux.scorsaire', mimeType: 'application/json', buffer: Buffer.from('pas du json') });
 await p.waitForTimeout(300); check('import : fichier invalide, message clair', (await p.locator('#importNote').textContent()).includes('pas un document Scorsaire'), await p.locator('#importNote').textContent());
 await p.reload(); await p.waitForSelector('#ecStaffWrap svg'); await p.locator('#tabs .tab-btn[data-tab="works"]').click(); await p.click('#worksPickerBtn');
-check('import : phrases conservées après rechargement', await p.locator('#worksGenreTabs .tab-btn', { hasText: 'Importées' }).count() === 1);
+check('import : phrases conservées après rechargement', await p.locator('#worksGenreTabs .tab-btn', { hasText: 'Mes phrases' }).count() === 1);
+
+
+// --- éditeur visuel de phrase (composant d'édition de Scorsaire)
+await p.reload(); await p.waitForSelector('#ecStaffWrap svg'); await p.locator('#tabs .tab-btn[data-tab="works"]').click();
+const taper = async (n, dec = 0) => { const r = await p.evaluate(() => { const l = [...document.querySelector('scorsaire-note').shadowRoot.querySelectorAll('[data-role="staff-line"]')].map((e) => e.getBoundingClientRect()); return { top: Math.min(...l.map((x) => x.top)), bottom: Math.max(...l.map((x) => x.bottom)), left: l[0].left }; });
+  const ys = [r.bottom - 4, r.top + 20, r.top + 30, r.top + 6, r.top + 14]; for (let i = 0; i < n; i++) { await p.mouse.click(r.left + 110 + (i + dec) * 48, ys[i % 5]); await p.waitForTimeout(220); } };
+const tetes = () => p.locator('scorsaire-note svg [data-glyph^="notehead"]').count();
+await p.click('#createBtn'); await p.waitForSelector('scorsaire-note'); await p.waitForTimeout(800);
+await p.locator('scorsaire-note [data-act="done"]').click(); await p.waitForTimeout(300);
+check('éditeur : une phrase vide est refusée', (await p.locator('#importNote').textContent()).includes('vide') && await p.locator('#nameSheet.open').count() === 0, await p.locator('#importNote').textContent());
+await p.click('#createBtn'); await p.waitForSelector('scorsaire-note'); await p.waitForTimeout(800);
+await p.locator('scorsaire-note [data-act="close"]').click(); await p.waitForTimeout(300);
+check('éditeur : « Fermer » abandonne sans rien enregistrer', await p.locator('scorsaire-note').count() === 0 && await p.locator('#nameSheet.open').count() === 0);
+await p.click('#createBtn'); await p.waitForSelector('scorsaire-note'); await p.waitForTimeout(800);
+await taper(4);
+check('éditeur : quatre notes posées en touchant la portée', await tetes() === 4, String(await tetes()));
+await p.locator('scorsaire-note textarea').fill('Ma petite phrase'); await p.waitForTimeout(500);
+await p.locator('scorsaire-note [data-act="done"]').click(); await p.waitForSelector('#nameSheet.open');
+check('éditeur : nom proposé (le titre saisi)', await p.inputValue('#nameInput') === 'Ma petite phrase', await p.inputValue('#nameInput'));
+await p.fill('#nameInput', 'Ma phrase de test'); await p.click('#nameSave'); await p.waitForTimeout(500);
+check('éditeur : phrase enregistrée et affichée', (await p.locator('#worksTitle').textContent()) === 'Ma phrase de test' && await heads('#worksStaffWrap') === 4 && (await p.locator('#importNote').textContent()).includes('enregistrée'));
+await p.click('#worksPlay'); await p.waitForFunction(() => /Stop/.test(window.__oreille.root.getElementById('worksPlay').textContent), null, { timeout: 12000 }).catch(() => {}); check('éditeur : la phrase créée se joue', (await p.locator('#worksPlay').textContent()).includes('Stop')); await p.click('#worksPlay');
+await p.reload(); await p.waitForSelector('#ecStaffWrap svg'); await p.locator('#tabs .tab-btn[data-tab="works"]').click(); await p.click('#worksPickerBtn');
+await p.locator('#worksGenreTabs .tab-btn', { hasText: 'Mes phrases' }).click();
+const creee = p.locator('#worksList .phrase-item', { hasText: 'Ma phrase de test' }); check('éditeur : phrase conservée après rechargement (avec 4 mesures au plus)', await creee.count() === 1);
+await p.locator('#worksList button[aria-label="Modifier Ma phrase de test"]').click(); await p.waitForSelector('scorsaire-note'); await p.waitForTimeout(900);
+check('éditeur : la phrase s’ouvre pour modification avec ses notes', await tetes() === 4, String(await tetes()));
+await taper(1, 4); check('éditeur : une cinquième note ajoutée', await tetes() === 5, String(await tetes()));
+await p.locator('scorsaire-note [data-act="done"]').click(); await p.waitForSelector('#nameSheet.open'); await p.click('#nameSave'); await p.waitForTimeout(500);
+check('éditeur : la phrase modifiée remplace l’ancienne', await heads('#worksStaffWrap') === 5 && (await p.locator('#worksTitle').textContent()) === 'Ma phrase de test');
+await p.click('#worksPickerBtn'); check('éditeur : une seule entrée « Ma phrase de test »', await p.locator('#worksList .phrase-item', { hasText: 'Ma phrase de test' }).count() === 1);
+await p.locator('#worksList button[aria-label="Retirer Ma phrase de test"]').click(); await p.waitForTimeout(200);
+check('éditeur : suppression d’une phrase créée', await p.locator('#worksList .phrase-item', { hasText: 'Ma phrase de test' }).count() === 0);
+await p.keyboard.press('Escape');
 
 // --- thèmes
 for (const t of ['dark', 'contrast', 'light']) { await p.evaluate((x) => document.documentElement.setAttribute('data-theme', x), t); await p.waitForTimeout(150); check(`thème ${t} suivi par le module`, await p.evaluate(() => window.__oreille.root.getElementById('ear').dataset.theme) === t); }

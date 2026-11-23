@@ -6,13 +6,14 @@ import { play, stopAll, configurePlayer } from '../music/player.js';
 import { renderDesc } from '../music/describe.js';
 import * as T from './oreille-theorie.js';
 import { lireDocumentScorsaire } from './oreille-import.js';
+import { SOUNDS_URL } from '../music/player.js';
 
 const MIDI_MIN = 36, MIDI_MAX = 96; // Do2 → Do7
 const LETTERS = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const midiLabel = (m) => LETTERS[m % 12] + (Math.floor(m / 12) - 1);
 const randInt = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 const IMPORT_KEY = 'solfege_oreille_import';
-const GENRES = [{ key: 'classique', label: 'Classique' }, { key: 'moderne', label: 'Actuelle' }, { key: 'importe', label: 'Importées' }];
+const GENRES = [{ key: 'classique', label: 'Classique' }, { key: 'moderne', label: 'Actuelle' }, { key: 'importe', label: 'Mes phrases' }];
 
 const HTML = `
 <div class="ear" id="ear" data-theme="dark"><div class="app">
@@ -78,6 +79,7 @@ const HTML = `
     <div class="subtabs2" id="worksSubtabs"><button class="subtab2-btn active" data-sub="ecoute">Écoute</button><button class="subtab2-btn" data-sub="ident">Identification</button></div>
     <div class="subpanel active" id="worksEcoutePanel">
       <div class="picker-row"><button class="phrase-picker-btn" id="worksPickerBtn" style="flex:1;">🎵 Choisir une phrase…</button>
+        <button class="hamburger-btn" id="createBtn" title="Créer une phrase" aria-label="Créer une phrase">➕</button>
         <button class="hamburger-btn" id="importBtn" title="Importer un document Scorsaire" aria-label="Importer un document Scorsaire">📥</button>
         <input type="file" id="importFile" accept=".scorsaire,.json,application/json" hidden></div>
       <div class="import-note" id="importNote" role="status"></div>
@@ -99,6 +101,10 @@ const HTML = `
   </div>
 </div>
 
+<div class="drawer-overlay" id="nameSheetOverlay"><div class="drawer" id="nameSheet" role="dialog" aria-label="Nom de la phrase">
+  <div class="drawer-handle"></div><div class="drawer-head"><h2>Enregistrer la phrase</h2><button class="drawer-close" data-close aria-label="Fermer">✕</button></div>
+  <div class="drawer-body"><div class="setting-block"><label class="drawer-section-title" for="nameInput">Nom de la phrase</label><input type="text" class="name-input" id="nameInput" maxlength="80" autocomplete="off"></div>
+    <div class="import-note" id="nameNote" role="status"></div><button class="mini-btn" id="nameSave" style="padding:12px; font-weight:600; border-color:var(--gold); color:var(--gold);">✓ Enregistrer dans « Mes phrases »</button></div></div></div>
 <div class="drawer-overlay" id="worksSheetOverlay"><div class="drawer" id="worksSheet" style="max-height:75vh;" role="dialog" aria-label="Choisir une phrase">
   <div class="drawer-handle"></div><div class="drawer-head"><h2>Choisir une phrase</h2><button class="drawer-close" data-close aria-label="Fermer">✕</button></div>
   <div class="drawer-body" style="gap:10px;"><div class="tabs" id="worksGenreTabs"></div><div id="worksList" style="display:flex; flex-direction:column; gap:8px;"></div></div></div></div>
@@ -217,8 +223,8 @@ export function renderOreille($view) {
 
   /* ---------- briques d'interface ---------- */
   const sheet = (ovId, shId) => { const ov = $(ovId), sh = $(shId); return { ov, open() { ov.classList.add('open'); sh.classList.add('open'); ov.querySelector('[data-close]')?.focus(); }, close() { ov.classList.remove('open'); sh.classList.remove('open'); } }; };
-  const sDrawer = sheet('drawerOverlay', 'drawer'), sPhrase = sheet('phraseSheetOverlay', 'phraseSheet'), sPhraseSet = sheet('phraseSettingsOverlay', 'phraseSettingsSheet'), sWorks = sheet('worksSheetOverlay', 'worksSheet'), sWk = sheet('wkIdentSettingsOverlay', 'wkIdentSettingsSheet');
-  const sheets = [sDrawer, sPhrase, sPhraseSet, sWorks, sWk];
+  const sDrawer = sheet('drawerOverlay', 'drawer'), sPhrase = sheet('phraseSheetOverlay', 'phraseSheet'), sPhraseSet = sheet('phraseSettingsOverlay', 'phraseSettingsSheet'), sWorks = sheet('worksSheetOverlay', 'worksSheet'), sWk = sheet('wkIdentSettingsOverlay', 'wkIdentSettingsSheet'), sName = sheet('nameSheetOverlay', 'nameSheet');
+  const sheets = [sDrawer, sPhrase, sPhraseSet, sWorks, sWk, sName];
   sheets.forEach((s) => { s.ov.addEventListener('click', (e) => { if (e.target === s.ov || e.target.closest('[data-close]')) s.close(); }); });
   const onKey = (e) => { if (e.key === 'Escape') sheets.forEach((s) => s.close()); };
   document.addEventListener('keydown', onKey); disposers.push(() => document.removeEventListener('keydown', onKey));
@@ -431,7 +437,7 @@ export function renderOreille($view) {
   const loadImported = () => { try { return JSON.parse(localStorage.getItem(IMPORT_KEY) || '[]'); } catch { return []; } };
   const saveImported = (list) => { try { localStorage.setItem(IMPORT_KEY, JSON.stringify(list)); return true; } catch { return false; } };
   let imported = loadImported();
-  const allPhrases = () => [...PHRASES.map((p, i) => ({ ...p, id: `b${i}` })), ...imported.map((p, i) => ({ genre: 'importe', title: p.title, featured: `${p.measures} mesure${p.measures > 1 ? 's' : ''} — document Scorsaire`, noteDoc: p.noteDoc, id: `i${i}`, imp: i }))];
+  const allPhrases = () => [...PHRASES.map((p, i) => ({ ...p, id: `b${i}` })), ...imported.map((p, i) => ({ genre: 'importe', title: p.title, featured: `${p.measures} mesure${p.measures > 1 ? 's' : ''} — ${p.cree ? 'phrase créée ici' : 'document Scorsaire'}`, noteDoc: p.noteDoc, id: `i${i}`, imp: i, cree: !!p.cree }))];
   const phraseDesc = (w) => (w.noteDoc ? { noteDoc: w.noteDoc, speed: 1 + speedPct / 100 } : T.withSpeed(w.desc, speedPct));
   let curWork = null, worksGenre = 'classique';
   const kbW = piano($('keyboardWorks'), (off) => curWork && speak({ ...phraseDesc(curWork), transpose: off }, { host: $('worksStaffWrap') }));
@@ -456,6 +462,7 @@ export function renderOreille($view) {
       const row = document.createElement('div'); row.style.cssText = 'display:flex;gap:6px;align-items:stretch';
       const b = document.createElement('button'); b.className = 'phrase-item'; b.style.flex = '1'; b.innerHTML = `<span class="pi-title"></span><span class="pi-meta"></span>`; b.querySelector('.pi-title').textContent = w.title; b.querySelector('.pi-meta').textContent = w.featured;
       b.onclick = () => { worksShow(w); sWorks.close(); }; row.append(b);
+      if (w.cree) { const e = document.createElement('button'); e.className = 'mini-btn'; e.textContent = '✏'; e.setAttribute('aria-label', `Modifier ${w.title}`); e.onclick = () => { sWorks.close(); editPhrase(w.imp); }; row.append(e); }
       if (w.imp != null) { const d = document.createElement('button'); d.className = 'mini-btn'; d.textContent = '🗑'; d.setAttribute('aria-label', `Retirer ${w.title}`); d.onclick = () => { imported.splice(w.imp, 1); saveImported(imported); if (curWork?.id === w.id) { curWork = null; $('worksPlayerPanel').style.display = 'none'; } if (!imported.length) worksGenre = 'classique'; worksList(); wkFilterTabs(); }; row.append(d); }
       list.append(row);
     });
@@ -464,6 +471,40 @@ export function renderOreille($view) {
   $('worksPlay').onclick = () => { if (!curWork) return; pulse($('worksPlay')); speak(phraseDesc(curWork), { button: $('worksPlay'), host: $('worksStaffWrap') }); };
   redraws.push(() => { if (curWork && $('worksEcoutePanel').classList.contains('active') && $('panelWorks').classList.contains('active')) draw($('worksStaffWrap'), curWork.noteDoc ? { noteDoc: curWork.noteDoc } : curWork.desc, hostWidth($('worksStaffWrap'))); });
   redraws.push(() => { if (gaNames && $('panelPhrase').classList.contains('active') && $('gaEcoutePanel').classList.contains('active')) draw($('staffWrap'), gaDesc(), gaDesc().width); });
+
+  // éditeur visuel : le composant d'édition de Scorsaire, en plein écran (chargé à l'ouverture)
+  let pending = null;
+  async function editPhrase(index = null) {
+    $('importNote').textContent = '';
+    let m;
+    try { m = await import('./editeur-phrase.js'); } catch { $('importNote').textContent = 'L’éditeur n’a pas pu être chargé. Vérifiez la connexion puis réessayez.'; return; }
+    stopAll();
+    m.ouvrirEditeur({
+      doc: index == null ? null : imported[index].noteDoc,
+      sounds: new URLSearchParams(location.search).get('sounds') || SOUNDS_URL,
+      theme: resolveTheme() === 'light' ? 'light' : 'dark',
+      onSave: (text) => {
+        if (!m.aDuContenu(text)) { $('importNote').textContent = 'La phrase est vide : placez au moins une note pour l’enregistrer.'; return; }
+        pending = { index, text, measures: m.nombreDeMesures(text) };
+        $('nameInput').value = index == null ? (m.titreDuDocument(text) || 'Ma phrase') : imported[index].title; // en modification, on garde le nom de la phrase
+        $('nameNote').textContent = ''; sName.open(); $('nameInput').focus(); $('nameInput').select();
+      },
+    });
+  }
+  function savePending() {
+    const title = $('nameInput').value.trim();
+    if (!title) { $('nameNote').textContent = 'Donnez un nom à la phrase.'; return; }
+    const entry = { title, measures: pending.measures, noteDoc: JSON.parse(pending.text), cree: true };
+    if (pending.index == null) imported.push(entry); else imported[pending.index] = entry;
+    const stored = saveImported(imported);
+    const idx = pending.index ?? imported.length - 1; pending = null;
+    sName.close(); worksGenre = 'importe'; wkFilterTabs();
+    worksShow(allPhrases().find((w) => w.id === `i${idx}`));
+    $('importNote').textContent = stored ? `Phrase « ${title} » enregistrée dans « Mes phrases ».` : 'Phrase ajoutée pour cette session seulement (espace de stockage du navigateur plein).';
+  }
+  $('createBtn').onclick = () => editPhrase(null);
+  $('nameSave').onclick = savePending;
+  $('nameInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') savePending(); });
 
   // import d'un document Scorsaire (un mouvement = une phrase)
   $('importBtn').onclick = () => $('importFile').click();
@@ -474,7 +515,7 @@ export function renderOreille($view) {
       const found = lireDocumentScorsaire(await f.text());
       imported = [...imported, ...found];
       if (!saveImported(imported)) { note.textContent = 'Phrases ajoutées pour cette session seulement (espace de stockage du navigateur plein).'; }
-      else note.textContent = `${found.length} phrase${found.length > 1 ? 's' : ''} importée${found.length > 1 ? 's' : ''} depuis « ${f.name} » : onglet « Importées » du choix de phrase.`;
+      else note.textContent = `${found.length} phrase${found.length > 1 ? 's' : ''} importée${found.length > 1 ? 's' : ''} depuis « ${f.name} » : onglet « Mes phrases » du choix de phrase.`;
       worksGenre = 'importe'; worksList(); wkFilterTabs();
     } catch (err) { note.textContent = err.message; }
   };

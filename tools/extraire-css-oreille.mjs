@@ -27,6 +27,8 @@ css += `
 .ear[data-theme="light"] { --gold: #86610a; --gold-dim: #6e500a; --green: #1d7142; --muted: #665c4e; }
 .ear .quality-btn .qs { opacity: 1; }
 .ear .quality-btn.active .qs { color: inherit; }
+.ear .name-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--card); color: var(--text); font: inherit; }
+.ear .name-input:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .ear .import-note { font-size: .74rem; color: var(--muted); }
 `;
 fs.writeFileSync(new URL('../src/app/oreille-style.txt', import.meta.url), css);
