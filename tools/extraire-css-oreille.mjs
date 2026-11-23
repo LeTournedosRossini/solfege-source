@@ -11,7 +11,7 @@ css = css.replace(':root, [data-theme="dark"] {', '.ear, .ear[data-theme="dark"]
   .replace(/\*, \*::before, \*::after \{[^}]*\}/, '.ear *, .ear *::before, .ear *::after { box-sizing: border-box; margin: 0; padding: 0; }')
   .replace(/'DM Sans',\s*sans-serif/g, 'inherit').replace(/'Libre Baskerville',\s*serif/g, "'Fraunces', Georgia, serif");
 css += `
-.ear { --accent: var(--gold); background: var(--bg); color: var(--text); font-family: inherit; border-radius: 14px; padding: 18px 12px 28px; display: block; }
+.ear { --accent: var(--gold); background: var(--bg); color: var(--text); font-family: inherit; border-radius: 14px; padding: 8px 12px 28px; display: block; }
 .ear .app { margin: 0 auto; }
 .ear [hidden] { display: none !important; }
 .ear .score-host { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; overflow-x: auto; position: relative; }

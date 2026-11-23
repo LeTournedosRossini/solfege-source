@@ -142,6 +142,7 @@ const HTML = `
 
 export function renderOreille($view) {
   const host = document.createElement('div');
+  $view.classList.add('compact'); // moins de marge en haut : plus de place pour la partition et le clavier
   $view.innerHTML = '<p class="crumb-row"><a class="crumb" href="#/">← Accueil</a></p>';
   $view.append(host);
   const root = host.attachShadow({ mode: 'open' });
@@ -557,5 +558,5 @@ export function renderOreille($view) {
   gaPickers(); gaPool(); gaBuildAnswers(); gaNew(false); wkFilterTabs(); wkNew(false);
   // les questions d'identification se relancent quand on ouvre l'onglet (pas de question « déjà jouée » en fond)
   window.__oreille = { root, state: () => ({ ivCur, gaCur, wkCur, ecDesc, gaNames, curWork, activeModes: [...activeModes], speedPct, noteGap }) };
-  return () => { disposers.forEach((d) => d()); delete window.__oreille; };
+  return () => { disposers.forEach((d) => d()); delete window.__oreille; $view.classList.remove('compact'); };
 }
