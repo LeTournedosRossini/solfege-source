@@ -1,0 +1,26 @@
+// Page de contrôle : nombre de partitions, absence de ressource externe avant le premier ▶, lecture avec curseur, relecture. Usage : node tools/test-controle.mjs <url> [capture.png]
+import { chromium } from 'playwright-core';
+setTimeout(() => { console.log('ARRET FORCE'); process.exit(2); }, 80000);
+const url = process.argv[2] || 'http://localhost:8123/';
+const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--autoplay-policy=no-user-gesture-required', '--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
+const p = await b.newPage({ viewport: { width: 1000, height: 800 } });
+const externes = [], erreurs = [];
+p.on('request', (r) => { if (!r.url().startsWith(new URL(url).origin) && !r.url().startsWith('data:')) externes.push(r.url().split('/').pop()); });
+p.on('console', (m) => { if (m.type() === 'error' && !/favicon|404/.test(m.text())) erreurs.push(m.text()); });
+p.on('pageerror', (e) => erreurs.push('pageerror ' + e.message));
+let ok = true; const check = (n, c, d = '') => { if (!c) ok = false; console.log(c ? 'OK  ' : 'ECHEC', n, d); };
+await p.goto(url + '#/controle'); await p.waitForSelector('.sc svg', { timeout: 20000 });
+const n = await p.locator('.sc svg').count(); check('90 partitions dessinées', n === 90, String(n));
+check('aucune ressource externe avant ▶', externes.length === 0, externes.join(','));
+const row = p.locator('div', { has: p.locator('code', { hasText: 'c27' }) }).last();
+const btn = row.locator('button'); await btn.scrollIntoViewIfNeeded(); await btn.click();
+await p.waitForFunction(() => [...document.querySelectorAll('button')].some((b) => b.textContent.includes('Stop')), null, { timeout: 40000 });
+await p.waitForTimeout(1500);
+const cur = await row.locator('.sc div[aria-hidden]').count(); check('curseur affiché pendant la lecture', cur === 1, String(cur));
+if (process.argv[3]) await row.screenshot({ path: process.argv[3] });
+const statut = await p.locator('#sndstatus').textContent(); check('son démarré', /SoundFont|léger/.test(statut), statut);
+await p.waitForFunction(() => ![...document.querySelectorAll('button')].some((b) => b.textContent.includes('Stop')), null, { timeout: 30000 });
+check('retour à ▶ à la fin', (await btn.textContent()).includes('Écouter'), await p.locator('#sndstatus').textContent());
+await btn.click(); await p.waitForTimeout(1500); check('relecture possible', (await btn.textContent()).includes('Stop') || (await btn.textContent()) === '…');
+check('aucune erreur', erreurs.length === 0, erreurs.slice(0, 3).join(' / '));
+console.log(ok ? 'TOUT EST BON' : 'DES ECHECS'); await b.close(); process.exit(ok ? 0 : 1);

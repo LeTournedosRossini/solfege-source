@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prototype Solfège</title>
+<style>
+:root{color-scheme:light dark;--bg:#faf7f2;--fg:#1c1b1f;--card:#fff;--line:#cac4d0;--accent:#8a6508}
+@media (prefers-color-scheme:dark){:root{--bg:#16141a;--fg:#f4f1ea;--card:#201e26;--line:#49454f;--accent:#f0c46a}}
+body{margin:0;padding:16px;background:var(--bg);color:var(--fg);font:1rem/1.5 system-ui,sans-serif;max-width:40rem;margin-inline:auto}
+section{background:var(--card);border:1px solid var(--line);border-radius:.75rem;padding:1rem;margin-block:1rem}
+h1{font-size:1.25rem}h2{font-size:1.05rem;margin-top:0}
+#answers{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.75rem}
+button{font:inherit;min-height:2.75rem;min-width:3.5rem;border-radius:.5rem;border:1px solid var(--line);background:var(--bg);color:var(--fg)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#result{min-height:1.5em}
+</style></head><body>
+<h1>Prototype — rendu par Scorsaire</h1>
+<section><h2>Leçon : la gamme de Do (exemple)</h2><div id="lesson" aria-label="Partition : gamme de Do majeur"></div></section>
+<section><h2>Jeu : quelle est cette note ? (clé de Sol) <span id="score" style="float:right"></span></h2>
+<div id="stage" aria-label="Note à identifier"></div><div id="answers"></div><div id="result" role="status"></div></section>
+<p id="sndstatus" role="status" style="font-size:.85rem;opacity:.8"></p>
+<script type="module" src="proto.js"></script>
+</body></html>

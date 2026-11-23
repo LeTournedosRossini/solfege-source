@@ -1,0 +1,3372 @@
+[
+ {
+  "id": "c01",
+  "routes": [
+   "#/cours/portee-cles"
+  ],
+  "abc": "L:1\nK:C clef=none\ny",
+  "desc": {
+   "clef": "none",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "gap": true,
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 400
+  }
+ },
+ {
+  "id": "c02",
+  "routes": [
+   "#/cours/portee-cles"
+  ],
+  "abc": "L:1\nK:C clef=treble\ng",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 400
+  }
+ },
+ {
+  "id": "c03",
+  "routes": [
+   "#/cours/portee-cles"
+  ],
+  "abc": "L:1\nK:C clef=bass\nF",
+  "desc": {
+   "clef": "bass",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "F4"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 400
+  }
+ },
+ {
+  "id": "c04",
+  "routes": [
+   "#/cours/figures-de-note"
+  ],
+  "abc": "L:1\nK:C clef=treble\nb",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "B5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c05",
+  "routes": [
+   "#/cours/figures-de-note"
+  ],
+  "abc": "L:1\nK:C clef=treble\nb/2",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "B5"
+      ],
+      "d": "half",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c06",
+  "routes": [
+   "#/cours/figures-de-note"
+  ],
+  "abc": "L:1\nK:C clef=treble\nb/4",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "B5"
+      ],
+      "d": "quarter",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c07",
+  "routes": [
+   "#/cours/figures-de-note"
+  ],
+  "abc": "L:1\nK:C clef=treble\nb/8",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "B5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c08",
+  "routes": [
+   "#/cours/figures-de-note"
+  ],
+  "abc": "L:1\nK:C clef=treble\nb/16",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "B5"
+      ],
+      "d": "sixteenth",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c09",
+  "routes": [
+   "#/cours/gammes-mineures"
+  ],
+  "abc": "L:1\nK:C clef=treble\nABcdefga",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "A4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "B4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "A5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 380
+  }
+ },
+ {
+  "id": "c10",
+  "routes": [
+   "#/cours/gammes-mineures"
+  ],
+  "abc": "L:1\nK:C clef=treble\nABcdef^ga",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "A4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "B4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "G#5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "A5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 380
+  }
+ },
+ {
+  "id": "c11",
+  "routes": [
+   "#/cours/gammes-mineures"
+  ],
+  "abc": "L:1\nK:C clef=treble\nABcde^f^ga",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "A4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "B4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F#5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "G#5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "A5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 380
+  }
+ },
+ {
+  "id": "c12",
+  "routes": [
+   "#/cours/intervalles"
+  ],
+  "abc": "L:1\nK:C clef=treble\ncd",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c13",
+  "routes": [
+   "#/cours/intervalles"
+  ],
+  "abc": "L:1\nK:C clef=treble\nc_e",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "Eb5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c14",
+  "routes": [
+   "#/cours/intervalles"
+  ],
+  "abc": "L:1\nK:C clef=treble\nce",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c15",
+  "routes": [
+   "#/cours/intervalles"
+  ],
+  "abc": "L:1\nK:C clef=treble\ncf",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c16",
+  "routes": [
+   "#/cours/intervalles"
+  ],
+  "abc": "L:1\nK:C clef=treble\nc^f",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F#5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c17",
+  "routes": [
+   "#/cours/intervalles"
+  ],
+  "abc": "L:1\nK:C clef=treble\ncg",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c18",
+  "routes": [
+   "#/cours/intervalles"
+  ],
+  "abc": "L:1\nK:C clef=treble\nc_a",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "Ab5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c19",
+  "routes": [
+   "#/cours/intervalles"
+  ],
+  "abc": "L:1\nK:C clef=treble\nca",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "A5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c20",
+  "routes": [
+   "#/cours/intervalles"
+  ],
+  "abc": "L:1\nK:C clef=treble\nc_b",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "Bb5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c21",
+  "routes": [
+   "#/cours/intervalles"
+  ],
+  "abc": "L:1\nK:C clef=treble\ncb",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "B5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c22",
+  "routes": [
+   "#/cours/intervalles"
+  ],
+  "abc": "L:1\nK:C clef=treble\ncc'",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C6"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c23",
+  "routes": [
+   "#/cours/mesure-temps"
+  ],
+  "abc": "L:1/4\nM:4/4\nK:C clef=treble\ncdef|",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": [
+    4,
+    4
+   ],
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "quarter",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "quarter",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "quarter",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F5"
+      ],
+      "d": "quarter",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 340
+  }
+ },
+ {
+  "id": "c24",
+  "routes": [
+   "#/cours/mesure-temps"
+  ],
+  "abc": "L:1/8\nM:6/8\nK:C clef=treble\ncdefga|",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": [
+    6,
+    8
+   ],
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "A5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 340
+  }
+ },
+ {
+  "id": "c25",
+  "routes": [
+   "#/cours/accords-base"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[CEG]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C4",
+       "E4",
+       "G4"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 260
+  }
+ },
+ {
+  "id": "c26",
+  "routes": [
+   "#/cours/accords-base"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[A,CE]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "A3",
+       "C4",
+       "E4"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 260
+  }
+ },
+ {
+  "id": "c27",
+  "routes": [
+   "#/cours/degres-gamme"
+  ],
+  "abc": "L:1/4\nK:C clef=treble\ncdefgabc'\nw: I II III IV V VI VII I",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "lyric": "I"
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "lyric": "II"
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "lyric": "III"
+     },
+     {
+      "n": [
+       "F5"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "lyric": "IV"
+     },
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "lyric": "V"
+     },
+     {
+      "n": [
+       "A5"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "lyric": "VI"
+     },
+     {
+      "n": [
+       "B5"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "lyric": "VII"
+     },
+     {
+      "n": [
+       "C6"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "lyric": "I"
+     }
+    ]
+   ],
+   "width": 400
+  }
+ },
+ {
+  "id": "c28",
+  "routes": [
+   "#/cours/silences-liaisons"
+  ],
+  "abc": "L:1\nK:C clef=treble\nz",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "rest": true,
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c29",
+  "routes": [
+   "#/cours/silences-liaisons"
+  ],
+  "abc": "L:1\nK:C clef=treble\nz/2",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "rest": true,
+      "d": "half",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c30",
+  "routes": [
+   "#/cours/silences-liaisons"
+  ],
+  "abc": "L:1\nK:C clef=treble\nz/4",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "rest": true,
+      "d": "quarter",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c31",
+  "routes": [
+   "#/cours/silences-liaisons"
+  ],
+  "abc": "L:1\nK:C clef=treble\nz/8",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "rest": true,
+      "d": "eighth",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c32",
+  "routes": [
+   "#/cours/silences-liaisons"
+  ],
+  "abc": "L:1\nK:C clef=treble\nz/16",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "rest": true,
+      "d": "sixteenth",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 150
+  }
+ },
+ {
+  "id": "c33",
+  "routes": [
+   "#/cours/silences-liaisons"
+  ],
+  "abc": "L:1/4\nK:C clef=treble\nb b3/2",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "B5"
+      ],
+      "d": "quarter",
+      "dots": 0
+     },
+     {
+      "n": [
+       "B5"
+      ],
+      "d": "quarter",
+      "dots": 1
+     }
+    ]
+   ],
+   "width": 240
+  }
+ },
+ {
+  "id": "c34",
+  "routes": [
+   "#/cours/silences-liaisons"
+  ],
+  "abc": "L:1/4\nK:C clef=treble\nb-b",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "B5"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "tie": true
+     },
+     {
+      "n": [
+       "B5"
+      ],
+      "d": "quarter",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 200
+  }
+ },
+ {
+  "id": "c35",
+  "routes": [
+   "#/cours/silences-liaisons"
+  ],
+  "abc": "L:1/4\nK:C clef=treble\n(cdef)",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "slurStart": true
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "quarter",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "quarter",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F5"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "slurEnd": true
+     }
+    ]
+   ],
+   "width": 300
+  }
+ },
+ {
+  "id": "c36",
+  "routes": [
+   "#/cours/silences-liaisons"
+  ],
+  "abc": "L:1/8\nK:C clef=treble\n(3cde",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "eighth",
+      "dots": 0,
+      "tuplet": {
+       "ratio": [
+        3,
+        2
+       ],
+       "base": "eighth",
+       "id": "t1"
+      }
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "eighth",
+      "dots": 0,
+      "tuplet": {
+       "ratio": [
+        3,
+        2
+       ],
+       "base": "eighth",
+       "id": "t1"
+      }
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "eighth",
+      "dots": 0,
+      "tuplet": {
+       "ratio": [
+        3,
+        2
+       ],
+       "base": "eighth",
+       "id": "t1"
+      }
+     }
+    ]
+   ],
+   "width": 200
+  }
+ },
+ {
+  "id": "c37",
+  "routes": [
+   "#/cours/signes-reprise"
+  ],
+  "abc": "L:1/4\nK:C clef=treble\n|: cdef | gabc' :|",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    {
+     "events": [
+      {
+       "n": [
+        "C5"
+       ],
+       "d": "quarter",
+       "dots": 0
+      },
+      {
+       "n": [
+        "D5"
+       ],
+       "d": "quarter",
+       "dots": 0
+      },
+      {
+       "n": [
+        "E5"
+       ],
+       "d": "quarter",
+       "dots": 0
+      },
+      {
+       "n": [
+        "F5"
+       ],
+       "d": "quarter",
+       "dots": 0
+      }
+     ],
+     "repeatStart": true
+    },
+    {
+     "events": [
+      {
+       "n": [
+        "G5"
+       ],
+       "d": "quarter",
+       "dots": 0
+      },
+      {
+       "n": [
+        "A5"
+       ],
+       "d": "quarter",
+       "dots": 0
+      },
+      {
+       "n": [
+        "B5"
+       ],
+       "d": "quarter",
+       "dots": 0
+      },
+      {
+       "n": [
+        "C6"
+       ],
+       "d": "quarter",
+       "dots": 0
+      }
+     ],
+     "repeatEnd": true
+    }
+   ],
+   "width": 380
+  }
+ },
+ {
+  "id": "c38",
+  "routes": [
+   "#/cours/signes-reprise"
+  ],
+  "abc": "L:1/4\nK:C clef=treble\n|: cdef |[1 g2 f2 :|[2 g4 |]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    {
+     "events": [
+      {
+       "n": [
+        "C5"
+       ],
+       "d": "quarter",
+       "dots": 0
+      },
+      {
+       "n": [
+        "D5"
+       ],
+       "d": "quarter",
+       "dots": 0
+      },
+      {
+       "n": [
+        "E5"
+       ],
+       "d": "quarter",
+       "dots": 0
+      },
+      {
+       "n": [
+        "F5"
+       ],
+       "d": "quarter",
+       "dots": 0
+      }
+     ],
+     "repeatStart": true
+    },
+    {
+     "events": [
+      {
+       "n": [
+        "G5"
+       ],
+       "d": "half",
+       "dots": 0
+      },
+      {
+       "n": [
+        "F5"
+       ],
+       "d": "half",
+       "dots": 0
+      }
+     ],
+     "volta": [
+      1
+     ],
+     "repeatEnd": true
+    },
+    {
+     "events": [
+      {
+       "n": [
+        "G5"
+       ],
+       "d": "whole",
+       "dots": 0
+      }
+     ],
+     "volta": [
+      2
+     ]
+    }
+   ],
+   "width": 380
+  }
+ },
+ {
+  "id": "c39",
+  "routes": [
+   "#/cours/signes-reprise"
+  ],
+  "abc": "L:1\nK:C clef=treble\n!segno!g",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0,
+      "sign": "segno"
+     }
+    ]
+   ],
+   "width": 180
+  }
+ },
+ {
+  "id": "c40",
+  "routes": [
+   "#/cours/signes-reprise"
+  ],
+  "abc": "L:1\nK:C clef=treble\n!coda!g",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0,
+      "sign": "coda"
+     }
+    ]
+   ],
+   "width": 180
+  }
+ },
+ {
+  "id": "c41",
+  "routes": [
+   "#/cours/modes-grecs"
+  ],
+  "abc": "L:1\nK:C clef=treble\nCDEFGABc",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "G4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "A4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "B4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c42",
+  "routes": [
+   "#/cours/modes-grecs"
+  ],
+  "abc": "L:1\nK:C clef=treble\nDEFGABcd",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "D4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "G4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "A4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "B4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c43",
+  "routes": [
+   "#/cours/modes-grecs"
+  ],
+  "abc": "L:1\nK:C clef=treble\nEFGABcde",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "E4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "G4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "A4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "B4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c44",
+  "routes": [
+   "#/cours/modes-grecs"
+  ],
+  "abc": "L:1\nK:C clef=treble\nFGABcdef",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "F4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "G4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "A4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "B4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c45",
+  "routes": [
+   "#/cours/modes-grecs"
+  ],
+  "abc": "L:1\nK:C clef=treble\nGABcdefg",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "A4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "B4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c46",
+  "routes": [
+   "#/cours/modes-grecs"
+  ],
+  "abc": "L:1\nK:C clef=treble\nABcdefga",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "A4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "B4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "A5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c47",
+  "routes": [
+   "#/cours/modes-grecs"
+  ],
+  "abc": "L:1\nK:C clef=treble\nBcdefgab",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "B4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "A5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "B5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c48",
+  "routes": [
+   "#/cours/accords-septieme"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[CEGB]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C4",
+       "E4",
+       "G4",
+       "B4"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 240
+  }
+ },
+ {
+  "id": "c49",
+  "routes": [
+   "#/cours/accords-septieme"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[GBdf]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G4",
+       "B4",
+       "D5",
+       "F5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 240
+  }
+ },
+ {
+  "id": "c50",
+  "routes": [
+   "#/cours/accords-septieme"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[Aceg]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "A4",
+       "C5",
+       "E5",
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 240
+  }
+ },
+ {
+  "id": "c51",
+  "routes": [
+   "#/cours/transposition"
+  ],
+  "abc": "L:1\nK:C clef=treble\ncdec",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 300
+  }
+ },
+ {
+  "id": "c52",
+  "routes": [
+   "#/cours/transposition"
+  ],
+  "abc": "L:1\nK:D clef=treble\ndefd",
+  "desc": {
+   "clef": "treble",
+   "key": 2,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F#5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 300
+  }
+ },
+ {
+  "id": "c53",
+  "routes": [
+   "#/cours/harmonisation-degres"
+  ],
+  "abc": "L:1/4\nK:C clef=treble\n[ceg][dfa][egb][fac'][gbd'][ac'e'][bd'f']\nw: I ii iii IV V vi vii°",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5",
+       "E5",
+       "G5"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "lyric": "I"
+     },
+     {
+      "n": [
+       "D5",
+       "F5",
+       "A5"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "lyric": "ii"
+     },
+     {
+      "n": [
+       "E5",
+       "G5",
+       "B5"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "lyric": "iii"
+     },
+     {
+      "n": [
+       "F5",
+       "A5",
+       "C6"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "lyric": "IV"
+     },
+     {
+      "n": [
+       "G5",
+       "B5",
+       "D6"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "lyric": "V"
+     },
+     {
+      "n": [
+       "A5",
+       "C6",
+       "E6"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "lyric": "vi"
+     },
+     {
+      "n": [
+       "B5",
+       "D6",
+       "F6"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "lyric": "vii°"
+     }
+    ]
+   ],
+   "width": 420
+  }
+ },
+ {
+  "id": "c54",
+  "routes": [
+   "#/cours/substitution-accords"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[ceg]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5",
+       "E5",
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c55",
+  "routes": [
+   "#/cours/substitution-accords"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[Ace]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "A4",
+       "C5",
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c56",
+  "routes": [
+   "#/cours/substitution-accords"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[GBdf]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G4",
+       "B4",
+       "D5",
+       "F5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c57",
+  "routes": [
+   "#/cours/substitution-accords"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[_DF_A_c]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "Db4",
+       "F4",
+       "Ab4",
+       "Cb5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c58",
+  "routes": [
+   "#/cours/basse-chiffree"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[CEG]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C4",
+       "E4",
+       "G4"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c59",
+  "routes": [
+   "#/cours/basse-chiffree"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[EGc]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "E4",
+       "G4",
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c60",
+  "routes": [
+   "#/cours/basse-chiffree"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[Gce]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G4",
+       "C5",
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c61",
+  "routes": [
+   "#/cours/cadences"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[GBd][CEG]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G4",
+       "B4",
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C4",
+       "E4",
+       "G4"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 240
+  }
+ },
+ {
+  "id": "c62",
+  "routes": [
+   "#/cours/cadences"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[FAc][CEG]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "F4",
+       "A4",
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C4",
+       "E4",
+       "G4"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 240
+  }
+ },
+ {
+  "id": "c63",
+  "routes": [
+   "#/cours/cadences"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[CEG][GBd]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C4",
+       "E4",
+       "G4"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "G4",
+       "B4",
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 240
+  }
+ },
+ {
+  "id": "c64",
+  "routes": [
+   "#/cours/cadences"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[GBd][Ace]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G4",
+       "B4",
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "A4",
+       "C5",
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 240
+  }
+ },
+ {
+  "id": "c65",
+  "routes": [
+   "#/cours/ornements"
+  ],
+  "abc": "L:1\nK:C clef=treble\n!trill!g/2",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "half",
+      "dots": 0,
+      "art": [
+       "trill"
+      ]
+     }
+    ]
+   ],
+   "width": 170
+  }
+ },
+ {
+  "id": "c66",
+  "routes": [
+   "#/cours/ornements"
+  ],
+  "abc": "L:1\nK:C clef=treble\n{a}g/4",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "quarter",
+      "dots": 0,
+      "grace": [
+       "A5"
+      ]
+     }
+    ]
+   ],
+   "width": 170
+  }
+ },
+ {
+  "id": "c67",
+  "routes": [
+   "#/cours/ornements"
+  ],
+  "abc": "L:1\nK:C clef=treble\n!mordent!g",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0,
+      "art": [
+       "mordent"
+      ]
+     }
+    ]
+   ],
+   "width": 170
+  }
+ },
+ {
+  "id": "c68",
+  "routes": [
+   "#/cours/ornements"
+  ],
+  "abc": "L:1\nK:C clef=treble\n!pralltriller!g",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0,
+      "art": [
+       "mordentInverted"
+      ]
+     }
+    ]
+   ],
+   "width": 170
+  }
+ },
+ {
+  "id": "c69",
+  "routes": [
+   "#/cours/chromatisme"
+  ],
+  "abc": "L:1/8\nK:C clef=treble\nc^cd^def^fg^ga^abc'",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C#5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D#5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F#5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "G#5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "A5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "A#5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "B5"
+      ],
+      "d": "eighth",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C6"
+      ],
+      "d": "eighth",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 440
+  }
+ },
+ {
+  "id": "c70",
+  "routes": [
+   "#/cours/chromatisme"
+  ],
+  "abc": "L:1\nK:C clef=treble\ncde",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 240
+  }
+ },
+ {
+  "id": "c71",
+  "routes": [
+   "#/cours/chromatisme"
+  ],
+  "abc": "L:1\nK:C clef=treble\ncdc",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 240
+  }
+ },
+ {
+  "id": "c72",
+  "routes": [
+   "#/cours/articulations"
+  ],
+  "abc": "L:1\nK:C clef=treble\n.g",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0,
+      "art": [
+       "staccato"
+      ]
+     }
+    ]
+   ],
+   "width": 170
+  }
+ },
+ {
+  "id": "c73",
+  "routes": [
+   "#/cours/articulations"
+  ],
+  "abc": "L:1\nK:C clef=treble\n(cde)",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0,
+      "slurStart": true
+     },
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0,
+      "slurEnd": true
+     }
+    ]
+   ],
+   "width": 170
+  }
+ },
+ {
+  "id": "c74",
+  "routes": [
+   "#/cours/articulations"
+  ],
+  "abc": "L:1\nK:C clef=treble\n!tenuto!g",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0,
+      "art": [
+       "tenuto"
+      ]
+     }
+    ]
+   ],
+   "width": 170
+  }
+ },
+ {
+  "id": "c75",
+  "routes": [
+   "#/cours/articulations"
+  ],
+  "abc": "L:1\nK:C clef=treble\n!accent!g",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0,
+      "art": [
+       "accent"
+      ]
+     }
+    ]
+   ],
+   "width": 170
+  }
+ },
+ {
+  "id": "c76",
+  "routes": [
+   "#/jeux/clef-sol"
+  ],
+  "abc": "L:1\nK:C clef=treble\nA",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "A4"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 300
+  }
+ },
+ {
+  "id": "c77",
+  "routes": [
+   "#/jeux/clef-sol"
+  ],
+  "abc": "L:1\nK:C clef=treble\nd",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "D5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 300
+  }
+ },
+ {
+  "id": "c78",
+  "routes": [
+   "#/jeux/clef-fa"
+  ],
+  "abc": "L:1\nK:C clef=bass\nG,,",
+  "desc": {
+   "clef": "bass",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "G2"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 300
+  }
+ },
+ {
+  "id": "c79",
+  "routes": [
+   "#/jeux/clef-fa"
+  ],
+  "abc": "L:1\nK:C clef=treble\ne",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "E5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 300
+  }
+ },
+ {
+  "id": "c80",
+  "routes": [
+   "#/jeux/clef-fa"
+  ],
+  "abc": "L:1\nK:C clef=bass\nB,,",
+  "desc": {
+   "clef": "bass",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "B2"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 300
+  }
+ },
+ {
+  "id": "c81",
+  "routes": [
+   "#/jeux/tonalites"
+  ],
+  "abc": "L:1\nK:Cb clef=treble\ny",
+  "desc": {
+   "clef": "treble",
+   "key": -7,
+   "time": null,
+   "measures": [
+    [
+     {
+      "gap": true,
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 300
+  }
+ },
+ {
+  "id": "c82",
+  "routes": [
+   "#/jeux/tonalites"
+  ],
+  "abc": "L:1\nK:Ab clef=treble\ny",
+  "desc": {
+   "clef": "treble",
+   "key": -4,
+   "time": null,
+   "measures": [
+    [
+     {
+      "gap": true,
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 300
+  }
+ },
+ {
+  "id": "c83",
+  "routes": [
+   "#/jeux/intervalles"
+  ],
+  "abc": "L:1\nK:C clef=treble\ncf",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "F5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 300
+  }
+ },
+ {
+  "id": "c84",
+  "routes": [
+   "#/jeux/intervalles"
+  ],
+  "abc": "L:1\nK:C clef=treble\ncb",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "C5"
+      ],
+      "d": "whole",
+      "dots": 0
+     },
+     {
+      "n": [
+       "B5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 300
+  }
+ },
+ {
+  "id": "c85",
+  "routes": [
+   "#/jeux/accords"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[Aceg]",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "A4",
+       "C5",
+       "E5",
+       "G5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 260
+  }
+ },
+ {
+  "id": "c86",
+  "routes": [
+   "#/jeux/accords"
+  ],
+  "abc": "L:1\nK:C clef=treble\n[dfac']",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "D5",
+       "F5",
+       "A5",
+       "C6"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 260
+  }
+ },
+ {
+  "id": "c87",
+  "routes": [
+   "#/jeux/durees-silences"
+  ],
+  "abc": "L:1\nK:C clef=treble\nb/16",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "B5"
+      ],
+      "d": "sixteenth",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c88",
+  "routes": [
+   "#/jeux/durees-silences"
+  ],
+  "abc": "L:1\nK:C clef=treble\nz/2",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "rest": true,
+      "d": "half",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 190
+  }
+ },
+ {
+  "id": "c89",
+  "routes": [
+   "#/jeux/degres"
+  ],
+  "abc": "L:1\nK:C clef=treble\na",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "A5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 240
+  }
+ },
+ {
+  "id": "c90",
+  "routes": [
+   "#/jeux/degres"
+  ],
+  "abc": "L:1\nK:C clef=treble\nf",
+  "desc": {
+   "clef": "treble",
+   "key": 0,
+   "time": null,
+   "measures": [
+    [
+     {
+      "n": [
+       "F5"
+      ],
+      "d": "whole",
+      "dots": 0
+     }
+    ]
+   ],
+   "width": 240
+  }
+ }
+]

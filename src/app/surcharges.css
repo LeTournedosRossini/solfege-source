@@ -1,0 +1,15 @@
+
+/* ---- Ajouts de la nouvelle application (le reste de ce fichier est repris tel quel de l'actuelle) ---- */
+/* Les partitions de Scorsaire sont des SVG avec un viewBox : on leur garde leur taille naturelle (largeur posée en --w par le code).
+   L'ancienne règle « width:100% » élargissait seulement la zone de dessin des SVG d'abcjs, qui n'avaient pas de viewBox, sans agrandir le dessin. */
+.abc-notation svg[viewBox]{ width:var(--w, auto) !important; max-width:100%; height:auto !important; }
+
+/* ---- Accessibilité (lot 7) : contrastes relevés par axe-core ---- */
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --fg-soft:#a9a2b8; } }
+:root[data-theme="dark"]{ --fg-soft:#a9a2b8; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-theme="contrast"]) :is(.btn-accent, .chip.active){ background:#8a6508; border-color:#8a6508; } }
+:root[data-theme="dark"] :is(.btn-accent, .chip.active){ background:#8a6508; border-color:#8a6508; }
+.pkey .lbl{ color:#595959; }
+.pkey.black .lbl{ color:#e4e4e4; }
+.sr-only{ position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+.form-theme{ color: color-mix(in srgb, var(--sage) 62%, var(--fg)); }

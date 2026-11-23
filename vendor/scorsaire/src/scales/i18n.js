@@ -1,0 +1,38 @@
+// Texts of the scale component (alone, like the note pad's): language = the `lang` attribute (fr by default).
+const TEXTS = {
+  fr: {
+    view_score: 'Portée', view_tab: 'Tablature', view_fretboard: 'Manche', view_keyboard: 'Clavier', allNeck: 'Tout le manche', inst_drums: 'Batterie', noScaleDrums: 'La batterie n’a pas de gamme à afficher.', edit: 'Éditer', scale: 'Gamme', root: 'Fondamentale', instrument: 'Instrument', level: 'Niveau', all: 'Toutes',
+    system: 'Positions', position: 'Position', previous: 'Position précédente', next: 'Position suivante', labels: 'Notes affichées', label_name: 'Noms', label_degree: 'Degrés', label_none: 'Rien',
+    chords: 'Accords de la gamme', triads: 'Triades', sevenths: 'Quatre sons', notes: 'Notes', search: 'Chercher une gamme…',
+    berkleeOnly6: 'Berklee : seulement pour la guitare 6 cordes accordée en standard.',
+    extrapolated: "Cette position est extrapolée à partir de gammes proches : elle n'est pas vérifiée.",
+    credit: 'Positions Berklee et CAGED vérifiées d’après les diagrammes de Jens Larsen (jenslarsen.nl, © Jens Larsen).',
+    noTab: "La tablature n'existe pas pour cet instrument.", failed: 'Cette gamme ne peut pas être affichée.', caged4: '4 cases', caged5: '5 cases', span: 'Largeur',
+    inst_guitar6: 'Guitare 6 cordes', inst_guitar7: 'Guitare 7 cordes', inst_bass4: 'Basse 4 cordes', inst_bass5: 'Basse 5 cordes', inst_piano: 'Piano', inst_violin: 'Violon', inst_viola: 'Alto', inst_cello: 'Violoncelle',
+    inst_flute: 'Flûte', inst_clarinet: 'Clarinette', inst_sopranoSax: 'Saxophone soprano', inst_altoSax: 'Saxophone alto', inst_tenorSax: 'Saxophone ténor', inst_baritoneSax: 'Saxophone baryton',
+    inst_trumpet: 'Trompette', inst_horn: 'Cor', inst_trombone: 'Trombone',
+    inst_ukulele: 'Ukulélé', inst_accordion: 'Accordéon', inst_harp: 'Harpe', inst_voice: 'Chant', inst_doubleBass: 'Contrebasse', inst_oboe: 'Hautbois', inst_bassoon: 'Basson', inst_tuba: 'Tuba',
+    inst_piccolo: 'Piccolo', inst_bassFlute: 'Flûte basse', inst_recorder: 'Flûte à bec', inst_ebClarinet: 'Clarinette en mi bémol', inst_bassClarinet: 'Clarinette basse',
+    fam_guitar: 'Guitare', fam_bass: 'Basse électrique', fam_ukulele: 'Ukulélé', fam_piano: 'Piano / clavier', fam_accordion: 'Accordéon', fam_violin: 'Violon', fam_viola: 'Alto', fam_cello: 'Violoncelle', fam_doubleBass: 'Contrebasse', fam_harp: 'Harpe', fam_flute: 'Flûte', fam_clarinet: 'Clarinette', fam_oboe: 'Hautbois', fam_bassoon: 'Basson', fam_saxophone: 'Saxophone', fam_trumpet: 'Trompette', fam_horn: 'Cor', fam_trombone: 'Trombone', fam_tuba: 'Tuba', fam_voice: 'Chant',
+    view: 'Vue', settings: 'Réglages de la gamme', chordsShort: 'Accords', done: 'Terminé', close: 'Fermer', closeAria: 'Fermer sans enregistrer', closeSheet: 'Fermer',
+    byPupil: 'Selon l’élève', pickInstrument: 'Choisissez votre instrument pour voir cette gamme.', pickInstrumentTeacher: 'Aucun instrument : la gamme s’affichera selon l’instrument de chaque élève (choisissez-en un pour l’aperçu).', choose: 'Choisir…',
+  },
+  en: {
+    view_score: 'Staff', view_tab: 'Tablature', view_fretboard: 'Fretboard', view_keyboard: 'Keyboard', allNeck: 'Whole neck', inst_drums: 'Drums', noScaleDrums: 'Drums have no scale to show.', edit: 'Edit', scale: 'Scale', root: 'Root', instrument: 'Instrument', level: 'Level', all: 'All',
+    system: 'Positions', position: 'Position', previous: 'Previous position', next: 'Next position', labels: 'Notes shown', label_name: 'Names', label_degree: 'Degrees', label_none: 'None',
+    chords: 'Chords of the scale', triads: 'Triads', sevenths: 'Four notes', notes: 'Notes', search: 'Search a scale…',
+    berkleeOnly6: 'Berklee: 6-string guitar in standard tuning only.',
+    extrapolated: 'This position is extrapolated from close scales: it is not verified.',
+    credit: 'Berklee and CAGED positions checked against the diagrams of Jens Larsen (jenslarsen.nl, © Jens Larsen).',
+    noTab: 'There is no tablature for this instrument.', failed: 'This scale cannot be shown.', caged4: '4 frets', caged5: '5 frets', span: 'Width',
+    inst_guitar6: '6-string guitar', inst_guitar7: '7-string guitar', inst_bass4: '4-string bass', inst_bass5: '5-string bass', inst_piano: 'Piano', inst_violin: 'Violin', inst_viola: 'Viola', inst_cello: 'Cello',
+    inst_flute: 'Flute', inst_clarinet: 'Clarinet', inst_sopranoSax: 'Soprano saxophone', inst_altoSax: 'Alto saxophone', inst_tenorSax: 'Tenor saxophone', inst_baritoneSax: 'Baritone saxophone',
+    inst_trumpet: 'Trumpet', inst_horn: 'Horn', inst_trombone: 'Trombone',
+    inst_ukulele: 'Ukulele', inst_accordion: 'Accordion', inst_harp: 'Harp', inst_voice: 'Voice', inst_doubleBass: 'Double bass', inst_oboe: 'Oboe', inst_bassoon: 'Bassoon', inst_tuba: 'Tuba',
+    inst_piccolo: 'Piccolo', inst_bassFlute: 'Bass flute', inst_recorder: 'Recorder', inst_ebClarinet: 'E-flat clarinet', inst_bassClarinet: 'Bass clarinet',
+    fam_guitar: 'Guitar', fam_bass: 'Electric bass', fam_ukulele: 'Ukulele', fam_piano: 'Piano / keyboard', fam_accordion: 'Accordion', fam_violin: 'Violin', fam_viola: 'Viola', fam_cello: 'Cello', fam_doubleBass: 'Double bass', fam_harp: 'Harp', fam_flute: 'Flute', fam_clarinet: 'Clarinet', fam_oboe: 'Oboe', fam_bassoon: 'Bassoon', fam_saxophone: 'Saxophone', fam_trumpet: 'Trumpet', fam_horn: 'Horn', fam_trombone: 'Trombone', fam_tuba: 'Tuba', fam_voice: 'Voice',
+    view: 'View', settings: 'Scale settings', chordsShort: 'Chords', done: 'Done', close: 'Close', closeAria: 'Close without saving', closeSheet: 'Close',
+    byPupil: 'According to the pupil', pickInstrument: 'Choose your instrument to see this scale.', pickInstrumentTeacher: 'No instrument: the scale will be shown for each pupil’s instrument (pick one for a preview).', choose: 'Choose…',
+  },
+};
+export const scaleText = (lang, key) => (TEXTS[lang] ?? TEXTS.fr)[key] ?? key;

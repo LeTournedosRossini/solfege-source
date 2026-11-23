@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Scorsaire Lecteur</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#faf8f4">
+<meta name="theme-color" content="#101012" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lecteur">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<script>if ('serviceWorker' in navigator && location.protocol.startsWith('http')) window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });</script>
+<style>
+  html[data-dark] [data-role="section-card"] { fill-opacity: .5; } html[data-dark] [data-role="section-card"] + text, html[data-dark] [data-role="section-card-text"] { fill: #fff; } /* the cards of the sections on a dark page: tinted glass, white text */
+  :root { --ui-font: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; --ink:#1c1b1a; --paper:#faf8f4; --score:#faf8f4; --line:#d8d3c8; --btn:#fff; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--paper); color: var(--ink); font-family: var(--ui-font); -webkit-font-smoothing: antialiased; overscroll-behavior: none; }
+  button, input, select { font-family: var(--ui-font); }
+  svg { display: block; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<!--LECTEUR_SCRIPT-->
+</body>
+</html>

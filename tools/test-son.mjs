@@ -1,0 +1,20 @@
+// Essai du son dans un Chromium sans écran : clic sur ▶, attente, relevé de l'état. Usage : node tools/test-son.mjs [url]
+import { chromium } from 'playwright-core';
+const url = process.argv[2] || 'http://localhost:8123/';
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--autoplay-policy=no-user-gesture-required', '--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
+const page = await browser.newPage();
+const T = Date.now(); const logs = [], reqs = [];
+setTimeout(() => { console.log('ARRET FORCE apres 60 s'); process.exit(2); }, 45000);
+page.on('console', (m) => { console.log(`[${((Date.now()-T)/1000).toFixed(1)}s] ${m.type()}: ${m.text()}`); });
+page.on('pageerror', (e) => console.log('PAGEERROR:', e.message, (e.stack||'').split('\n').slice(0,4).join(' / ')));
+page.on('request', (r) => { if (/\.sf3|sound-/.test(r.url())) console.log(`[${((Date.now()-T)/1000).toFixed(1)}s] requete ${r.url().split('/').pop()}`); });
+page.on('requestfinished', async (r) => { if (/\.sf3/.test(r.url())) { const s = await r.response(); reqs.push(`${s?.status()} ${r.url().split('/').pop()}`); } });
+page.on('crash', () => logs.push('PAGE CRASH'));
+await page.goto(url);
+const t0 = Date.now();
+await page.locator('button', { hasText: 'Écouter' }).first().click();
+await page.waitForFunction(() => document.querySelectorAll('button')[0].textContent.includes('Stop') || document.getElementById('sndstatus').textContent.includes('indisponible'), null, { timeout: 40000 }).catch(() => logs.push('timeout en attente du démarrage'));
+const started = Date.now() - t0;
+await page.waitForTimeout(1500);
+console.log(JSON.stringify({ demarrageMs: started, statut: await page.locator('#sndstatus').textContent(), bouton: await page.locator('button').first().textContent(), sf3: reqs, logs: logs.slice(0, 12) }, null, 1));
+await browser.close(); process.exit(0);

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Scorsaire — gammes, essai</title>
+<style>
+  html{--md-sys-color-surface:#fff;--md-sys-color-on-surface:#1c1b1f}
+  @media (prefers-color-scheme:dark){html{--md-sys-color-surface:#1c1b1f;--md-sys-color-on-surface:#e6e1e5;--md-sys-color-surface-container:#2b2930;--md-sys-color-outline:#938f99;--md-sys-color-outline-variant:#49454f;--md-sys-color-primary:#d0bcff;--md-sys-color-on-primary:#381e72;--md-sys-color-on-surface-variant:#cac4d0;background:#121212;color:#e6e1e5}}
+  body{margin:0;padding:.5rem;font-family:system-ui,sans-serif}
+  body :is(div,button,p){font-family:Comic Sans MS,cursive !important} /* hostile portal CSS: the component must not be touched by it */
+  #out{margin-top:1rem;font:.75rem monospace;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<scorsaire-scale id="s" lang="fr"></scorsaire-scale>
+<pre id="out" hidden></pre>
+<script type="module">
+  import './scorsaire-scale.js';
+  const el = document.getElementById('s'); const q = new URLSearchParams(location.search);
+  if (q.has('edit')) el.setAttribute('mode', 'edit');
+  for (const a of ['scale', 'root', 'instrument', 'view', 'system', 'position', 'alias']) if (q.has(a)) el.setAttribute(a, q.get(a));
+  if (!q.has('scale')) el.setAttribute('scale', 'dorian');
+  if (!q.has('root')) el.setAttribute('root', 'D');
+  if (q.has('debug')) { const out = document.getElementById('out'); out.hidden = false; for (const k of ['change', 'settingschange', 'error']) el.addEventListener(k, (e) => { out.textContent = k + ' ' + JSON.stringify(e.detail) + '\n' + out.textContent; }); }
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scorsaire — faire un lien</title>
+<style>
+  :root { color-scheme: light dark; --bg: #faf8f4; --ink: #1c1b1a; --soft: #5a5750; --line: #c9c4b8; --btn: #fdfcfa; --card: #f3f0ea; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #131313; --ink: #f2f1ee; --soft: #b5b2aa; --line: #4a4a4a; --btn: #1f1f1f; --card: #1a1a1a; } }
+  body { margin: 0; padding: 16px; background: var(--bg); color: var(--ink); font: 16px/1.45 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+  main { max-width: 680px; margin: 0 auto; }
+  /* a wide screen (a computer): the settings and the links on the left, the preview on the right (it stays in view while one scrolls the settings) */
+  @media (min-width: 1000px) {
+    body { padding: 20px 28px; }
+    main { max-width: 1500px; }
+    .cols { display: grid; grid-template-columns: minmax(380px, 600px) minmax(0, 1fr); gap: 28px; align-items: start; }
+    #right { position: sticky; top: 16px; }
+    #right .frame { height: calc(100vh - 150px); }
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 22px 0 6px; }
+  p, label { color: var(--soft); font-size: 14px; }
+  label { display: block; margin: 14px 0 4px; color: var(--ink); font-weight: 600; }
+  select, input[type=text], button, textarea { font: inherit; color: var(--ink); background: var(--btn); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; width: 100%; box-sizing: border-box; min-height: 44px; }
+  button { cursor: pointer; width: auto; padding: 0 16px; margin-top: 8px; }
+  input[type=checkbox] { width: 22px; height: 22px; flex: none; }
+  output { display: block; }
+  .out { margin: 8px 0 4px; padding: 10px; border: 1px dashed var(--line); border-radius: 8px; word-break: break-all; font-size: 13px; }
+  .card { margin: 10px 0; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 0; }
+  .row label { margin: 0; }
+  .lbl { font-size: 14px; color: var(--soft); }
+  .stepper { display: inline-flex; align-items: center; gap: 8px; }
+  .stepper .val { min-width: 2.4em; text-align: center; font-weight: 600; }
+  .stp { margin: 0; min-width: 44px; padding: 0; }
+  .pick { display: flex; flex-direction: column; align-items: flex-start; width: 100%; margin: 4px 0; padding: 6px 12px; text-align: left; }
+  .pick .nm { font-weight: 600; }
+  .pick .fd { font-size: 12px; color: var(--soft); }
+  #repo-list { max-height: 40vh; overflow: auto; }
+  .frame { width: 100%; height: 75vh; min-height: 420px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+  a { color: inherit; }
+  .hint { font-size: 13px; }
+  .warn { padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="t-title">Faire un lien Scorsaire</h1>
+  <p id="t-intro"></p>
+  <div class="cols"><div id="left">
+  <label for="reader" id="t-reader">Lecteur</label>
+  <select id="reader">
+    <option value=""></option>
+    <option value="synchro/"></option>
+    <option value="youtube/"></option>
+    <option value="feuilles/" selected></option>
+  </select>
+  <label for="file" id="t-file">Adresse du fichier</label>
+  <input id="file" type="text" inputmode="url" autocomplete="off" spellcheck="false">
+  <p class="hint" id="t-hint"></p>
+  <button id="load" type="button"></button>
+  <p id="msg" class="hint" role="status" aria-live="polite"></p>
+  <div id="settings"></div>
+  <div id="links"></div>
+  </div>
+  <div id="right"><div id="preview"></div></div></div>
+</main>
+<!--LIENS_SCRIPT-->
+</body>
+</html>

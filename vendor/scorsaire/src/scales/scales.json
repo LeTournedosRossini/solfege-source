@@ -1,0 +1,166 @@
+{
+"meta": {
+ "version": "1.0",
+ "generated": "2026-11-02",
+ "description": "Catalogue de gammes pour application pédagogique, niveaux 1 à 4. Toutes les formules sont relatives à la fondamentale.",
+ "conventions": {
+  "intervals": "demi-tons depuis la fondamentale (0 = fondamentale)",
+  "steps": "écarts successifs en demi-tons, le dernier ramenant à l'octave (somme = 12)",
+  "steps_label": "T = ton, ½ = demi-ton, T½ = ton et demi, 2T = deux tons",
+  "degrees": "degrés relatifs à la gamme majeure : b = bémol, # = dièse, bb = double bémol. Sert aussi à l'orthographe des notes. Pour les gammes de plus de 7 notes ou ambiguës (triton), c'est une convention.",
+  "family_mode": "family regroupe les gammes qui sont des rotations les unes des autres ; mode = numéro du mode dans la famille (1 = mode de base). null si la gamme n'appartient à aucune famille de modes.",
+  "names": "le nom affiché d'une gamme se choisit parmi name.fr, name.en et aliases. Une affectation stocke la clé de l'alias choisi (slug : sans accents, minuscules, tirets), par exemple 'ionien' pour la majeure. Une gamme est unique ; seul son nom d'affichage change.",
+  "also_levels": "si non null, la gamme est aussi listée à ces niveaux, sous l'alias dont la clé est donnée (ex. major listée au niveau 2 sous 'ionien'). Elle garde son niveau principal (level).",
+  "rank": "classement global, du plus courant au plus rare (niveau puis popularité dans le niveau)"
+ },
+ "levels": {
+  "1": {
+   "fr": "Essentielles",
+   "en": "Essentials"
+  },
+  "2": {
+   "fr": "Modes de l'Église",
+   "en": "Church modes"
+  },
+  "3": {
+   "fr": "Jazz et classique",
+   "en": "Jazz and classical"
+  },
+  "4": {
+   "fr": "Autres modes et gammes du monde",
+   "en": "Other modes and world scales"
+  }
+ },
+ "categories": {
+  "diatonic": {
+   "fr": "Majeure et modes diatoniques",
+   "en": "Major and diatonic modes"
+  },
+  "pentatonic": {
+   "fr": "Pentatoniques",
+   "en": "Pentatonic"
+  },
+  "blues": {
+   "fr": "Blues",
+   "en": "Blues"
+  },
+  "melodic_minor": {
+   "fr": "Mineure mélodique et ses modes",
+   "en": "Melodic minor and its modes"
+  },
+  "harmonic_minor": {
+   "fr": "Mineure harmonique et ses modes",
+   "en": "Harmonic minor and its modes"
+  },
+  "harmonic_major": {
+   "fr": "Majeure harmonique et ses modes",
+   "en": "Harmonic major and its modes"
+  },
+  "symmetric": {
+   "fr": "Gammes symétriques",
+   "en": "Symmetric scales"
+  },
+  "bebop": {
+   "fr": "Gammes bebop",
+   "en": "Bebop scales"
+  },
+  "double_harmonic": {
+   "fr": "Double harmonique et ses modes",
+   "en": "Double harmonic and its modes"
+  },
+  "world": {
+   "fr": "Gammes du monde",
+   "en": "World scales"
+  },
+  "other": {
+   "fr": "Autres gammes",
+   "en": "Other scales"
+  }
+ }
+},
+"families": [
+{"id": "diatonic", "base": "major", "modes": ["major", "dorian", "phrygian", "lydian", "mixolydian", "natural_minor", "locrian"]},
+{"id": "pentatonic", "base": "major_pentatonic", "modes": ["major_pentatonic", "suspended_pentatonic", "man_gong", "ritusen", "minor_pentatonic"]},
+{"id": "melodic_minor", "base": "melodic_minor", "modes": ["melodic_minor", "dorian_b2", "lydian_augmented", "lydian_dominant", "mixolydian_b6", "locrian_n2", "altered"]},
+{"id": "harmonic_minor", "base": "harmonic_minor", "modes": ["harmonic_minor", "locrian_n6", "ionian_s5", "dorian_s4", "phrygian_dominant", "lydian_s2", "ultralocrian"]},
+{"id": "whole_tone", "base": "whole_tone", "modes": ["whole_tone"]},
+{"id": "diminished", "base": "diminished_wh", "modes": ["diminished_wh", "diminished_hw"]},
+{"id": "augmented", "base": "augmented", "modes": ["augmented"]},
+{"id": "harmonic_major", "base": "harmonic_major", "modes": ["harmonic_major", "dorian_b5", "phrygian_b4", "lydian_b3", "mixolydian_b2", "lydian_augmented_s2", "locrian_bb7"]},
+{"id": "double_harmonic", "base": "double_harmonic_major", "modes": ["double_harmonic_major", "lydian_s2_s6", "ultraphrygian", "hungarian_minor", "oriental", "ionian_s2_s5", "locrian_bb3_bb7"]}
+],
+"scales": [
+{"id": "major", "level": 1, "category": "diatonic", "family": "diatonic", "mode": 1, "also_levels": {"2": "ionien"}, "name": {"fr": "Majeure", "en": "Major"}, "aliases": {"fr": ["Ionien", "Mode ionien"], "en": ["Ionian"]}, "degrees": "1 2 3 4 5 6 7", "intervals": [0, 2, 4, 5, 7, 9, 11], "steps": [2, 2, 1, 2, 2, 2, 1], "steps_label": "T T ½ T T T ½", "notes_count": 7, "rank": 1},
+{"id": "natural_minor", "level": 1, "category": "diatonic", "family": "diatonic", "mode": 6, "also_levels": {"2": "eolien"}, "name": {"fr": "Mineure naturelle", "en": "Natural minor"}, "aliases": {"fr": ["Éolien", "Mode éolien", "Mineur naturel"], "en": ["Aeolian", "Minor"]}, "degrees": "1 2 b3 4 5 b6 b7", "intervals": [0, 2, 3, 5, 7, 8, 10], "steps": [2, 1, 2, 2, 1, 2, 2], "steps_label": "T ½ T T ½ T T", "notes_count": 7, "rank": 2},
+{"id": "major_pentatonic", "level": 1, "category": "pentatonic", "family": "pentatonic", "mode": 1, "also_levels": null, "name": {"fr": "Pentatonique majeure", "en": "Major pentatonic"}, "aliases": {"fr": [], "en": []}, "degrees": "1 2 3 5 6", "intervals": [0, 2, 4, 7, 9], "steps": [2, 2, 3, 2, 3], "steps_label": "T T T½ T T½", "notes_count": 5, "rank": 3},
+{"id": "minor_pentatonic", "level": 1, "category": "pentatonic", "family": "pentatonic", "mode": 5, "also_levels": null, "name": {"fr": "Pentatonique mineure", "en": "Minor pentatonic"}, "aliases": {"fr": [], "en": []}, "degrees": "1 b3 4 5 b7", "intervals": [0, 3, 5, 7, 10], "steps": [3, 2, 2, 3, 2], "steps_label": "T½ T T T½ T", "notes_count": 5, "rank": 4},
+{"id": "blues_minor", "level": 1, "category": "blues", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Blues (mineure)", "en": "Blues scale"}, "aliases": {"fr": ["Gamme blues", "Blues mineur"], "en": ["Minor blues"]}, "degrees": "1 b3 4 b5 5 b7", "intervals": [0, 3, 5, 6, 7, 10], "steps": [3, 2, 1, 1, 3, 2], "steps_label": "T½ T ½ ½ T½ T", "notes_count": 6, "rank": 5},
+{"id": "dorian", "level": 2, "category": "diatonic", "family": "diatonic", "mode": 2, "also_levels": null, "name": {"fr": "Dorien", "en": "Dorian"}, "aliases": {"fr": ["Mode dorien"], "en": []}, "degrees": "1 2 b3 4 5 6 b7", "intervals": [0, 2, 3, 5, 7, 9, 10], "steps": [2, 1, 2, 2, 2, 1, 2], "steps_label": "T ½ T T T ½ T", "notes_count": 7, "rank": 6},
+{"id": "mixolydian", "level": 2, "category": "diatonic", "family": "diatonic", "mode": 5, "also_levels": null, "name": {"fr": "Mixolydien", "en": "Mixolydian"}, "aliases": {"fr": ["Mode mixolydien", "Gamme de dominante"], "en": ["Dominant scale"]}, "degrees": "1 2 3 4 5 6 b7", "intervals": [0, 2, 4, 5, 7, 9, 10], "steps": [2, 2, 1, 2, 2, 1, 2], "steps_label": "T T ½ T T ½ T", "notes_count": 7, "rank": 7},
+{"id": "lydian", "level": 2, "category": "diatonic", "family": "diatonic", "mode": 4, "also_levels": null, "name": {"fr": "Lydien", "en": "Lydian"}, "aliases": {"fr": ["Mode lydien"], "en": []}, "degrees": "1 2 3 #4 5 6 7", "intervals": [0, 2, 4, 6, 7, 9, 11], "steps": [2, 2, 2, 1, 2, 2, 1], "steps_label": "T T T ½ T T ½", "notes_count": 7, "rank": 8},
+{"id": "phrygian", "level": 2, "category": "diatonic", "family": "diatonic", "mode": 3, "also_levels": null, "name": {"fr": "Phrygien", "en": "Phrygian"}, "aliases": {"fr": ["Mode phrygien"], "en": ["Kurd (maqam)"]}, "degrees": "1 b2 b3 4 5 b6 b7", "intervals": [0, 1, 3, 5, 7, 8, 10], "steps": [1, 2, 2, 2, 1, 2, 2], "steps_label": "½ T T T ½ T T", "notes_count": 7, "rank": 9},
+{"id": "locrian", "level": 2, "category": "diatonic", "family": "diatonic", "mode": 7, "also_levels": null, "name": {"fr": "Locrien", "en": "Locrian"}, "aliases": {"fr": ["Mode locrien"], "en": []}, "degrees": "1 b2 b3 4 b5 b6 b7", "intervals": [0, 1, 3, 5, 6, 8, 10], "steps": [1, 2, 2, 1, 2, 2, 2], "steps_label": "½ T T ½ T T T", "notes_count": 7, "rank": 10},
+{"id": "melodic_minor", "level": 3, "category": "melodic_minor", "family": "melodic_minor", "mode": 1, "also_levels": null, "name": {"fr": "Mineure mélodique", "en": "Melodic minor"}, "aliases": {"fr": ["Mineure mélodique ascendante", "Mineure jazz"], "en": ["Jazz minor", "Ascending melodic minor"]}, "degrees": "1 2 b3 4 5 6 7", "intervals": [0, 2, 3, 5, 7, 9, 11], "steps": [2, 1, 2, 2, 2, 2, 1], "steps_label": "T ½ T T T T ½", "notes_count": 7, "rank": 11},
+{"id": "harmonic_minor", "level": 3, "category": "harmonic_minor", "family": "harmonic_minor", "mode": 1, "also_levels": null, "name": {"fr": "Mineure harmonique", "en": "Harmonic minor"}, "aliases": {"fr": [], "en": ["Nahawand (maqam)"]}, "degrees": "1 2 b3 4 5 b6 7", "intervals": [0, 2, 3, 5, 7, 8, 11], "steps": [2, 1, 2, 2, 1, 3, 1], "steps_label": "T ½ T T ½ T½ ½", "notes_count": 7, "rank": 12},
+{"id": "lydian_dominant", "level": 3, "category": "melodic_minor", "family": "melodic_minor", "mode": 4, "also_levels": null, "name": {"fr": "Lydien dominant", "en": "Lydian dominant"}, "aliases": {"fr": ["Lydien ♭7", "Mixolydien ♯11", "Gamme acoustique"], "en": ["Lydian ♭7", "Overtone scale", "Acoustic scale", "Mixolydian ♯4"]}, "degrees": "1 2 3 #4 5 6 b7", "intervals": [0, 2, 4, 6, 7, 9, 10], "steps": [2, 2, 2, 1, 2, 1, 2], "steps_label": "T T T ½ T ½ T", "notes_count": 7, "rank": 13},
+{"id": "altered", "level": 3, "category": "melodic_minor", "family": "melodic_minor", "mode": 7, "also_levels": null, "name": {"fr": "Altérée", "en": "Altered"}, "aliases": {"fr": ["Gamme altérée", "Super locrien", "Diminuée tons entiers"], "en": ["Super Locrian", "Diminished whole tone"]}, "degrees": "1 b2 b3 b4 b5 b6 b7", "intervals": [0, 1, 3, 4, 6, 8, 10], "steps": [1, 2, 1, 2, 2, 2, 2], "steps_label": "½ T ½ T T T T", "notes_count": 7, "rank": 14},
+{"id": "phrygian_dominant", "level": 3, "category": "harmonic_minor", "family": "harmonic_minor", "mode": 5, "also_levels": null, "name": {"fr": "Phrygien dominant", "en": "Phrygian dominant"}, "aliases": {"fr": ["Mixolydien ♭9 ♭13", "Gamme espagnole", "Hijaz"], "en": ["Spanish Phrygian", "Freygish", "Hijaz"]}, "degrees": "1 b2 3 4 5 b6 b7", "intervals": [0, 1, 4, 5, 7, 8, 10], "steps": [1, 3, 1, 2, 1, 2, 2], "steps_label": "½ T½ ½ T ½ T T", "notes_count": 7, "rank": 15},
+{"id": "locrian_n2", "level": 3, "category": "melodic_minor", "family": "melodic_minor", "mode": 6, "also_levels": null, "name": {"fr": "Locrien ♮2", "en": "Locrian ♮2"}, "aliases": {"fr": ["Demi-diminué", "Éolien ♭5"], "en": ["Half-diminished", "Aeolian ♭5"]}, "degrees": "1 2 b3 4 b5 b6 b7", "intervals": [0, 2, 3, 5, 6, 8, 10], "steps": [2, 1, 2, 1, 2, 2, 2], "steps_label": "T ½ T ½ T T T", "notes_count": 7, "rank": 16},
+{"id": "mixolydian_b6", "level": 3, "category": "melodic_minor", "family": "melodic_minor", "mode": 5, "also_levels": null, "name": {"fr": "Mixolydien ♭6", "en": "Mixolydian ♭6"}, "aliases": {"fr": ["Éolien majeur", "Gamme hindoue", "Majeure mélodique"], "en": ["Aeolian dominant", "Hindu scale", "Melodic major"]}, "degrees": "1 2 3 4 5 b6 b7", "intervals": [0, 2, 4, 5, 7, 8, 10], "steps": [2, 2, 1, 2, 1, 2, 2], "steps_label": "T T ½ T ½ T T", "notes_count": 7, "rank": 17},
+{"id": "lydian_augmented", "level": 3, "category": "melodic_minor", "family": "melodic_minor", "mode": 3, "also_levels": null, "name": {"fr": "Lydien augmenté", "en": "Lydian augmented"}, "aliases": {"fr": ["Lydien ♯5"], "en": ["Lydian ♯5"]}, "degrees": "1 2 3 #4 #5 6 7", "intervals": [0, 2, 4, 6, 8, 9, 11], "steps": [2, 2, 2, 2, 1, 2, 1], "steps_label": "T T T T ½ T ½", "notes_count": 7, "rank": 18},
+{"id": "whole_tone", "level": 3, "category": "symmetric", "family": "whole_tone", "mode": 1, "also_levels": null, "name": {"fr": "Gamme par tons", "en": "Whole tone"}, "aliases": {"fr": ["Gamme par tons entiers"], "en": ["Whole-tone scale"]}, "degrees": "1 2 3 #4 #5 b7", "intervals": [0, 2, 4, 6, 8, 10], "steps": [2, 2, 2, 2, 2, 2], "steps_label": "T T T T T T", "notes_count": 6, "rank": 19},
+{"id": "diminished_hw", "level": 3, "category": "symmetric", "family": "diminished", "mode": 2, "also_levels": null, "name": {"fr": "Diminuée (demi-ton–ton)", "en": "Diminished (half-whole)"}, "aliases": {"fr": ["Dominante diminuée", "Octatonique demi-ton–ton"], "en": ["Dominant diminished", "Octatonic half-whole"]}, "degrees": "1 b2 b3 3 #4 5 6 b7", "intervals": [0, 1, 3, 4, 6, 7, 9, 10], "steps": [1, 2, 1, 2, 1, 2, 1, 2], "steps_label": "½ T ½ T ½ T ½ T", "notes_count": 8, "rank": 20},
+{"id": "diminished_wh", "level": 3, "category": "symmetric", "family": "diminished", "mode": 1, "also_levels": null, "name": {"fr": "Diminuée (ton–demi-ton)", "en": "Diminished (whole-half)"}, "aliases": {"fr": ["Octatonique ton–demi-ton"], "en": ["Octatonic whole-half"]}, "degrees": "1 2 b3 4 b5 b6 6 7", "intervals": [0, 2, 3, 5, 6, 8, 9, 11], "steps": [2, 1, 2, 1, 2, 1, 2, 1], "steps_label": "T ½ T ½ T ½ T ½", "notes_count": 8, "rank": 21},
+{"id": "augmented", "level": 3, "category": "symmetric", "family": "augmented", "mode": 1, "also_levels": null, "name": {"fr": "Gamme augmentée", "en": "Augmented scale"}, "aliases": {"fr": ["Hexatonique augmentée"], "en": ["Hexatonic augmented"]}, "degrees": "1 b3 3 5 #5 7", "intervals": [0, 3, 4, 7, 8, 11], "steps": [3, 1, 3, 1, 3, 1], "steps_label": "T½ ½ T½ ½ T½ ½", "notes_count": 6, "rank": 22},
+{"id": "bebop_dominant", "level": 3, "category": "bebop", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Bebop dominante", "en": "Bebop dominant"}, "aliases": {"fr": ["Gamme bebop de dominante"], "en": ["Bebop scale"]}, "degrees": "1 2 3 4 5 6 b7 7", "intervals": [0, 2, 4, 5, 7, 9, 10, 11], "steps": [2, 2, 1, 2, 2, 1, 1, 1], "steps_label": "T T ½ T T ½ ½ ½", "notes_count": 8, "rank": 23},
+{"id": "bebop_major", "level": 3, "category": "bebop", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Bebop majeure", "en": "Bebop major"}, "aliases": {"fr": [], "en": []}, "degrees": "1 2 3 4 5 b6 6 7", "intervals": [0, 2, 4, 5, 7, 8, 9, 11], "steps": [2, 2, 1, 2, 1, 1, 2, 1], "steps_label": "T T ½ T ½ ½ T ½", "notes_count": 8, "rank": 24},
+{"id": "bebop_dorian", "level": 3, "category": "bebop", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Bebop dorienne", "en": "Bebop dorian"}, "aliases": {"fr": ["Bebop mineure"], "en": ["Bebop minor"]}, "degrees": "1 2 b3 3 4 5 6 b7", "intervals": [0, 2, 3, 4, 5, 7, 9, 10], "steps": [2, 1, 1, 1, 2, 2, 1, 2], "steps_label": "T ½ ½ ½ T T ½ T", "notes_count": 8, "rank": 25},
+{"id": "blues_major", "level": 3, "category": "blues", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Blues majeur", "en": "Major blues"}, "aliases": {"fr": ["Gamme blues majeure"], "en": ["Major blues scale"]}, "degrees": "1 2 b3 3 5 6", "intervals": [0, 2, 3, 4, 7, 9], "steps": [2, 1, 1, 3, 2, 3], "steps_label": "T ½ ½ T½ T T½", "notes_count": 6, "rank": 26},
+{"id": "dorian_b2", "level": 4, "category": "melodic_minor", "family": "melodic_minor", "mode": 2, "also_levels": null, "name": {"fr": "Dorien ♭2", "en": "Dorian ♭2"}, "aliases": {"fr": ["Phrygien ♮6"], "en": ["Phrygian ♮6", "Javanese"]}, "degrees": "1 b2 b3 4 5 6 b7", "intervals": [0, 1, 3, 5, 7, 9, 10], "steps": [1, 2, 2, 2, 2, 1, 2], "steps_label": "½ T T T T ½ T", "notes_count": 7, "rank": 27},
+{"id": "locrian_n6", "level": 4, "category": "harmonic_minor", "family": "harmonic_minor", "mode": 2, "also_levels": null, "name": {"fr": "Locrien ♮6", "en": "Locrian ♮6"}, "aliases": {"fr": [], "en": []}, "degrees": "1 b2 b3 4 b5 6 b7", "intervals": [0, 1, 3, 5, 6, 9, 10], "steps": [1, 2, 2, 1, 3, 1, 2], "steps_label": "½ T T ½ T½ ½ T", "notes_count": 7, "rank": 28},
+{"id": "ionian_s5", "level": 4, "category": "harmonic_minor", "family": "harmonic_minor", "mode": 3, "also_levels": null, "name": {"fr": "Ionien ♯5", "en": "Ionian ♯5"}, "aliases": {"fr": ["Majeure augmentée"], "en": ["Ionian augmented"]}, "degrees": "1 2 3 4 #5 6 7", "intervals": [0, 2, 4, 5, 8, 9, 11], "steps": [2, 2, 1, 3, 1, 2, 1], "steps_label": "T T ½ T½ ½ T ½", "notes_count": 7, "rank": 29},
+{"id": "dorian_s4", "level": 4, "category": "harmonic_minor", "family": "harmonic_minor", "mode": 4, "also_levels": null, "name": {"fr": "Dorien ♯4", "en": "Dorian ♯4"}, "aliases": {"fr": ["Mineur roumain", "Dorien ukrainien"], "en": ["Romanian minor", "Ukrainian Dorian", "Nikriz (maqam)"]}, "degrees": "1 2 b3 #4 5 6 b7", "intervals": [0, 2, 3, 6, 7, 9, 10], "steps": [2, 1, 3, 1, 2, 1, 2], "steps_label": "T ½ T½ ½ T ½ T", "notes_count": 7, "rank": 30},
+{"id": "lydian_s2", "level": 4, "category": "harmonic_minor", "family": "harmonic_minor", "mode": 6, "also_levels": null, "name": {"fr": "Lydien ♯2", "en": "Lydian ♯2"}, "aliases": {"fr": [], "en": []}, "degrees": "1 #2 3 #4 5 6 7", "intervals": [0, 3, 4, 6, 7, 9, 11], "steps": [3, 1, 2, 1, 2, 2, 1], "steps_label": "T½ ½ T ½ T T ½", "notes_count": 7, "rank": 31},
+{"id": "ultralocrian", "level": 4, "category": "harmonic_minor", "family": "harmonic_minor", "mode": 7, "also_levels": null, "name": {"fr": "Ultralocrien", "en": "Ultralocrian"}, "aliases": {"fr": ["Super locrien ♭♭7"], "en": ["Superlocrian ♭♭7"]}, "degrees": "1 b2 b3 b4 b5 b6 bb7", "intervals": [0, 1, 3, 4, 6, 8, 9], "steps": [1, 2, 1, 2, 2, 1, 3], "steps_label": "½ T ½ T T ½ T½", "notes_count": 7, "rank": 32},
+{"id": "harmonic_major", "level": 4, "category": "harmonic_major", "family": "harmonic_major", "mode": 1, "also_levels": null, "name": {"fr": "Majeure harmonique", "en": "Harmonic major"}, "aliases": {"fr": [], "en": []}, "degrees": "1 2 3 4 5 b6 7", "intervals": [0, 2, 4, 5, 7, 8, 11], "steps": [2, 2, 1, 2, 1, 3, 1], "steps_label": "T T ½ T ½ T½ ½", "notes_count": 7, "rank": 33},
+{"id": "dorian_b5", "level": 4, "category": "harmonic_major", "family": "harmonic_major", "mode": 2, "also_levels": null, "name": {"fr": "Dorien ♭5", "en": "Dorian ♭5"}, "aliases": {"fr": [], "en": []}, "degrees": "1 2 b3 4 b5 6 b7", "intervals": [0, 2, 3, 5, 6, 9, 10], "steps": [2, 1, 2, 1, 3, 1, 2], "steps_label": "T ½ T ½ T½ ½ T", "notes_count": 7, "rank": 34},
+{"id": "phrygian_b4", "level": 4, "category": "harmonic_major", "family": "harmonic_major", "mode": 3, "also_levels": null, "name": {"fr": "Phrygien ♭4", "en": "Phrygian ♭4"}, "aliases": {"fr": [], "en": []}, "degrees": "1 b2 b3 b4 5 b6 b7", "intervals": [0, 1, 3, 4, 7, 8, 10], "steps": [1, 2, 1, 3, 1, 2, 2], "steps_label": "½ T ½ T½ ½ T T", "notes_count": 7, "rank": 35},
+{"id": "lydian_b3", "level": 4, "category": "harmonic_major", "family": "harmonic_major", "mode": 4, "also_levels": null, "name": {"fr": "Lydien ♭3", "en": "Lydian ♭3"}, "aliases": {"fr": [], "en": []}, "degrees": "1 2 b3 #4 5 6 7", "intervals": [0, 2, 3, 6, 7, 9, 11], "steps": [2, 1, 3, 1, 2, 2, 1], "steps_label": "T ½ T½ ½ T T ½", "notes_count": 7, "rank": 36},
+{"id": "mixolydian_b2", "level": 4, "category": "harmonic_major", "family": "harmonic_major", "mode": 5, "also_levels": null, "name": {"fr": "Mixolydien ♭2", "en": "Mixolydian ♭2"}, "aliases": {"fr": [], "en": []}, "degrees": "1 b2 3 4 5 6 b7", "intervals": [0, 1, 4, 5, 7, 9, 10], "steps": [1, 3, 1, 2, 2, 1, 2], "steps_label": "½ T½ ½ T T ½ T", "notes_count": 7, "rank": 37},
+{"id": "lydian_augmented_s2", "level": 4, "category": "harmonic_major", "family": "harmonic_major", "mode": 6, "also_levels": null, "name": {"fr": "Lydien augmenté ♯2", "en": "Lydian augmented ♯2"}, "aliases": {"fr": [], "en": []}, "degrees": "1 #2 3 #4 #5 6 7", "intervals": [0, 3, 4, 6, 8, 9, 11], "steps": [3, 1, 2, 2, 1, 2, 1], "steps_label": "T½ ½ T T ½ T ½", "notes_count": 7, "rank": 38},
+{"id": "locrian_bb7", "level": 4, "category": "harmonic_major", "family": "harmonic_major", "mode": 7, "also_levels": null, "name": {"fr": "Locrien ♭♭7", "en": "Locrian ♭♭7"}, "aliases": {"fr": ["Locrien diminué"], "en": []}, "degrees": "1 b2 b3 4 b5 b6 bb7", "intervals": [0, 1, 3, 5, 6, 8, 9], "steps": [1, 2, 2, 1, 2, 1, 3], "steps_label": "½ T T ½ T ½ T½", "notes_count": 7, "rank": 39},
+{"id": "double_harmonic_major", "level": 4, "category": "double_harmonic", "family": "double_harmonic", "mode": 1, "also_levels": null, "name": {"fr": "Double harmonique majeure", "en": "Double harmonic major"}, "aliases": {"fr": ["Gamme byzantine", "Gamme arabe", "Majeure tzigane"], "en": ["Byzantine scale", "Arabic scale", "Gypsy major", "Bhairav", "Hijaz Kar"]}, "degrees": "1 b2 3 4 5 b6 7", "intervals": [0, 1, 4, 5, 7, 8, 11], "steps": [1, 3, 1, 2, 1, 3, 1], "steps_label": "½ T½ ½ T ½ T½ ½", "notes_count": 7, "rank": 40},
+{"id": "lydian_s2_s6", "level": 4, "category": "double_harmonic", "family": "double_harmonic", "mode": 2, "also_levels": null, "name": {"fr": "Lydien ♯2 ♯6", "en": "Lydian ♯2 ♯6"}, "aliases": {"fr": [], "en": []}, "degrees": "1 #2 3 #4 5 #6 7", "intervals": [0, 3, 4, 6, 7, 10, 11], "steps": [3, 1, 2, 1, 3, 1, 1], "steps_label": "T½ ½ T ½ T½ ½ ½", "notes_count": 7, "rank": 41},
+{"id": "ultraphrygian", "level": 4, "category": "double_harmonic", "family": "double_harmonic", "mode": 3, "also_levels": null, "name": {"fr": "Ultraphrygien", "en": "Ultraphrygian"}, "aliases": {"fr": [], "en": []}, "degrees": "1 b2 b3 b4 5 b6 bb7", "intervals": [0, 1, 3, 4, 7, 8, 9], "steps": [1, 2, 1, 3, 1, 1, 3], "steps_label": "½ T ½ T½ ½ ½ T½", "notes_count": 7, "rank": 42},
+{"id": "hungarian_minor", "level": 4, "category": "double_harmonic", "family": "double_harmonic", "mode": 4, "also_levels": null, "name": {"fr": "Mineure hongroise", "en": "Hungarian minor"}, "aliases": {"fr": ["Double harmonique mineure", "Mineure tzigane"], "en": ["Double harmonic minor", "Gypsy minor"]}, "degrees": "1 2 b3 #4 5 b6 7", "intervals": [0, 2, 3, 6, 7, 8, 11], "steps": [2, 1, 3, 1, 1, 3, 1], "steps_label": "T ½ T½ ½ ½ T½ ½", "notes_count": 7, "rank": 43},
+{"id": "oriental", "level": 4, "category": "double_harmonic", "family": "double_harmonic", "mode": 5, "also_levels": null, "name": {"fr": "Orientale", "en": "Oriental"}, "aliases": {"fr": [], "en": []}, "degrees": "1 b2 3 4 b5 6 b7", "intervals": [0, 1, 4, 5, 6, 9, 10], "steps": [1, 3, 1, 1, 3, 1, 2], "steps_label": "½ T½ ½ ½ T½ ½ T", "notes_count": 7, "rank": 44},
+{"id": "ionian_s2_s5", "level": 4, "category": "double_harmonic", "family": "double_harmonic", "mode": 6, "also_levels": null, "name": {"fr": "Ionien ♯2 ♯5", "en": "Ionian ♯2 ♯5"}, "aliases": {"fr": [], "en": []}, "degrees": "1 #2 3 4 #5 6 7", "intervals": [0, 3, 4, 5, 8, 9, 11], "steps": [3, 1, 1, 3, 1, 2, 1], "steps_label": "T½ ½ ½ T½ ½ T ½", "notes_count": 7, "rank": 45},
+{"id": "locrian_bb3_bb7", "level": 4, "category": "double_harmonic", "family": "double_harmonic", "mode": 7, "also_levels": null, "name": {"fr": "Locrien ♭♭3 ♭♭7", "en": "Locrian ♭♭3 ♭♭7"}, "aliases": {"fr": [], "en": []}, "degrees": "1 b2 bb3 4 b5 b6 bb7", "intervals": [0, 1, 2, 5, 6, 8, 9], "steps": [1, 1, 3, 1, 2, 1, 3], "steps_label": "½ ½ T½ ½ T ½ T½", "notes_count": 7, "rank": 46},
+{"id": "suspended_pentatonic", "level": 4, "category": "pentatonic", "family": "pentatonic", "mode": 2, "also_levels": null, "name": {"fr": "Pentatonique suspendue", "en": "Suspended pentatonic"}, "aliases": {"fr": ["Pentatonique égyptienne"], "en": ["Egyptian pentatonic"]}, "degrees": "1 2 4 5 b7", "intervals": [0, 2, 5, 7, 10], "steps": [2, 3, 2, 3, 2], "steps_label": "T T½ T T½ T", "notes_count": 5, "rank": 47},
+{"id": "man_gong", "level": 4, "category": "pentatonic", "family": "pentatonic", "mode": 3, "also_levels": null, "name": {"fr": "Pentatonique Man Gong", "en": "Man Gong pentatonic"}, "aliases": {"fr": [], "en": ["Man Gong", "Pentatonic mode 3"]}, "degrees": "1 b3 4 b6 b7", "intervals": [0, 3, 5, 8, 10], "steps": [3, 2, 3, 2, 2], "steps_label": "T½ T T½ T T", "notes_count": 5, "rank": 48},
+{"id": "ritusen", "level": 4, "category": "pentatonic", "family": "pentatonic", "mode": 4, "also_levels": null, "name": {"fr": "Pentatonique Ritusen", "en": "Ritusen pentatonic"}, "aliases": {"fr": ["Yo (japonaise)", "Ryo"], "en": ["Ritusen", "Yo scale"]}, "degrees": "1 2 4 5 6", "intervals": [0, 2, 5, 7, 9], "steps": [2, 3, 2, 2, 3], "steps_label": "T T½ T T T½", "notes_count": 5, "rank": 49},
+{"id": "hungarian_major", "level": 4, "category": "world", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Majeure hongroise", "en": "Hungarian major"}, "aliases": {"fr": [], "en": []}, "degrees": "1 #2 3 #4 5 6 b7", "intervals": [0, 3, 4, 6, 7, 9, 10], "steps": [3, 1, 2, 1, 2, 1, 2], "steps_label": "T½ ½ T ½ T ½ T", "notes_count": 7, "rank": 50},
+{"id": "neapolitan_minor", "level": 4, "category": "other", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Mineure napolitaine", "en": "Neapolitan minor"}, "aliases": {"fr": [], "en": []}, "degrees": "1 b2 b3 4 5 b6 7", "intervals": [0, 1, 3, 5, 7, 8, 11], "steps": [1, 2, 2, 2, 1, 3, 1], "steps_label": "½ T T T ½ T½ ½", "notes_count": 7, "rank": 51},
+{"id": "neapolitan_major", "level": 4, "category": "other", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Majeure napolitaine", "en": "Neapolitan major"}, "aliases": {"fr": [], "en": []}, "degrees": "1 b2 b3 4 5 6 7", "intervals": [0, 1, 3, 5, 7, 9, 11], "steps": [1, 2, 2, 2, 2, 2, 1], "steps_label": "½ T T T T T ½", "notes_count": 7, "rank": 52},
+{"id": "persian", "level": 4, "category": "world", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Persane", "en": "Persian"}, "aliases": {"fr": ["Gamme persane"], "en": ["Persian scale"]}, "degrees": "1 b2 3 4 b5 b6 7", "intervals": [0, 1, 4, 5, 6, 8, 11], "steps": [1, 3, 1, 1, 2, 3, 1], "steps_label": "½ T½ ½ ½ T T½ ½", "notes_count": 7, "rank": 53},
+{"id": "enigmatic", "level": 4, "category": "other", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Énigmatique", "en": "Enigmatic"}, "aliases": {"fr": ["Gamme énigmatique"], "en": ["Enigmatic scale"]}, "degrees": "1 b2 3 #4 #5 #6 7", "intervals": [0, 1, 4, 6, 8, 10, 11], "steps": [1, 3, 2, 2, 2, 1, 1], "steps_label": "½ T½ T T T ½ ½", "notes_count": 7, "rank": 54},
+{"id": "prometheus", "level": 4, "category": "other", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Prométhée", "en": "Prometheus"}, "aliases": {"fr": ["Gamme prométhéenne"], "en": ["Prometheus scale", "Mystic chord scale"]}, "degrees": "1 2 3 #4 6 b7", "intervals": [0, 2, 4, 6, 9, 10], "steps": [2, 2, 2, 3, 1, 2], "steps_label": "T T T T½ ½ T", "notes_count": 6, "rank": 55},
+{"id": "prometheus_neapolitan", "level": 4, "category": "other", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Prométhée napolitaine", "en": "Prometheus Neapolitan"}, "aliases": {"fr": [], "en": []}, "degrees": "1 b2 3 #4 6 b7", "intervals": [0, 1, 4, 6, 9, 10], "steps": [1, 3, 2, 3, 1, 2], "steps_label": "½ T½ T T½ ½ T", "notes_count": 6, "rank": 56},
+{"id": "tritone_scale", "level": 4, "category": "other", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Gamme du triton", "en": "Tritone scale"}, "aliases": {"fr": [], "en": []}, "degrees": "1 b2 3 b5 5 b7", "intervals": [0, 1, 4, 6, 7, 10], "steps": [1, 3, 2, 1, 3, 2], "steps_label": "½ T½ T ½ T½ T", "notes_count": 6, "rank": 57},
+{"id": "leading_whole_tone", "level": 4, "category": "other", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Tons entiers de sensible", "en": "Leading whole tone"}, "aliases": {"fr": [], "en": []}, "degrees": "1 2 3 #4 #5 #6 7", "intervals": [0, 2, 4, 6, 8, 10, 11], "steps": [2, 2, 2, 2, 2, 1, 1], "steps_label": "T T T T T ½ ½", "notes_count": 7, "rank": 58},
+{"id": "lydian_minor", "level": 4, "category": "other", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Lydien mineur", "en": "Lydian minor"}, "aliases": {"fr": ["Majeure ♯4 ♭6"], "en": []}, "degrees": "1 2 3 #4 5 b6 b7", "intervals": [0, 2, 4, 6, 7, 8, 10], "steps": [2, 2, 2, 1, 1, 2, 2], "steps_label": "T T T ½ ½ T T", "notes_count": 7, "rank": 59},
+{"id": "locrian_major", "level": 4, "category": "other", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Locrien majeur", "en": "Locrian major"}, "aliases": {"fr": ["Gamme arabe (mode)"], "en": ["Arabian scale"]}, "degrees": "1 2 3 4 b5 b6 b7", "intervals": [0, 2, 4, 5, 6, 8, 10], "steps": [2, 2, 1, 1, 2, 2, 2], "steps_label": "T T ½ ½ T T T", "notes_count": 7, "rank": 60},
+{"id": "spanish_8", "level": 4, "category": "world", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Gamme espagnole (8 notes)", "en": "Spanish 8-note scale"}, "aliases": {"fr": [], "en": ["Spanish octatonic"]}, "degrees": "1 b2 b3 3 4 b5 b6 b7", "intervals": [0, 1, 3, 4, 5, 6, 8, 10], "steps": [1, 2, 1, 1, 1, 2, 2, 2], "steps_label": "½ T ½ ½ ½ T T T", "notes_count": 8, "rank": 61},
+{"id": "hirajoshi", "level": 4, "category": "world", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Hirajoshi", "en": "Hirajoshi"}, "aliases": {"fr": [], "en": []}, "degrees": "1 2 b3 5 b6", "intervals": [0, 2, 3, 7, 8], "steps": [2, 1, 4, 1, 4], "steps_label": "T ½ 2T ½ 2T", "notes_count": 5, "rank": 62},
+{"id": "in_sen", "level": 4, "category": "world", "family": null, "mode": null, "also_levels": null, "name": {"fr": "In Sen", "en": "In Sen"}, "aliases": {"fr": ["Insen"], "en": ["Insen"]}, "degrees": "1 b2 4 5 b7", "intervals": [0, 1, 5, 7, 10], "steps": [1, 4, 2, 3, 2], "steps_label": "½ 2T T T½ T", "notes_count": 5, "rank": 63},
+{"id": "iwato", "level": 4, "category": "world", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Iwato", "en": "Iwato"}, "aliases": {"fr": [], "en": []}, "degrees": "1 b2 4 b5 b7", "intervals": [0, 1, 5, 6, 10], "steps": [1, 4, 1, 4, 2], "steps_label": "½ 2T ½ 2T T", "notes_count": 5, "rank": 64},
+{"id": "kumoi", "level": 4, "category": "world", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Kumoi", "en": "Kumoi"}, "aliases": {"fr": [], "en": []}, "degrees": "1 2 b3 5 6", "intervals": [0, 2, 3, 7, 9], "steps": [2, 1, 4, 2, 3], "steps_label": "T ½ 2T T T½", "notes_count": 5, "rank": 65},
+{"id": "pelog", "level": 4, "category": "world", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Pelog", "en": "Pelog"}, "aliases": {"fr": ["Pelog balinais"], "en": ["Balinese pelog"]}, "degrees": "1 b2 b3 5 b6", "intervals": [0, 1, 3, 7, 8], "steps": [1, 2, 4, 1, 4], "steps_label": "½ T 2T ½ 2T", "notes_count": 5, "rank": 66},
+{"id": "chinese", "level": 4, "category": "world", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Pentatonique lydienne (chinoise)", "en": "Chinese / Lydian pentatonic"}, "aliases": {"fr": [], "en": ["Chinese scale", "Lydian pentatonic"]}, "degrees": "1 3 #4 5 7", "intervals": [0, 4, 6, 7, 11], "steps": [4, 2, 1, 4, 1], "steps_label": "2T T ½ 2T ½", "notes_count": 5, "rank": 67},
+{"id": "poorvi", "level": 4, "category": "world", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Poorvi (thaat)", "en": "Poorvi (thaat)"}, "aliases": {"fr": ["Purvi"], "en": ["Purvi"]}, "degrees": "1 b2 3 #4 5 b6 7", "intervals": [0, 1, 4, 6, 7, 8, 11], "steps": [1, 3, 2, 1, 1, 3, 1], "steps_label": "½ T½ T ½ ½ T½ ½", "notes_count": 7, "rank": 68},
+{"id": "marwa", "level": 4, "category": "world", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Marwa (thaat)", "en": "Marwa (thaat)"}, "aliases": {"fr": ["Marva"], "en": ["Marva"]}, "degrees": "1 b2 3 #4 5 6 7", "intervals": [0, 1, 4, 6, 7, 9, 11], "steps": [1, 3, 2, 1, 2, 2, 1], "steps_label": "½ T½ T ½ T T ½", "notes_count": 7, "rank": 69},
+{"id": "todi", "level": 4, "category": "world", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Todi (thaat)", "en": "Todi (thaat)"}, "aliases": {"fr": [], "en": []}, "degrees": "1 b2 b3 #4 5 b6 7", "intervals": [0, 1, 3, 6, 7, 8, 11], "steps": [1, 2, 3, 1, 1, 3, 1], "steps_label": "½ T T½ ½ ½ T½ ½", "notes_count": 7, "rank": 70},
+{"id": "major_hexatonic", "level": 4, "category": "other", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Hexatonique majeure", "en": "Major hexatonic"}, "aliases": {"fr": [], "en": []}, "degrees": "1 2 3 4 5 6", "intervals": [0, 2, 4, 5, 7, 9], "steps": [2, 2, 1, 2, 2, 3], "steps_label": "T T ½ T T T½", "notes_count": 6, "rank": 71},
+{"id": "minor_hexatonic", "level": 4, "category": "other", "family": null, "mode": null, "also_levels": null, "name": {"fr": "Hexatonique mineure", "en": "Minor hexatonic"}, "aliases": {"fr": [], "en": []}, "degrees": "1 2 b3 4 5 b7", "intervals": [0, 2, 3, 5, 7, 10], "steps": [2, 1, 2, 2, 3, 2], "steps_label": "T ½ T T T½ T", "notes_count": 6, "rank": 72}
+]
+}

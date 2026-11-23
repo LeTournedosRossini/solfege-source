@@ -1,0 +1,20 @@
+// Que contient le SVG ? Cherche de quoi positionner un curseur de lecture.
+import { createScore } from '../vendor/scorsaire/src/model/newscore.js';
+import { createNoteChord } from '../vendor/scorsaire/src/model/elements.js';
+import { createDocument } from '../vendor/scorsaire/src/model/document.js';
+import { placeChord } from '../vendor/scorsaire/src/model/noteedit.js';
+import { frac } from '../vendor/scorsaire/src/model/fraction.js';
+import { createNoteDocument } from '../vendor/scorsaire/src/note/document.js';
+import { renderScore } from '../src/render.js';
+const work = createScore({ measures: 2, parts: [{ staffType: 'score', clef: 'G' }], tempo: { bpm: 90 }, lang: 'fr' });
+const staff = work.movements[0].tracks[0].staves[0];
+const doc = createDocument(work);
+doc.transaction('d', () => [['C4','D4','E4','F4'],['G4','A4','B4','C5']].forEach((row, m) => row.forEach((n, k) => placeChord(doc, { staff, measure: m, position: frac(k, 4), duration: { base: 'quarter', dots: 0 }, makeChord: (d) => createNoteChord([{ step: n[0], alter: 0, octave: +n[1] }], { duration: d.base, dots: d.dots }) }))));
+const svg = renderScore(createNoteDocument(doc.work), { width: 560 });
+console.log(svg.length, 'octets');
+console.log(svg.slice(0, 700));
+console.log('data-* :', [...new Set([...svg.matchAll(/ (data-[a-z-]+)=/g)].map((m) => m[1]))]);
+console.log('classes :', [...new Set([...svg.matchAll(/class="([^"]+)"/g)].map((m) => m[1]))].slice(0, 20));
+console.log('roles :', [...new Set([...svg.matchAll(/data-role="([^"]+)"/g)].map((m) => m[1]))]);
+console.log(svg.match(/<[^>]*notehead[^>]*>/g)?.slice(0, 2));
+console.log(svg.match(/<g[^>]*data-system[^>]*>/g));

@@ -1,0 +1,599 @@
+{
+ "source": "MuseScore 4.7.5 : import Guitar Pro (guitarprodrumset.cpp) et noms General MIDI (typesconv.cpp)",
+ "gpDrumset": [
+  {
+   "midi": 27,
+   "id": "highQ",
+   "name": "High Q",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 28,
+   "id": "slap",
+   "name": "Slap",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 29,
+   "id": "scratchPush",
+   "name": "Scratch Push",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 30,
+   "id": "scratchPull",
+   "name": "Scratch Pull",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 31,
+   "id": "sticks",
+   "name": "Sticks",
+   "head": "cross",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 32,
+   "id": "squareClick",
+   "name": "Square Click",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 33,
+   "id": "metronomeClick",
+   "name": "Metronome Click",
+   "head": "cross",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 34,
+   "id": "metronomeBell",
+   "name": "Metronome Bell",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 35,
+   "id": "acousticBassDrum",
+   "name": "Acoustic Bass Drum",
+   "head": "normal",
+   "line": 8,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 36,
+   "id": "bassDrum1",
+   "name": "Bass Drum 1",
+   "head": "normal",
+   "line": 7,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 37,
+   "id": "sideStick",
+   "name": "Side Stick",
+   "head": "cross",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 38,
+   "id": "acousticSnare",
+   "name": "Acoustic Snare",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 39,
+   "id": "handClap",
+   "name": "Hand Clap",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 40,
+   "id": "electricSnare",
+   "name": "Electric Snare",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 41,
+   "id": "lowFloorTom",
+   "name": "Low Floor Tom",
+   "head": "normal",
+   "line": 6,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 42,
+   "id": "closedHiHat",
+   "name": "Closed Hi-Hat",
+   "head": "cross",
+   "line": -1,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 43,
+   "id": "highFloorTom",
+   "name": "High Floor Tom",
+   "head": "normal",
+   "line": 6,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 44,
+   "id": "pedalHiHat",
+   "name": "Pedal Hi-Hat",
+   "head": "cross",
+   "line": 9,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 45,
+   "id": "lowTom",
+   "name": "Low Tom",
+   "head": "normal",
+   "line": 5,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 46,
+   "id": "openHiHat",
+   "name": "Open Hi-Hat",
+   "head": "xcircle",
+   "line": -1,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 47,
+   "id": "lowMidTom",
+   "name": "Low-Mid Tom",
+   "head": "normal",
+   "line": 4,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 48,
+   "id": "hiMidTom",
+   "name": "Hi-Mid Tom",
+   "head": "normal",
+   "line": 2,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 49,
+   "id": "crashCymbal1",
+   "name": "Crash Cymbal 1",
+   "head": "cross",
+   "line": -2,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 50,
+   "id": "highTom",
+   "name": "High Tom",
+   "head": "normal",
+   "line": 1,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 51,
+   "id": "rideCymbal1",
+   "name": "Ride Cymbal 1",
+   "head": "cross",
+   "line": 0,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 52,
+   "id": "chineseCymbal",
+   "name": "Chinese Cymbal",
+   "head": "noteheadHeavyXHat",
+   "line": -3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 53,
+   "id": "rideBell",
+   "name": "Ride Bell",
+   "head": "diamond",
+   "line": 0,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 54,
+   "id": "tambourine",
+   "name": "Tambourine",
+   "head": "cross",
+   "line": 2,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 55,
+   "id": "splashCymbal",
+   "name": "Splash Cymbal",
+   "head": "cross",
+   "line": -2,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 56,
+   "id": "cowbell",
+   "name": "Cowbell",
+   "head": "normal",
+   "line": 0,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 57,
+   "id": "crashCymbal2",
+   "name": "Crash Cymbal 2",
+   "head": "cross",
+   "line": -3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 58,
+   "id": "vibraslap",
+   "name": "Vibraslap",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 59,
+   "id": "rideCymbal2",
+   "name": "Ride Cymbal 2",
+   "head": "cross",
+   "line": 2,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 60,
+   "id": "hiBongo",
+   "name": "Hi Bongo",
+   "head": "normal",
+   "line": 8,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 61,
+   "id": "lowBongo",
+   "name": "Low Bongo",
+   "head": "normal",
+   "line": 9,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 62,
+   "id": "muteHiConga",
+   "name": "Mute Hi Conga",
+   "head": "cross",
+   "line": 5,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 63,
+   "id": "openHiConga",
+   "name": "Open Hi Conga",
+   "head": "cross",
+   "line": 4,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 64,
+   "id": "lowConga",
+   "name": "Low Conga",
+   "head": "cross",
+   "line": 6,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 65,
+   "id": "highTimbale",
+   "name": "High Timbale",
+   "head": "cross",
+   "line": 8,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 66,
+   "id": "lowTimbale",
+   "name": "Low Timbale",
+   "head": "cross",
+   "line": 9,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 67,
+   "id": "highAgogo",
+   "name": "High Agogo",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 68,
+   "id": "lowAgogo",
+   "name": "Low Agogo",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 69,
+   "id": "cabasa",
+   "name": "Cabasa",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 70,
+   "id": "maracas",
+   "name": "Maracas",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 71,
+   "id": "shortWhistle",
+   "name": "Short Whistle",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 72,
+   "id": "longWhistle",
+   "name": "Long Whistle",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 73,
+   "id": "shortGuiro",
+   "name": "Short Güiro",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 74,
+   "id": "longGuiro",
+   "name": "Long Güiro",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 75,
+   "id": "claves",
+   "name": "Claves",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 76,
+   "id": "hiWoodBlock",
+   "name": "Hi Wood Block",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 77,
+   "id": "lowWoodBlock",
+   "name": "Low Wood Block",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 78,
+   "id": "muteCuica",
+   "name": "Mute Cuica",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 79,
+   "id": "openCuica",
+   "name": "Open Cuica",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 80,
+   "id": "muteTriangle",
+   "name": "Mute Triangle",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 81,
+   "id": "openTriangle",
+   "name": "Open Triangle",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 82,
+   "id": "shaker",
+   "name": "Shaker",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 83,
+   "id": "sleighBell",
+   "name": "Sleigh Bell",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 84,
+   "id": "markTree",
+   "name": "Mark Tree",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 85,
+   "id": "castanets",
+   "name": "Castanets",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 86,
+   "id": "muteSurdo",
+   "name": "Mute Surdo",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 87,
+   "id": "openSurdo",
+   "name": "Open Surdo",
+   "head": "normal",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 91,
+   "id": "snareRimShot",
+   "name": "Snare (Rim shot)",
+   "head": "diamond",
+   "line": 3,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 92,
+   "id": "openHiHat92",
+   "name": "Open Hi-Hat",
+   "head": "cross",
+   "line": -1,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 93,
+   "id": "rideEdge",
+   "name": "Ride (Edge)",
+   "head": "cross",
+   "line": 0,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 99,
+   "id": "cowbellLow",
+   "name": "Cowbell Low",
+   "head": "triangle-up",
+   "line": 1,
+   "voice": 0,
+   "stem": "up"
+  },
+  {
+   "midi": 102,
+   "id": "cowbellHigh",
+   "name": "Cowbell High",
+   "head": "triangle-up",
+   "line": -1,
+   "voice": 0,
+   "stem": "up"
+  }
+ ]
+}
