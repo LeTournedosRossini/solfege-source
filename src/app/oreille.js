@@ -6,6 +6,7 @@ import { play, stopAll, configurePlayer } from '../music/player.js';
 import { renderDesc } from '../music/describe.js';
 import * as T from './oreille-theorie.js';
 import { lireDocumentScorsaire } from './oreille-import.js';
+import { documentScorsaire, nomDeFichier } from './oreille-export.js';
 import { SOUNDS_URL } from '../music/player.js';
 
 const MIDI_MIN = 36, MIDI_MAX = 96; // Do2 → Do7
@@ -84,7 +85,7 @@ const HTML = `
         <input type="file" id="importFile" accept=".scorsaire,.json,application/json" hidden></div>
       <div class="import-note" id="importNote" role="status"></div>
       <div class="panel" id="worksPlayerPanel" style="display:none;"><div class="phrase-title" id="worksTitle"></div>
-        <div class="score-host" id="worksStaffWrap"></div><button class="abc-play-btn" id="worksPlay" type="button">▶ Écouter</button>
+        <div class="score-host" id="worksStaffWrap"></div><button class="abc-play-btn" id="worksPlay" type="button">▶ Écouter</button> <button class="abc-play-btn" id="worksExport" type="button" title="Télécharger cette phrase en fichier Scorsaire">⬇ Exporter (Scorsaire)</button>
         <div class="keyboard-container" id="keyboardWorks" style="margin-top:8px;"></div>
         <div class="setting-block" style="margin-top:10px;"><label for="phraseSpeedRangeB">Vitesse : <strong id="phraseSpeedValB">0 %</strong></label>
           <input type="range" id="phraseSpeedRangeB" min="-50" max="50" step="5" value="0" class="gap-slider speed-slider"></div></div>
@@ -107,7 +108,7 @@ const HTML = `
     <div class="import-note" id="nameNote" role="status"></div><button class="mini-btn" id="nameSave" style="padding:12px; font-weight:600; border-color:var(--gold); color:var(--gold);">✓ Enregistrer dans « Mes phrases »</button></div></div></div>
 <div class="drawer-overlay" id="worksSheetOverlay"><div class="drawer" id="worksSheet" style="max-height:75vh;" role="dialog" aria-label="Choisir une phrase">
   <div class="drawer-handle"></div><div class="drawer-head"><h2>Choisir une phrase</h2><button class="drawer-close" data-close aria-label="Fermer">✕</button></div>
-  <div class="drawer-body" style="gap:10px;"><div class="tabs" id="worksGenreTabs"></div><div id="worksList" style="display:flex; flex-direction:column; gap:8px;"></div></div></div></div>
+  <div class="drawer-body" style="gap:10px;"><div class="tabs" id="worksGenreTabs"></div><button class="mini-btn" id="worksExportAll" type="button">⬇ Exporter ces phrases (un fichier Scorsaire)</button><div id="worksList" style="display:flex; flex-direction:column; gap:8px;"></div></div></div></div>
 <div class="drawer-overlay" id="phraseSheetOverlay"><div class="drawer" id="phraseSheet" role="dialog" aria-label="Choisir une gamme ou un arpège">
   <div class="drawer-handle"></div><div class="drawer-head"><h2>Choisir une gamme / un arpège</h2><button class="drawer-close" data-close aria-label="Fermer">✕</button></div>
   <div class="drawer-body"><div class="drawer-columns-wrap"><div class="drawer-columns" id="phraseColumns"><div class="family-col" id="rootCol"></div><div class="quality-col" id="qualityColPhrase"></div><div class="family-col" id="dirCol"></div></div></div>
@@ -459,7 +460,9 @@ export function renderOreille($view) {
   function worksList() {
     genreTabs($('worksGenreTabs'), worksGenre, (k) => { worksGenre = k; worksList(); });
     const list = $('worksList'); list.innerHTML = '';
-    allPhrases().filter((w) => w.genre === worksGenre).forEach((w) => {
+    const dansGenre = allPhrases().filter((w) => w.genre === worksGenre);
+    $('worksExportAll').textContent = `⬇ Exporter ces ${dansGenre.length} phrase${dansGenre.length > 1 ? 's' : ''} (un fichier Scorsaire)`; $('worksExportAll').hidden = !dansGenre.length;
+    dansGenre.forEach((w) => {
       const row = document.createElement('div'); row.style.cssText = 'display:flex;gap:6px;align-items:stretch';
       const b = document.createElement('button'); b.className = 'phrase-item'; b.style.flex = '1'; b.innerHTML = `<span class="pi-title"></span><span class="pi-meta"></span>`; b.querySelector('.pi-title').textContent = w.title; b.querySelector('.pi-meta').textContent = w.featured;
       b.onclick = () => { worksShow(w); sWorks.close(); }; row.append(b);
@@ -468,6 +471,15 @@ export function renderOreille($view) {
       list.append(row);
     });
   }
+  // export vers Scorsaire : un fichier .scorsaire, qui s'ouvre dans Scorsaire ; plusieurs phrases = un mouvement chacune (l'inverse de l'import)
+  function telecharger(phrases, nom) {
+    const blob = new Blob([documentScorsaire(phrases)], { type: 'application/json' }), a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = nomDeFichier(nom); document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    $('importNote').textContent = `Fichier « ${a.download} » téléchargé (${phrases.length} phrase${phrases.length > 1 ? 's' : ''}) : à ouvrir dans Scorsaire.`;
+  }
+  $('worksExport').onclick = () => { if (curWork) telecharger([curWork], curWork.title); };
+  $('worksExportAll').onclick = () => { const l = allPhrases().filter((w) => w.genre === worksGenre); if (l.length) telecharger(l, GENRES.find((g) => g.key === worksGenre).label === 'Mes phrases' ? 'Mes phrases' : `Phrases ${GENRES.find((g) => g.key === worksGenre).label}`); };
   $('worksPickerBtn').onclick = () => { worksList(); sWorks.open(); };
   $('worksPlay').onclick = () => { if (!curWork) return; pulse($('worksPlay')); speak(phraseDesc(curWork), { button: $('worksPlay'), host: $('worksStaffWrap') }); };
   redraws.push(() => { if (curWork && $('worksEcoutePanel').classList.contains('active') && $('panelWorks').classList.contains('active')) draw($('worksStaffWrap'), curWork.noteDoc ? { noteDoc: curWork.noteDoc } : curWork.desc, hostWidth($('worksStaffWrap'))); });

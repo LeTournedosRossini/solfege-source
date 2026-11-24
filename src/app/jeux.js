@@ -257,8 +257,11 @@ function rhythmGame($view) {
   });
   const onSpace = (e) => { if (e.code === 'Space' && !e.repeat) { e.preventDefault(); if (phase === 'tap') registerTap(e.timeStamp); else if (phase === 'idle' || phase === 'done') start(false); } };
   window.addEventListener('keydown', onSpace);
+  // onglet masqué : la manche en cours est abandonnée (sons programmés arrêtés), le même motif est prêt à être réécouté
+  const onPause = () => { if (phase === 'listen' || phase === 'tap' || phase === 'wait') { clearAll(); phase = 'idle'; setPad('Écouter le motif'); replayBtn.hidden = true; taps = []; drawPattern(); feedback.innerHTML = '&nbsp;'; } };
+  window.addEventListener('solfege-pause', onPause);
   setLevel(level); genPattern(); drawPattern();
-  return () => { clearAll(); window.removeEventListener('keydown', onSpace); if (audioCtx) { audioCtx.close().catch(() => {}); audioCtx = null; } }; // quitter la page coupe aussi les sons déjà programmés
+  return () => { window.removeEventListener('solfege-pause', onPause); clearAll(); window.removeEventListener('keydown', onSpace); if (audioCtx) { audioCtx.close().catch(() => {}); audioCtx = null; } }; // quitter la page coupe aussi les sons déjà programmés
 }
 
 /* ---------- Rythme à vue ---------- (le motif est écrit en notation, jamais joué avant la frappe : le joueur le lit, puis le tape à son rythme, sans repère)
@@ -375,8 +378,10 @@ function rhythmSightGame($view) {
   levelsEl.addEventListener('click', (e) => { const b = e.target.closest('.ans-btn'); if (!b || phase === 'wait') return; setLevel(Number(b.dataset.l)); newPattern(); });
   const onSpace = (e) => { if (e.code === 'Space' && !e.repeat) { e.preventDefault(); if (phase === 'tap') registerTap(e.timeStamp); else if (phase === 'done') newPattern(); } };
   window.addEventListener('keydown', onSpace);
+  const onPause = () => { if (phase === 'tap' || phase === 'wait') newPattern(); }; // onglet masqué : manche abandonnée, nouveau motif
+  window.addEventListener('solfege-pause', onPause);
   setLevel(level); newPattern();
-  return () => { clearTimeout(idleTimer); stopAll(); window.removeEventListener('keydown', onSpace); };
+  return () => { window.removeEventListener('solfege-pause', onPause); clearTimeout(idleTimer); stopAll(); window.removeEventListener('keydown', onSpace); };
 }
 
 export function renderJeu($view, id) {

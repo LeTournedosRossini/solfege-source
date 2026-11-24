@@ -77,7 +77,9 @@ function renderMetronome($view) {
       bpmRange.value = bpm; bpmVal.textContent = bpm;
     }
   });
-  return () => { clearTimeout(timerId); if (audioCtx) audioCtx.close(); };
+  const onPause = () => { if (playing) { playing = false; clearTimeout(timerId); playBtn.textContent = '▶ Démarrer'; } }; // onglet masqué : le métronome s'arrête
+  window.addEventListener('solfege-pause', onPause);
+  return () => { window.removeEventListener('solfege-pause', onPause); clearTimeout(timerId); if (audioCtx) audioCtx.close(); };
 }
 
 /* ---------- Accordeur ---------- */
@@ -147,7 +149,11 @@ function renderTuner($view) {
       loop();
     } catch (e) { centsEl.textContent = 'Micro inaccessible — vérifiez les autorisations de votre navigateur.'; }
   });
-  return () => { if (rafId) cancelAnimationFrame(rafId); if (stream) stream.getTracks().forEach((t) => t.stop()); if (audioCtx) audioCtx.close(); };
+  const release = () => { if (rafId) cancelAnimationFrame(rafId); rafId = null; if (stream) stream.getTracks().forEach((t) => t.stop()); stream = null; if (audioCtx) audioCtx.close(); audioCtx = null; analyser = null; };
+  // onglet masqué : le micro est coupé (vie privée, batterie) ; on le réactive d'un appui
+  const onPause = () => { if (!stream) return; release(); micBtn.style.display = ''; micBtn.textContent = '🎤 Réactiver le micro'; centsEl.textContent = 'micro coupé (page masquée)'; noteEl.textContent = '—'; };
+  window.addEventListener('solfege-pause', onPause);
+  return () => { window.removeEventListener('solfege-pause', onPause); release(); };
 }
 
 /* ---------- Piano virtuel ---------- */

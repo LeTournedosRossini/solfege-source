@@ -20,6 +20,10 @@ let currentCleanup = null;
 // Titre de niveau 1 de chaque page (lecteurs d'écran) : le premier titre affiché, ou le nom de l'application
 const $h1 = document.getElementById('page-h1');
 new MutationObserver(() => { const t = ($view.querySelector('h1, h2')?.textContent || '').trim(); $h1.textContent = t ? `${t} — Solfège` : 'Solfège — apprendre à lire la musique'; }).observe($view, { childList: true, subtree: true });
+// Onglet du navigateur masqué ou page quittée (écran verrouillé, autre application) : tout son et tout micro s'arrêtent (chaque page écoute cet événement)
+const pause = () => window.dispatchEvent(new Event('solfege-pause'));
+document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+window.addEventListener('pagehide', pause);
 function navigate() {
   const hash = location.hash || '#/';
   let m = null;

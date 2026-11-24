@@ -16,6 +16,7 @@ let onStatus = () => {};
 /** Réglages : adresse des SoundFonts (ou autre emplacement / panne simulée) et fonction qui reçoit les messages d'état. */
 export function configurePlayer(o = {}) { if (o.sounds) sounds = o.sounds; if (o.onStatus) onStatus = o.onStatus; }
 export const stopAll = () => active?.stop();
+if (typeof window !== 'undefined') window.addEventListener('solfege-pause', () => stopAll()); // onglet masqué : la lecture s'arrête
 
 /** Barre verticale qui suit la position de lecture. Les colonnes de têtes de notes du SVG (triées par système puis par x) sont associées aux accords du document
  *  (triés par mesure puis par premier instant) ; la séquence jouée peut repasser plusieurs fois sur le même accord (reprises, deuxièmes fins) : on retrouve

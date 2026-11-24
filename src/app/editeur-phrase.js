@@ -24,7 +24,9 @@ export function ouvrirEditeur({ doc = null, sounds, theme = 'light', onSave, onC
   const zone = document.createElement('section'); zone.setAttribute('aria-label', 'Éditeur de phrase'); zone.append(el);
   const nommer = () => el.shadowRoot?.querySelectorAll('svg[role="img"]:not([aria-label])').forEach((g) => g.setAttribute('aria-label', 'Partition en cours d’édition'));
   const obs = new MutationObserver(nommer); obs.observe(el.shadowRoot, { childList: true, subtree: true });
-  const done = () => { obs.disconnect(); zone.remove(); document.body.style.overflow = prevOverflow; };
+  const onPause = () => el.stop?.();
+  window.addEventListener('solfege-pause', onPause);
+  const done = () => { window.removeEventListener('solfege-pause', onPause); obs.disconnect(); zone.remove(); document.body.style.overflow = prevOverflow; };
   const prevOverflow = document.body.style.overflow; document.body.style.overflow = 'hidden';
   el.addEventListener('save', (e) => { const v = e.detail.value; done(); onSave?.(typeof v === 'string' ? v : stringifyNoteDocument(v)); });
   el.addEventListener('cancel', () => { done(); onCancel?.(); });

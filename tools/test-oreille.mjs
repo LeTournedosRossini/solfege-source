@@ -1,7 +1,8 @@
 // Module d'oreille : intervalles (écoute, identification), gammes et arpèges, phrases du répertoire, import d'un document Scorsaire.
 // Usage : node tools/test-oreille.mjs <url> <document .scorsaire à trois mouvements>
 import { chromium } from 'playwright-core';
-setTimeout(() => { console.log('ARRET FORCE'); process.exit(2); }, 150000);
+import fs from 'node:fs';
+setTimeout(() => { console.log('ARRET FORCE'); process.exit(2); }, 280000);
 const url = process.argv[2] || 'http://localhost:8123/', doc = process.argv[3];
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--autoplay-policy=no-user-gesture-required', '--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
 const ctx = await b.newContext({ viewport: { width: 700, height: 900 } });
@@ -103,6 +104,23 @@ await p.waitForTimeout(300); check('import : fichier invalide, message clair', (
 await p.reload(); await p.waitForSelector('#ecStaffWrap svg'); await p.locator('#tabs .tab-btn[data-tab="works"]').click(); await p.click('#worksPickerBtn');
 check('import : phrases conservées après rechargement', await p.locator('#worksGenreTabs .tab-btn', { hasText: 'Mes phrases' }).count() === 1);
 
+
+
+// --- export vers Scorsaire
+await p.locator('#worksGenreTabs .tab-btn', { hasText: 'Classique' }).click();
+let [dl] = await Promise.all([p.waitForEvent('download'), p.click('#worksExportAll')]);
+let texte = fs.readFileSync(await dl.path(), 'utf8'), json = JSON.parse(texte);
+check('export : tout le répertoire classique dans un fichier nommé', dl.suggestedFilename() === 'Phrases-Classique.scorsaire' && json.format === 'scorsaire' && json.work.movements.length === 65, `${dl.suggestedFilename()} ${json.work?.movements?.length} mouvements`);
+check('export : message de téléchargement', (await p.locator('#importNote').textContent()).includes('Phrases-Classique.scorsaire'));
+await p.locator('#worksList .phrase-item', { hasText: 'Frère Jacques' }).click(); await p.waitForSelector('#worksStaffWrap svg');
+[dl] = await Promise.all([p.waitForEvent('download'), p.click('#worksExport')]);
+texte = fs.readFileSync(await dl.path(), 'utf8'); json = JSON.parse(texte);
+check('export : une phrase = un fichier à un mouvement, au nom de la phrase', dl.suggestedFilename() === 'Frere-Jacques.scorsaire' && json.work.movements.length === 1 && json.work.movements[0].props.title === 'Frère Jacques', dl.suggestedFilename());
+await p.setInputFiles('#importFile', { name: dl.suggestedFilename(), mimeType: 'application/json', buffer: Buffer.from(texte) }); await p.waitForTimeout(400);
+check('export : le fichier exporté se réimporte (aller-retour)', (await p.locator('#importNote').textContent()).includes('1 phrase importée'), await p.locator('#importNote').textContent());
+await p.click('#worksPickerBtn'); await p.locator('#worksGenreTabs .tab-btn', { hasText: 'Mes phrases' }).click();
+check('export : la phrase réimportée garde son nom', await p.locator('#worksList .phrase-item', { hasText: 'Frère Jacques' }).count() === 1);
+await p.keyboard.press('Escape');
 
 // --- éditeur visuel de phrase (composant d'édition de Scorsaire)
 await p.reload(); await p.waitForSelector('#ecStaffWrap svg'); await p.locator('#tabs .tab-btn[data-tab="works"]').click();

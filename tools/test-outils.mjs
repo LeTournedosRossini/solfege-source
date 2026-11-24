@@ -37,6 +37,8 @@ await p.waitForTimeout(1500);
 const note = await p.locator('#t-note').textContent(), cents = await p.locator('#t-cents').textContent();
 check('accordeur : un la à 440 Hz est reconnu', note === 'La4', `${note} · ${cents}`);
 const c = parseInt(cents); check('accordeur : écart inférieur à 10 centièmes', Math.abs(c) <= 10, cents);
+await p.evaluate(() => { Object.defineProperty(document, 'hidden', { value: true, configurable: true }); document.dispatchEvent(new Event('visibilitychange')); }); await p.waitForTimeout(300);
+check('accordeur : onglet masqué → micro coupé, bouton de réactivation', await p.locator('#mic-btn').isVisible() && (await p.locator('#t-cents').textContent()).includes('micro coupé'), await p.locator('#t-cents').textContent());
 check('aucune ressource externe', externes.length === 0, externes.join(' '));
 check('aucune erreur', erreurs.length === 0, erreurs.slice(0, 3).join(' / '));
 console.log(ok ? 'TOUT EST BON' : 'DES ECHECS'); await b.close(); process.exit(ok ? 0 : 1);

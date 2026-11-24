@@ -1,7 +1,7 @@
 // Jeu « Rythme à vue » (motif écrit, frappe sans écoute préalable) et interruption des jeux de rythme quand on quitte la page.
 // Usage : node tools/test-rythme-vue.mjs <url>
 import { chromium } from 'playwright-core';
-setTimeout(() => { console.log('ARRET FORCE'); process.exit(2); }, 100000);
+setTimeout(() => { console.log('ARRET FORCE'); process.exit(2); }, 170000);
 const url = process.argv[2] || 'http://localhost:8123/';
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--autoplay-policy=no-user-gesture-required', '--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
 const p = await (await b.newContext({ viewport: { width: 700, height: 900 } })).newPage();
@@ -64,6 +64,25 @@ check('à vue : frappes toutes égales sur un rythme inégal → score bas (sur 
 await p.click('#rv-tap'); await p.click('#rv-tap'); // deux frappes puis rien : la manche se conclut seule
 await p.waitForSelector('#rv-listen:not([hidden])', { timeout: 15000 }).catch(() => {});
 check('à vue : manche incomplète conclue après un temps sans frappe', await p.locator('#rv-listen').isVisible() && /manquait/.test(await p.locator('#rv-feedback').textContent()), await p.locator('#rv-feedback').textContent());
+
+// --- onglet du navigateur masqué : tout s'arrête
+const masquer = () => p.evaluate(() => { Object.defineProperty(document, 'hidden', { value: true, configurable: true }); document.dispatchEvent(new Event('visibilitychange')); });
+const montrer = () => p.evaluate(() => { Object.defineProperty(document, 'hidden', { value: false, configurable: true }); document.dispatchEvent(new Event('visibilitychange')); });
+await p.goto(url + '#/jeux/rythme'); await p.waitForSelector('#rg-tap'); await p.click('#rg-tap'); await p.waitForTimeout(500);
+await masquer(); await p.waitForTimeout(200); await montrer();
+check('onglet masqué : le jeu à l\'oreille abandonne la manche et se remet à zéro', (await p.locator('#rg-tap').textContent()) === 'Écouter le motif' && await p.locator('#rg-tap').isEnabled());
+await p.goto(url + '#/jeux/rythme-vue'); await p.waitForSelector('#rv-score-host svg'); await p.click('#rv-tap'); await p.click('#rv-tap');
+await masquer(); await montrer();
+check('onglet masqué : le jeu à vue abandonne les frappes (nouveau motif)', (await p.locator('#rv-hits .hit.mid').count()) === 0 && (await p.locator('#rv-feedback').textContent()).trim() === '');
+await p.goto(url + '#/outils/metronome'); await p.waitForSelector('#play-btn'); await p.click('#play-btn'); await p.waitForTimeout(700);
+await masquer(); await p.waitForTimeout(300); const om = await p.evaluate(() => window.__osc); await p.waitForTimeout(1000); await montrer();
+check('onglet masqué : le métronome s\'arrête', (await p.locator('#play-btn').textContent()).includes('Démarrer') && (await p.evaluate(() => window.__osc)) === om, (await p.locator('#play-btn').textContent()) + ' ' + om + ' → ' + (await p.evaluate(() => window.__osc)));
+await p.goto(url + '#/cours/gammes-mineures'); await p.waitForSelector('#view .abc-play-btn'); await p.locator('#view .abc-play-btn').first().click();
+await p.waitForFunction(() => /Stop/.test(document.querySelector('#view .abc-play-btn').textContent), null, { timeout: 12000 }).catch(() => {});
+const avant = await p.locator('#view .abc-play-btn').first().textContent();
+await masquer(); await p.waitForTimeout(400); await montrer();
+check('onglet masqué : la lecture d\'une partition s\'arrête', avant.includes('Stop') && (await p.locator('#view .abc-play-btn').first().textContent()).includes('Écouter'), avant + ' → ' + (await p.locator('#view .abc-play-btn').first().textContent()));
+
 // quitter la page pendant la lecture arrête le son
 await p.goto(url + '#/outils'); await p.waitForTimeout(300);
 check('aucune erreur', erreurs.length === 0, erreurs.slice(0, 2).join(' / '));
