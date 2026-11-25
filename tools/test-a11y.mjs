@@ -5,12 +5,16 @@ import fs from 'node:fs';
 setTimeout(() => { console.log('ARRET FORCE'); process.exit(2); }, 560000);
 const url = process.argv[2] || 'http://localhost:8123/', tout = process.argv.includes('--tout');
 const axe = fs.readFileSync(new URL('../node_modules/axe-core/axe.min.js', import.meta.url), 'utf8');
-const PAGES = [...(process.argv.includes('--lecons') ? (await import('../src/app/data/catalogue.js')).CATALOGUE.lessons.map((l) => '#/cours/' + l.id) : []), '#/', '#/cours', '#/cours/portee-cles', '#/jeux', '#/jeux/clef-sol', '#/jeux/rythme', '#/jeux/rythme-vue', '#/outils', '#/outils/metronome', '#/outils/accordeur', '#/outils/piano', '#/oreille'].slice(process.argv.includes('--lecons') ? 0 : 0);
+const PAGES = [...(process.argv.includes('--lecons') ? (await import('../src/app/data/catalogue.js')).CATALOGUE.lessons.map((l) => '#/cours/' + l.id) : []), '#/', '#/cours', '#/cours/portee-cles', '#/jeux', '#/jeux/clef-sol', '#/jeux/rythme', '#/jeux/rythme-vue', '#/outils', '#/outils/metronome', '#/outils/accordeur', '#/outils/piano', '#/oreille', '#/progression', '#/donnees'].slice(process.argv.includes('--lecons') ? 0 : 0);
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
 let total = 0; const vus = new Map();
 for (const [w, theme] of [[390, 'light'], [768, 'dark'], [1200, 'contrast'], ...(tout ? [[390, 'dark'], [390, 'contrast'], [768, 'light'], [768, 'contrast'], [1200, 'light'], [1200, 'dark']] : [])]) {
   const p = await (await b.newContext({ viewport: { width: w, height: 900 } })).newPage();
-  await p.addInitScript((t) => localStorage.setItem('solfege_theme', t), theme);
+  await p.addInitScript((t) => { localStorage.setItem('solfege_theme', t);
+    // quelques données de suivi, pour que la page de progression et l'accueil (« Reprendre ») soient audités avec du contenu
+    const J = 86400000, n = Date.now(), ev = (d, j, e, m, ok) => ({ t: n - d * J, j, e, m, ok });
+    localStorage.setItem('solfege_suivi', JSON.stringify({ v: 1, evts: [...[1, 1, 0, 1, 0].map((o, i) => ev(4 - i * 0.1, 'ig', 'intervalle:M3', 'L', o)), ...[1, 1, 1, 1, 1, 1].map((o, i) => ev(i < 3 ? 6 : 2, 'oreille-intervalles', 'intervalle:P5', 'O', o)), ev(0.1, 'dg', 'duree:Ronde', 'L', 0)], lecons: { 'portee-cles': { debut: n - 3 * J, fin: n - 2 * J }, 'notes-de-musique': { debut: n - J } } }));
+  }, theme);
   for (const page of PAGES) {
     await p.goto(url + page); await p.waitForTimeout(700);
     if (page === '#/oreille') { await p.waitForSelector('#ecStaffWrap svg'); }

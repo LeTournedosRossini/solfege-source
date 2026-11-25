@@ -19,3 +19,35 @@ main.compact, main:has(> .crumb:first-child){ padding-top:10px; }
 main:has(> .crumb:first-child) > .crumb:first-child{ margin-bottom:14px; }
 main.compact .crumb-row{ margin:0 0 4px; }
 main.compact .crumb{ margin-bottom:0; }
+
+/* Suivi : page « Ma progression », liens croisés leçon / jeu */
+.liens-croises{ margin:20px 0 6px; font-size:.95rem; line-height:1.9; }
+.liens-croises a{ color:var(--accent-deep); }
+.prog-bloc{ margin:26px 0; }
+.prog-bloc h3{ margin:0 0 10px; font-size:1.15rem; }
+.prog-table{ width:100%; border-collapse:collapse; font-size:.92rem; }
+.prog-table th, .prog-table td{ text-align:left; padding:8px 10px; border-bottom:1px solid var(--rule); vertical-align:top; }
+.prog-table thead th{ font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-soft); }
+.prog-table tbody th{ font-weight:600; }
+.petit{ font-size:.82rem; color:var(--fg-soft); }
+.niveau{ display:inline-block; padding:1px 9px; border-radius:999px; font-size:.78rem; font-weight:600; border:1.5px solid var(--rule-strong); white-space:nowrap; }
+.niveau-maitrise{ border-color:var(--sage); color:color-mix(in srgb, var(--sage) 62%, var(--fg)); }
+.niveau-a_retravailler, .niveau-a_revoir{ border-color:var(--brick); color:color-mix(in srgb, var(--brick) 62%, var(--fg)); }
+.niveau-apprentissage{ border-color:var(--accent-deep); }
+.prog-recent{ padding-left:18px; line-height:1.8; }
+progress{ width:100%; height:14px; accent-color:var(--accent-deep); }
+.prog-vide{ padding:14px 18px; border:1px dashed var(--rule-strong); border-radius:10px; }
+.table-scroll{ overflow-x:auto; }
+.table-scroll:focus-visible{ outline:3px solid var(--accent-deep); outline-offset:2px; }
+
+/* Cinq entrées de menu : sur écran étroit, le nom de l'application cède la place (l'icône ♪ reste) et les liens se resserrent */
+@media (max-width:600px){
+  .brand-text{ display:none; }
+  nav.mainnav{ gap:0; }
+  nav.mainnav a{ padding:8px 9px; font-size:.9rem; }
+  .topbar{ gap:6px; }
+}
+@media (max-width:380px){ nav.mainnav a{ padding:8px 6px; font-size:.84rem; } }
+@media (max-width:340px){ nav.mainnav a{ padding:8px 4px; font-size:.78rem; } .topbar{ gap:2px; } }
+.d-liste{ padding-left:20px; line-height:1.7; }
+#d-confirme{ padding:14px 18px; border:2px solid var(--brick); border-radius:10px; margin-top:10px; }

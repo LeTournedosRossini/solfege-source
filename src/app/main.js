@@ -2,6 +2,8 @@
 // Reprend le comportement et les textes de l'application actuelle ; le contenu des leçons, des jeux et des outils est porté lot par lot
 // (voir l'annexe C du cahier des charges). Les pages de détail non encore portées affichent un message clair.
 import { CATALOGUE } from './data/catalogue.js';
+import { liensLecons } from './liens.js';
+import { htmlReprise } from './reprise.js';
 const { lessons: LESSONS, games: GAMES, tools: TOOLS } = CATALOGUE;
 
 /* ======================================================================
@@ -58,6 +60,7 @@ const notYet = (what, lot, back, backLabel) => `
 ====================================================================== */
 route(/^#\/$/, function home() {
   $view.innerHTML = `
+    ${htmlReprise()}
     <section style="padding-top:20px;">
       <div class="section-head"><h2>Par où commencer ?</h2><p>Si vous débutez totalement, ces trois étapes suffisent pour lire vos premières notes.</p></div>
       <div class="grid">
@@ -93,11 +96,11 @@ route(/^#\/jeux$/, function jeuxListe() {
     <div class="section-head"><h2>Jeux de solfège</h2><p>Huit façons de s'entraîner, du plus calme au plus rapide.</p></div>
     <div class="grid">${GAMES.map(gameCard).join('')}</div>`;
 });
-route(/^#\/jeux\/([\w-]+)$/, function jeuDetail(id) {
+route(/^#\/jeux\/([\w-]+)(?:\?(.*))?$/, function jeuDetail(id, query = '') {
   // les jeux (et le moteur de notation) ne se chargent qu'à l'ouverture d'un jeu
   let cleanup = null, gone = false;
   $view.innerHTML = '<p style="padding:24px 0">Chargement du jeu…</p>';
-  import('./jeux.js').then((m) => { if (!gone) cleanup = m.renderJeu($view, id); }).catch(() => { $view.innerHTML = '<p>Le jeu n’a pas pu être chargé. Vérifiez la connexion puis réessayez.</p>'; });
+  import('./jeux.js').then((m) => { if (!gone) { cleanup = m.renderJeu($view, id, /(^|&)reviser=1(&|$)/.test(query || '')); $view.insertAdjacentHTML('beforeend', liensLecons(id)); } }).catch(() => { $view.innerHTML = '<p>Le jeu n’a pas pu être chargé. Vérifiez la connexion puis réessayez.</p>'; });
   return () => { gone = true; if (cleanup) cleanup(); };
 });
 
@@ -120,9 +123,21 @@ route(/^#\/controle$/, function controle() {
   return () => { gone = true; if (cleanup) cleanup(); };
 });
 
+route(/^#\/progression$/, function progression() {
+  let gone = false;
+  import('./progression.js').then((m) => { if (!gone) m.renderProgression($view); }).catch(() => { $view.innerHTML = '<p>La page n’a pas pu être chargée. Vérifiez la connexion puis réessayez.</p>'; });
+  return () => { gone = true; };
+});
+
+route(/^#\/donnees$/, function donneesPage() {
+  let gone = false;
+  import('./donnees.js').then((m) => { if (!gone) m.renderDonnees($view); }).catch(() => { $view.innerHTML = '<p>La page n’a pas pu être chargée. Vérifiez la connexion puis réessayez.</p>'; });
+  return () => { gone = true; };
+});
+
 route(/^#\/oreille$/, function oreille() {
   let cleanup = null, gone = false;
-  import('./oreille.js').then((m) => { if (!gone) cleanup = m.renderOreille($view); }).catch(() => { $view.innerHTML = '<p>Le module d’oreille n’a pas pu être chargé. Vérifiez la connexion puis réessayez.</p>'; });
+  import('./oreille.js').then((m) => { if (!gone) { cleanup = m.renderOreille($view); $view.insertAdjacentHTML('beforeend', liensLecons('oreille')); } }).catch(() => { $view.innerHTML = '<p>Le module d’oreille n’a pas pu être chargé. Vérifiez la connexion puis réessayez.</p>'; });
   return () => { gone = true; if (cleanup) cleanup(); };
 });
 

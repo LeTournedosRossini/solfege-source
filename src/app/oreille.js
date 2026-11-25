@@ -7,6 +7,8 @@ import { renderDesc } from '../music/describe.js';
 import * as T from './oreille-theorie.js';
 import { lireDocumentScorsaire } from './oreille-import.js';
 import { documentScorsaire, nomDeFichier } from './oreille-export.js';
+import { noter } from './suivi-local.js';
+import { elIntervalle, elGamme, elPhrase } from './suivi-elements.js';
 import { SOUNDS_URL } from '../music/player.js';
 
 const MIDI_MIN = 36, MIDI_MAX = 96; // Do2 → Do7
@@ -317,6 +319,7 @@ export function renderOreille($view) {
   }
   function ivAnswer(semi, btn) {
     if (ivAnswered || !ivCur || btn.classList.contains('inactive')) return;
+    if (!ivCur.note) { ivCur.note = true; noter({ j: 'oreille-intervalles', e: elIntervalle(ivCur.iv.short), m: 'O', ok: semi === ivCur.iv.semitones, r: T.ALL_INTERVALS.find((i) => i.semitones === semi)?.short, c: ivCur.mode }); } // suivi : première réponse de la question
     ivScore.st.total++;
     if (semi === ivCur.iv.semitones) {
       ivAnswered = true; ivScore.st.ok++; ivScore.update(); btn.classList.add('correct');
@@ -429,6 +432,7 @@ export function renderOreille($view) {
   }
   function gaAnswer(key, btn) {
     if (gaAnswered || !gaCur || btn.classList.contains('inactive')) return;
+    if (!gaCur.note) { gaCur.note = true; noter({ j: 'oreille-gammes', e: elGamme(gaCur.q.key), m: 'O', ok: key === gaCur.q.key, r: key, c: gaCur.mode }); }
     gaScore.st.total++;
     if (key === gaCur.q.key) { gaAnswered = true; gaScore.st.ok++; gaScore.update(); btn.classList.add('correct'); $('gaAnswersGrid').querySelectorAll('.ans-btn').forEach((b) => { if (b !== btn) b.disabled = true; }); gaFb.show(`✓ Bravo !  ${gaCur.q.label}`, 'correct'); gaFb.soon(() => { gaFb.clear(); gaNew(true); }, nextDelay * 1000); }
     else { gaScore.update(); btn.classList.add('wrong'); btn.disabled = true; gaFb.show('✗ Essaie encore…', 'wrong'); gaFb.soon(() => { if (!gaAnswered) gaFb.clear(); }, 1200); }
@@ -557,6 +561,7 @@ export function renderOreille($view) {
   const wkPlayCur = () => { if (!wkCur) return; pulse($('wkPlayBtn')); speak({ ...phraseDesc(wkCur.work), transpose: wkCur.offset }); };
   function wkAnswer(w, btn) {
     if (wkAnswered || !wkCur) return;
+    if (!wkCur.note) { wkCur.note = true; const el = (x) => (x.id.startsWith('b') ? elPhrase(x.title) : 'phrase:perso'); noter({ j: 'oreille-phrases', e: el(wkCur.work), m: 'O', ok: w === wkCur.work || w.id === wkCur.work.id, r: el(w) }); }
     wkScore.st.total++;
     if (w === wkCur.work || w.id === wkCur.work.id) { wkAnswered = true; wkScore.st.ok++; wkScore.update(); btn.classList.add('correct'); $('wkAnswersGrid').querySelectorAll('.ans-btn').forEach((b) => { if (b !== btn) b.disabled = true; }); wkFb.show(`✓ Bravo !  ${w.title}`, 'correct'); wkFb.soon(() => { wkFb.clear(); wkNew(true); }, nextDelay * 1000); }
     else { wkScore.update(); btn.classList.add('wrong'); btn.disabled = true; wkFb.show('✗ Essaie encore…', 'wrong'); wkFb.soon(() => { if (!wkAnswered) wkFb.clear(); }, 1200); }

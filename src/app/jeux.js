@@ -3,6 +3,9 @@
 import { mountScore, configurePlayer, stopAll } from '../music/player.js';
 import { CATALOGUE } from './data/catalogue.js';
 import { evaluateRhythm } from './rythme-eval.js';
+import { noter, etatsActuels } from './suivi-local.js';
+import { choisir, apresReponse, nouvelleSeance } from './suivi-tirage.js';
+import { elNote, elIntervalleLecture, elSimple, elRythme } from './suivi-elements.js';
 import { FR_NOTE, TREBLE_POOL, BASS_POOL, INTERVAL_START, INTERVAL_POOL, CHORD_LABELS, CHORD_POOL, DURATION_POOL, DURATION_NOTE, DEGREE_POOL, SHARP_KEYS, FLAT_KEYS } from './jeux-donnees.js';
 
 const crumb = (href, label) => `<a class="crumb" href="${href}">← ${label}</a>`;
@@ -29,12 +32,13 @@ function show(host, desc, { staffwidth, scale = 1.15, play = true } = {}) {
 }
 
 /** Squelette commun d'un jeu à réponses : score, essais, partition, boutons, retour. */
-function quizShell($view, { gid, title, intro }) {
+function quizShell($view, { gid, title, intro, adaptive }) {
   $view.innerHTML = `
     ${crumb('#/jeux', 'Tous les jeux')}
     <div class="game-shell">
       <div class="section-head"><h2>${title}</h2></div>
       ${intro ? `<p class="game-intro">${intro}</p>` : ''}
+      ${adaptive ? `<div class="mode-choix" id="${gid}-mode" role="group" aria-label="Choix des questions" style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px"><button type="button" class="chip" data-mode="libre" aria-pressed="false">Au hasard</button><button type="button" class="chip" data-mode="adapte" aria-pressed="false" title="Ce qui est à retravailler revient plus souvent, les nouveautés arrivent peu à peu">Adaptées à ma progression</button><button type="button" class="chip" data-mode="erreurs" aria-pressed="false" title="Seulement ce que tu as raté">Mes erreurs</button></div>` : ''}
       <div class="game-hud">
         <div class="hud-stat"><b id="${gid}-score">0</b>score</div>
         <div class="hud-stat"><b id="${gid}-total">0</b>essais</div>
@@ -44,40 +48,62 @@ function quizShell($view, { gid, title, intro }) {
       <div class="feedback" id="${gid}-feedback" role="status" aria-live="polite">&nbsp;</div>
     </div>`;
   configurePlayer({ sounds: new URLSearchParams(location.search).get('sounds') || undefined, onStatus: () => {} });
-  return { staff: document.getElementById(`${gid}-staff`), answers: document.getElementById(`${gid}-answers`), feedback: document.getElementById(`${gid}-feedback`), scoreEl: document.getElementById(`${gid}-score`), totalEl: document.getElementById(`${gid}-total`) };
+  return { staff: document.getElementById(`${gid}-staff`), answers: document.getElementById(`${gid}-answers`), feedback: document.getElementById(`${gid}-feedback`), mode: document.getElementById(`${gid}-mode`), scoreEl: document.getElementById(`${gid}-score`), totalEl: document.getElementById(`${gid}-total`) };
 }
 
 /** Moteur commun : `answers` = les boutons de réponse, TOUJOURS les mêmes et dans le même ordre (le joueur prend le réflexe d'appuyer au bon endroit) ;
  *  `next(staff)` prépare une question et renvoie { label } ; `good(label)` / `bad(label)` donnent le texte de retour. */
-function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, delay = 900 }) {
-  const ui = quizShell($view, { gid, title, intro });
+function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, delay = 900, adaptive = null, reviser = false }) {
+  const ui = quizShell($view, { gid, title, intro, adaptive });
   ui.answers.innerHTML = answers.map((k) => `<button class="ans-btn" data-k="${k}">${k}</button>`).join('');
   let score = 0, total = 0, current = null, active = true, timer = 0;
+  // choix des questions : au hasard (comme avant), adapté à la progression (règles 7.2), ou seulement les erreurs ; le choix est mémorisé par jeu
+  const cleMode = `solfege_mode_${scoreId ?? gid}`; let mode = reviser ? 'erreurs' : 'libre', seance = nouvelleSeance();
+  if (!reviser) { try { const m = localStorage.getItem(cleMode); if (m === 'adapte' || m === 'erreurs') mode = m; } catch (e) { /* ignoré */ } }
+  const majMode = () => ui.mode?.querySelectorAll('.chip').forEach((b) => { const on = b.dataset.mode === mode; b.setAttribute('aria-pressed', String(on)); b.classList.toggle('active', on); });
+  function question() {
+    if (adaptive && mode !== 'libre') {
+      const elements = [...new Set(adaptive.pool.map(adaptive.element))];
+      const e = choisir({ candidats: elements, etats: etatsActuels(), m: 'L', seance, mode });
+      if (e !== null) { const items = adaptive.pool.filter((it) => adaptive.element(it) === e); return adaptive.render(ui.staff, pick(items)); }
+      ui.feedback.textContent = 'Aucune erreur à retravailler pour l’instant : questions adaptées à ta progression.'; mode = 'adapte'; try { localStorage.setItem(cleMode, mode); } catch (er) { /* ignoré */ } majMode();
+      const e2 = choisir({ candidats: elements, etats: etatsActuels(), m: 'L', seance, mode });
+      return adaptive.render(ui.staff, pick(adaptive.pool.filter((it) => adaptive.element(it) === e2)));
+    }
+    return next(ui.staff);
+  }
   function round() {
-    current = next(ui.staff);
+    current = question();
     ui.answers.querySelectorAll('.ans-btn').forEach((b) => b.classList.remove('correct', 'wrong'));
-    ui.feedback.innerHTML = '&nbsp;'; ui.feedback.className = 'feedback'; active = true;
+    if (!ui.feedback.textContent.startsWith('Aucune erreur')) ui.feedback.innerHTML = '&nbsp;'; ui.feedback.className = 'feedback'; active = true;
   }
   ui.answers.addEventListener('click', (e) => {
     const btn = e.target.closest('.ans-btn'); if (!btn || !active) return;
     active = false; total++; ui.totalEl.textContent = total;
+    noter({ j: scoreId ?? gid, e: current.element, m: 'L', ok: btn.dataset.k === current.label, r: btn.dataset.k }); // suivi : une réponse par question
     if (btn.dataset.k === current.label) { score++; ui.scoreEl.textContent = score; btn.classList.add('correct'); ui.feedback.textContent = good(current.label); ui.feedback.className = 'feedback ok'; }
     else { btn.classList.add('wrong'); ui.answers.querySelectorAll('.ans-btn').forEach((b) => { if (b.dataset.k === current.label) b.classList.add('correct'); }); ui.feedback.textContent = bad(current.label); ui.feedback.className = 'feedback no'; }
+    apresReponse(seance, current.element, btn.dataset.k === current.label);
     recordScore(scoreId ?? gid, score, total);
     timer = setTimeout(round, delay);
   });
+  ui.mode?.addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; mode = b.dataset.mode; seance = nouvelleSeance(); try { localStorage.setItem(cleMode, mode); } catch (er) { /* ignoré */ } majMode(); clearTimeout(timer); round(); });
+  majMode();
   round();
   return () => { clearTimeout(timer); stopAll(); };
 }
 
 /* ---------- Lecture de notes (clé de Sol, clé de Fa) ---------- */
-function noteGame($view, clef) {
+function noteGame($view, clef, reviser) {
   const pool = clef === 'treble' ? TREBLE_POOL : BASS_POOL;
   const names = ['C', 'D', 'E', 'F', 'G', 'A', 'B'].map((l) => FR_NOTE[l]); // Do Ré Mi Fa Sol La Si, toujours dans cet ordre
+  const rendreNote = (staff, n) => { show(staff, { clef, measures: [[whole([n])]] }, { staffwidth: 260 }); return { label: FR_NOTE[n[0]], element: elNote(clef, n) }; };
   return runQuiz($view, {
     answers: names,
     gid: 'ng', scoreId: clef === 'treble' ? 'clef-sol' : 'clef-fa', title: clef === 'treble' ? 'Lecture de notes — Clé de Sol' : 'Lecture de notes — Clé de Fa',
-    next(staff) { const n = pick(pool); show(staff, { clef, measures: [[whole([n])]] }, { staffwidth: 260 }); return { label: FR_NOTE[n[0]] }; },
+    next(staff) { return rendreNote(staff, pick(pool)); },
+    adaptive: { pool, element: (n) => elNote(clef, n), render: (staff, n) => rendreNote(staff, n) },
+    reviser,
     good: (l) => `Exact : ${l}.`, bad: (l) => `C'était ${l}.`, delay: 750,
   });
 }
@@ -85,29 +111,32 @@ function noteGame($view, clef) {
 /* ---------- Jeux à réservoir : intervalles, accords, durées et silences, degrés ---------- */
 const poolGames = {
   intervalles: { gid: 'ig', title: 'Jeu des intervalles', intro: "Do est toujours la première note. Identifie l'intervalle qui la sépare de la seconde note affichée.",
-    labels: [...new Set(INTERVAL_POOL.map((p) => p.label))], staffwidth: 260, bpm: 260,
+    labels: [...new Set(INTERVAL_POOL.map((p) => p.label))], staffwidth: 260, bpm: 260, element: elIntervalleLecture,
     item: (it) => ({ label: it.label, desc: { clef: 'treble', measures: [[whole([INTERVAL_START]), whole([it.note])]] } }), pool: INTERVAL_POOL },
   accords: { gid: 'ag', title: 'Jeu des accords', intro: "Observe les notes empilées sur la portée et identifie la nature de l'accord.",
-    labels: CHORD_LABELS, staffwidth: 220, bpm: 120,
+    labels: CHORD_LABELS, staffwidth: 220, bpm: 120, element: (l) => elSimple('accord', l),
     item: (it) => ({ label: it.label, desc: { clef: 'treble', measures: [[whole(it.notes)]] } }), pool: CHORD_POOL },
   'durees-silences': { gid: 'dg', title: 'Jeu des durées et silences', intro: "Une figure de note ou un silence s'affiche : retrouve son nom. (Un silence... ne joue rien : c'est normal !)",
-    labels: [...new Set(DURATION_POOL.map((p) => p.label))], staffwidth: 150, scale: 1.2, bpm: 150,
+    labels: [...new Set(DURATION_POOL.map((p) => p.label))], staffwidth: 150, scale: 1.2, bpm: 150, element: (l) => elSimple('duree', l),
     item: (it) => ({ label: it.label, desc: { clef: 'treble', measures: [[it.rest ? { rest: true, d: it.d } : { n: [DURATION_NOTE], d: it.d }]] } }), pool: DURATION_POOL },
   degres: { gid: 'gg', title: 'Jeu des degrés', intro: 'Toujours en Do majeur : quelle est la fonction (le degré) de la note affichée ?',
-    labels: DEGREE_POOL.map((p) => p.label), staffwidth: 200, bpm: 200,
+    labels: DEGREE_POOL.map((p) => p.label), staffwidth: 200, bpm: 200, element: (l) => elSimple('degre', l),
     item: (it) => ({ label: it.label, desc: { clef: 'treble', measures: [[whole([it.note])]] } }), pool: DEGREE_POOL },
 };
-function poolGame($view, id) {
+function poolGame($view, id, reviser) {
   const g = poolGames[id];
+  const rendre = (staff, raw) => { const it = g.item(raw); show(staff, { ...it.desc, bpm: g.bpm }, { staffwidth: g.staffwidth, scale: g.scale ?? 1.15 }); return { label: it.label, element: g.element(it.label) }; };
   return runQuiz($view, {
     gid: g.gid, scoreId: g.gid, title: g.title, intro: g.intro, answers: g.labels,
-    next(staff) { const it = g.item(pick(g.pool)); show(staff, { ...it.desc, bpm: g.bpm }, { staffwidth: g.staffwidth, scale: g.scale ?? 1.15 }); return { label: it.label }; },
+    next(staff) { return rendre(staff, pick(g.pool)); },
+    adaptive: { pool: g.pool, element: (raw) => g.element(g.item(raw).label), render: rendre },
+    reviser,
     good: (l) => `Exact : ${l}.`, bad: (l) => `C'était : ${l}.`,
   });
 }
 
 /* ---------- Tonalités ---------- */
-function keyGame($view) {
+function keyGame($view, reviser) {
   const all = [...SHARP_KEYS, ...FLAT_KEYS.slice(1)]; // Do Sol Ré La Mi Si Fa♯ Do♯ puis Fa Si♭ Mi♭ La♭ Ré♭ Sol♭ Do♭ (Do n'apparaît qu'une fois)
   return runQuiz($view, {
     answers: all,
@@ -116,9 +145,15 @@ function keyGame($view) {
       const sharp = Math.random() < 0.5, n = Math.floor(Math.random() * 8), label = (sharp ? SHARP_KEYS : FLAT_KEYS)[n];
       // une pause invisible (« gap ») garde la largeur de la portée tout en ne montrant que la clé et l'armure
       show(staff, { clef: 'treble', key: sharp ? n : -n, measures: [[{ gap: true, d: 'whole' }]] }, { staffwidth: 260, play: false });
-      return { label };
+      return { label, element: elSimple('tonalite', label) };
     },
     good: (l) => `Exact, ${l} majeur.`, bad: (l) => `C'était ${l} majeur.`,
+    adaptive: {
+      pool: [...SHARP_KEYS.map((label, n) => ({ label, n })), ...FLAT_KEYS.slice(1).map((label, i) => ({ label, n: -(i + 1) }))],
+      element: (it) => elSimple('tonalite', it.label),
+      render: (staff, it) => { show(staff, { clef: 'treble', key: it.n, measures: [[{ gap: true, d: 'whole' }]] }, { staffwidth: 260, play: false }); return { label: it.label, element: elSimple('tonalite', it.label) }; },
+    },
+    reviser,
   });
 }
 
@@ -238,6 +273,7 @@ function rhythmGame($view) {
     hitsEl.querySelectorAll('.hit').forEach((h, i) => { h.classList.remove('mid'); h.style.background = ''; h.classList.add(i === 0 ? 'good' : res.intervals[i - 1].grade); });
     compareEl.innerHTML = compareSvg(expected, taps, res);
     scoreEl.textContent = res.pct + '%';
+    noter({ j: 'rythme', e: elRythme('oreille', level), m: 'O', ok: res.pct >= 70, r: res.pct }); // suivi : précision du motif
     tempoEl.textContent = res.tempo ? Math.round(BPM * res.tempo) : '—';
     const parts = [];
     if (!res.complete) parts.push(`Il manquait ${expected.length - taps.length} frappe${expected.length - taps.length > 1 ? 's' : ''}.`);
@@ -363,6 +399,7 @@ function rhythmSightGame($view) {
     hitsEl.querySelectorAll('.hit').forEach((h, i) => { h.classList.remove('mid'); h.style.background = ''; h.classList.add(i === 0 ? 'good' : res.intervals[i - 1].grade); });
     compareEl.innerHTML = compareSvg(expected, taps, res);
     scoreEl.textContent = res.pct + '%';
+    noter({ j: 'rythme-vue', e: elRythme('vue', level), m: 'L', ok: res.pct >= 70, r: res.pct });
     tempoEl.textContent = res.tempo ? Math.round(60 * res.tempo) : '—'; // frappes par minute au rythme du joueur : un temps = une noire
     const parts = [];
     if (!res.complete) parts.push(`Il manquait ${expected.length - taps.length} frappe${expected.length - taps.length > 1 ? 's' : ''}.`);
@@ -384,12 +421,12 @@ function rhythmSightGame($view) {
   return () => { window.removeEventListener('solfege-pause', onPause); clearTimeout(idleTimer); stopAll(); window.removeEventListener('keydown', onSpace); };
 }
 
-export function renderJeu($view, id) {
-  if (id === 'clef-sol') return noteGame($view, 'treble');
-  if (id === 'clef-fa') return noteGame($view, 'bass');
+export function renderJeu($view, id, reviser = false) {
+  if (id === 'clef-sol') return noteGame($view, 'treble', reviser);
+  if (id === 'clef-fa') return noteGame($view, 'bass', reviser);
   if (id === 'rythme') return rhythmGame($view);
   if (id === 'rythme-vue') return rhythmSightGame($view);
-  if (id === 'tonalites') return keyGame($view);
-  if (poolGames[id]) return poolGame($view, id);
+  if (id === 'tonalites') return keyGame($view, reviser);
+  if (poolGames[id]) return poolGame($view, id, reviser);
   $view.innerHTML = '<p>Jeu introuvable.</p>'; return null;
 }
