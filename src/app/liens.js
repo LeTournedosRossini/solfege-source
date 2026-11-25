@@ -34,3 +34,13 @@ export function liensLecons(jeuId) {
   const ls = LECONS_DE_JEU[jeuId]; if (!ls) return '';
   return `<nav class="liens-croises" aria-label="Leçon à relire"><strong>Leçon à relire :</strong> ${ls.map((l) => `<a href="#/cours/${l}">${titreLecon(l)}</a>`).join(' · ')}</nav>`;
 }
+
+/** Jeu de lecture qui travaille un élément suivi (pour « Réviser ») ; null si l'élément n'appartient à aucun jeu de lecture (rythme, oreille…). */
+const JEU_DE = { intervalle: 'intervalles', accord: 'accords', duree: 'durees-silences', degre: 'degres', tonalite: 'tonalites' };
+export const jeuDeLecture = (e) => (e.startsWith('note:bass') ? 'clef-fa' : e.startsWith('note:') ? 'clef-sol' : JEU_DE[e.split(':')[0]] ?? null);
+/** Jeux de lecture ayant des éléments à retravailler ou à revoir, du plus chargé au moins chargé : [[jeu, nombre], …]. `et` : Map des états (suivi.js, `etats`). */
+export function jeuxARevoir(et) {
+  const n = new Map();
+  for (const x of et.values()) { if (x.m !== 'L' || (x.niveau !== 'a_retravailler' && x.niveau !== 'a_revoir')) continue; const j = jeuDeLecture(x.e); if (j) n.set(j, (n.get(j) || 0) + 1); }
+  return [...n.entries()].sort((a, b) => b[1] - a[1]);
+}

@@ -624,3 +624,6 @@
 .mode-choix-o .chip { padding:6px 12px; border:1.5px solid var(--border); border-radius:8px; background:transparent; color:var(--muted); font-family:inherit; font-size:0.78rem; font-weight:500; cursor:pointer; }
 .mode-choix-o .chip:hover { border-color:var(--gold-dim); color:var(--text); }
 .mode-choix-o .chip.active { border-color:var(--gold); background:var(--gold-a10); color:var(--gold); }
+.bilan-o { margin-top:12px; }
+.bilan-o p, .bilan-o ul { margin:6px 0; color:var(--text); font-size:0.9rem; }
+.bilan-o ul { padding-left:20px; }

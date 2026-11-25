@@ -7,6 +7,8 @@ import { noter, etatsActuels } from './suivi-local.js';
 import { choisir, apresReponse, nouvelleSeance } from './suivi-tirage.js';
 import { elNote, elIntervalleLecture, elSimple, elRythme, libelle as libelleEl } from './suivi-elements.js';
 import { noteDuDegre, intervalAuHasard } from './jeux-tonalites.js';
+import { explication } from './explications.js';
+import { jeuxARevoir, titreActivite } from './liens.js';
 import { FR_NOTE, TREBLE_POOL, BASS_POOL, INTERVAL_START, INTERVAL_POOL, CHORD_LABELS, CHORD_POOL, DURATION_POOL, DURATION_NOTE, DEGREE_POOL, SHARP_KEYS, FLAT_KEYS } from './jeux-donnees.js';
 
 const crumb = (href, label) => `<a class="crumb" href="${href}">← ${label}</a>`;
@@ -94,7 +96,7 @@ function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, 
     active = false; total++; ui.totalEl.textContent = total;
     noter({ j: scoreId ?? gid, e: current.element, m: 'L', ok: btn.dataset.k === current.label, r: btn.dataset.k }); // suivi : une réponse par question
     if (btn.dataset.k === current.label) { score++; ui.scoreEl.textContent = score; btn.classList.add('correct'); ui.feedback.textContent = good(current.label); ui.feedback.className = 'feedback ok'; }
-    else { btn.classList.add('wrong'); ui.answers.querySelectorAll('.ans-btn').forEach((b) => { if (b.dataset.k === current.label) b.classList.add('correct'); }); ui.feedback.textContent = bad(current.label); ui.feedback.className = 'feedback no'; }
+    else { btn.classList.add('wrong'); ui.answers.querySelectorAll('.ans-btn').forEach((b) => { if (b.dataset.k === current.label) b.classList.add('correct'); }); ui.feedback.textContent = `${bad(current.label)} ${explication(current.element)}`.trim(); ui.feedback.className = 'feedback no'; }
     apresReponse(seance, current.element, btn.dataset.k === current.label);
     recordScore(scoreId ?? gid, score, total);
     if (serie) {
@@ -107,17 +109,19 @@ function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, 
   function bilan() {
     const s = serie, sec = Math.round((Date.now() - s.debut) / 1000), duree = sec >= 60 ? `${Math.floor(sec / 60)} min ${String(sec % 60).padStart(2, '0')} s` : `${sec} s`;
     const rates = [...s.rates.entries()].sort((a, b) => b[1] - a[1]);
+    const courant = (location.hash.match(/^#\/jeux\/([^?]+)/) || [])[1], suivant = reviser ? (jeuxARevoir(etatsActuels()).map(([j]) => j).find((j) => j !== courant) ?? null) : null;
     let panneau = document.getElementById(`${gid}-bilan`); panneau?.remove();
     panneau = document.createElement('section'); panneau.id = `${gid}-bilan`; panneau.className = 'card'; panneau.setAttribute('aria-label', 'Bilan de la série'); panneau.style.cssText = 'margin-top:14px;padding:16px';
-    panneau.innerHTML = `<h3 style="margin:0 0 6px">Série terminée : ${s.ok} / ${SERIE}</h3><p style="margin:0 0 8px">Durée : ${duree}.</p>${rates.length ? `<p style="margin:0 0 4px">À retravailler :</p><ul style="margin:0 0 10px 18px">${rates.map(([e, n]) => `<li>${libelleEl(e)}${n > 1 ? ` (${n} erreurs)` : ''}</li>`).join('')}</ul>` : '<p style="margin:0 0 10px">Aucune erreur : bravo !</p>'}<div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn btn-accent" data-act="encore">Nouvelle série</button><button type="button" class="btn" data-act="libre">Continuer sans limite</button></div>`;
+    panneau.innerHTML = `<h3 style="margin:0 0 6px">Série terminée : ${s.ok} / ${SERIE}</h3><p style="margin:0 0 8px">Durée : ${duree}.</p>${rates.length ? `<p style="margin:0 0 4px">À retravailler :</p><ul style="margin:0 0 10px 18px">${rates.map(([e, n]) => `<li>${libelleEl(e)}${n > 1 ? ` (${n} erreurs)` : ''}</li>`).join('')}</ul>` : '<p style="margin:0 0 10px">Aucune erreur : bravo !</p>'}<div style="display:flex;flex-wrap:wrap;gap:8px">${suivant ? `<a class="btn btn-accent" href="#/jeux/${suivant}?reviser=1">Jeu suivant à réviser : ${titreActivite(suivant)}</a>` : ''}<button type="button" class="btn ${suivant ? '' : 'btn-accent'}" data-act="encore">Nouvelle série</button><button type="button" class="btn" data-act="libre">Continuer sans limite</button></div>`;
     ui.box.append(panneau); active = false; ui.answers.querySelectorAll('.ans-btn').forEach((b) => { b.disabled = true; });
-    panneau.querySelector('[data-act=encore]').focus();
+    (panneau.querySelector('a.btn') || panneau.querySelector('[data-act=encore]')).focus();
     panneau.addEventListener('click', (e) => { const a = e.target.closest('[data-act]')?.dataset.act; if (!a) return; panneau.remove(); ui.answers.querySelectorAll('.ans-btn').forEach((b) => { b.disabled = false; }); if (a === 'encore') demarrerSerie(); else { serie = null; majSerie(); } clearTimeout(timer); round(); });
   }
   const demarrerSerie = () => { serie = { n: 0, ok: 0, rates: new Map(), debut: Date.now() }; majSerie(); };
   ui.serie.addEventListener('click', () => { document.getElementById(`${gid}-bilan`)?.remove(); ui.answers.querySelectorAll('.ans-btn').forEach((b) => { b.disabled = false; }); if (serie) { serie = null; majSerie(); } else demarrerSerie(); clearTimeout(timer); round(); });
   ui.ton?.addEventListener('click', () => { varie = !varie; try { localStorage.setItem(cleTon, varie ? '1' : '0'); } catch (er) { /* ignoré */ } majTon(); clearTimeout(timer); round(); });
   ui.mode?.addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; mode = b.dataset.mode; seance = nouvelleSeance(); try { localStorage.setItem(cleMode, mode); } catch (er) { /* ignoré */ } majMode(); clearTimeout(timer); round(); });
+  if (reviser) demarrerSerie();   // une séance de révision est une série de 10 : on enchaîne ensuite avec le jeu suivant à réviser
   majMode(); majTon(); majSerie();
   round();
   return () => { clearTimeout(timer); stopAll(); };

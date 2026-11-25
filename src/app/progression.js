@@ -5,16 +5,13 @@ import PHRASES from './data/phrases.json';
 import { donnees } from './suivi-local.js';
 import { etats, LIBELLES, JOUR } from './suivi.js';
 import { libelle, typeLibelle, INTERVALLES, elIntervalle } from './suivi-elements.js';
-import { activite, titreLecon, titreActivite } from './liens.js';
+import { activite, titreLecon, titreActivite, jeuDeLecture, jeuxARevoir } from './liens.js';
 
 const crumb = (href, label) => `<a class="crumb" href="${href}">← ${label}</a>`;
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const date = (t) => new Date(t).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
 const modalite = (m) => (m === 'O' ? 'Oreille' : 'Lecture');
 const pct = (a, b) => (b ? `${Math.round((a / b) * 100)} %` : '—');
-/** Jeu de lecture qui travaille cet élément (pour « Réviser maintenant »). */
-const JEU_DE = { intervalle: 'intervalles', accord: 'accords', duree: 'durees-silences', degre: 'degres', tonalite: 'tonalites' };
-const jeuDeLecture = (e) => (e.startsWith('note:bass') ? 'clef-fa' : e.startsWith('note:') ? 'clef-sol' : JEU_DE[e.split(':')[0]] ?? null);
 /** Tableau qui défile horizontalement sur écran étroit : la zone reçoit le focus clavier et un nom. */
 const defile = (nom, html) => `<div class="table-scroll" tabindex="0" role="region" aria-label="${nom}">${html}</div>`;
 const chip = (niveau) => `<span class="niveau niveau-${niveau}">${LIBELLES[niveau]}</span>`;
@@ -47,7 +44,8 @@ export function renderProgression($view) {
   // « Réviser maintenant » : une séance ciblée par jeu de lecture (les éléments à retravailler y reviennent), et le jeu d'oreille pour les éléments entendus
   const parJeu = new Map(); let nOreille = 0;
   for (const x of aRevoir) { if (x.m === 'O') { nOreille++; continue; } const j = jeuDeLecture(x.e); if (j) parJeu.set(j, (parJeu.get(j) || 0) + 1); }
-  const boutonsRevision = [...parJeu.entries()].map(([j, n]) => `<a class="btn btn-accent" href="#/jeux/${j}?reviser=1">Réviser : ${esc(titreActivite(j))} (${n})</a>`).join(' ') + (nOreille ? ` <a class="btn btn-ghost" href="#/oreille">Retravailler à l’oreille (${nOreille})</a>` : '');
+  const tout = jeuxARevoir(et), boutonToutReviser = tout.length > 1 ? `<a class="btn btn-accent" href="#/jeux/${tout[0][0]}?reviser=1">Tout réviser (${tout.length} jeux à la suite)</a> ` : '';
+  const boutonsRevision = boutonToutReviser + [...parJeu.entries()].map(([j, n]) => `<a class="btn btn-accent" href="#/jeux/${j}?reviser=1">Réviser : ${esc(titreActivite(j))} (${n})</a>`).join(' ') + (nOreille ? ` <a class="btn btn-ghost" href="#/oreille">Retravailler à l’oreille (${nOreille})</a>` : '');
 
   const vide = !d.evts.length && !terminees.length && !commencees.length;
   $view.innerHTML = `

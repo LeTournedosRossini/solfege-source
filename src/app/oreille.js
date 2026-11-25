@@ -9,7 +9,7 @@ import { lireDocumentScorsaire } from './oreille-import.js';
 import { documentScorsaire, nomDeFichier } from './oreille-export.js';
 import { noter, etatsActuels } from './suivi-local.js';
 import { choisir, apresReponse, nouvelleSeance } from './suivi-tirage.js';
-import { elIntervalle, elGamme, elPhrase } from './suivi-elements.js';
+import { elIntervalle, elGamme, elPhrase, libelle as libelleEl } from './suivi-elements.js';
 import { SOUNDS_URL } from '../music/player.js';
 
 const MIDI_MIN = 36, MIDI_MAX = 96; // Do2 → Do7
@@ -190,7 +190,22 @@ export function renderOreille($view) {
   const CLE_MODE = 'solfege_mode_oreille'; let modeQ = 'libre', seanceQ = nouvelleSeance();
   try { const m = localStorage.getItem(CLE_MODE); if (m === 'adapte' || m === 'erreurs') modeQ = m; } catch (e) { /* ignoré */ }
   const chipsQ = [];
-  const majModeQ = () => chipsQ.forEach((g) => g.querySelectorAll('.chip').forEach((b) => { const on = b.dataset.mode === modeQ; b.setAttribute('aria-pressed', String(on)); b.classList.toggle('active', on); }));
+  /* Série de 10 questions avec bilan (SUI-04) : une question compte dès sa première réponse ; le bilan s'affiche quand la dixième est résolue. */
+  const SERIE = 10; let serieQ = null;
+  const majSerieQ = () => chipsQ.forEach((g) => { const b = g.querySelector('.serie'); b.setAttribute('aria-pressed', String(!!serieQ)); b.classList.toggle('active', !!serieQ); b.textContent = serieQ ? `Série : ${Math.min(serieQ.n + 1, SERIE)} / ${SERIE}` : 'Série de 10 questions'; });
+  const compterSerie = (el, ok) => { if (!serieQ) return; serieQ.n++; if (ok) serieQ.ok++; else serieQ.rates.set(el, (serieQ.rates.get(el) ?? 0) + 1); majSerieQ(); };
+  const retirerBilan = () => root.querySelectorAll('.bilan-o').forEach((x) => x.remove());
+  /** À appeler une fois la question résolue : question suivante, ou bilan si la série est finie. */
+  function suiteQ(suivante, panelId) {
+    if (!serieQ || serieQ.n < SERIE) { suivante(); return; }
+    const s = serieQ, sec = Math.round((Date.now() - s.debut) / 1000), duree = sec >= 60 ? `${Math.floor(sec / 60)} min ${String(sec % 60).padStart(2, '0')} s` : `${sec} s`, rates = [...s.rates.entries()].sort((a, b) => b[1] - a[1]);
+    retirerBilan();
+    const b = document.createElement('section'); b.className = 'panel bilan-o'; b.setAttribute('aria-label', 'Bilan de la série');
+    b.innerHTML = `<div class="panel-label">Série terminée : ${s.ok} / ${SERIE}</div><p>Durée : ${duree}.</p>${rates.length ? `<p>À retravailler :</p><ul>${rates.map(([e, n]) => `<li>${libelleEl(e)}${n > 1 ? ` (${n} erreurs)` : ''}</li>`).join('')}</ul>` : '<p>Aucune erreur : bravo !</p>'}<div class="mode-choix-o"><button type="button" class="chip active" data-act="encore">Nouvelle série</button><button type="button" class="chip" data-act="libre">Continuer sans limite</button></div>`;
+    $(panelId).append(b); b.querySelector('[data-act=encore]').focus();
+    b.addEventListener('click', (e) => { const a = e.target.closest('[data-act]')?.dataset.act; if (!a) return; b.remove(); serieQ = a === 'encore' ? { n: 0, ok: 0, rates: new Map(), debut: Date.now() } : null; majSerieQ(); suivante(); });
+  }
+  const majModeQ = () => chipsQ.forEach((g) => g.querySelectorAll('.chip[data-mode]').forEach((b) => { const on = b.dataset.mode === modeQ; b.setAttribute('aria-pressed', String(on)); b.classList.toggle('active', on); }));
   /** Choisit un élément de `pool` (éléments de n'importe quel type) selon le mode ; `elOf` donne l'identifiant de suivi. Renvoie un élément du pool. */
   function choisirQ(pool, elOf) {
     if (modeQ === 'libre' || !pool.length) return pool[randInt(0, pool.length - 1)];
@@ -202,9 +217,11 @@ export function renderOreille($view) {
   }
   const montrerModeQ = (panelId, relancer) => {
     const g = document.createElement('div'); g.className = 'mode-choix-o'; g.setAttribute('role', 'group'); g.setAttribute('aria-label', 'Choix des questions');
-    g.innerHTML = '<button type="button" class="chip" data-mode="libre" aria-pressed="false">Au hasard</button><button type="button" class="chip" data-mode="adapte" aria-pressed="false" title="Ce qui est à retravailler revient plus souvent">Adaptées à ma progression</button><button type="button" class="chip" data-mode="erreurs" aria-pressed="false" title="Seulement ce que tu as raté">Mes erreurs</button>';
+    g.innerHTML = '<button type="button" class="chip" data-mode="libre" aria-pressed="false">Au hasard</button><button type="button" class="chip" data-mode="adapte" aria-pressed="false" title="Ce qui est à retravailler revient plus souvent">Adaptées à ma progression</button><button type="button" class="chip" data-mode="erreurs" aria-pressed="false" title="Seulement ce que tu as raté">Mes erreurs</button><button type="button" class="chip serie" aria-pressed="false" title="Dix questions, puis un bilan">Série de 10 questions</button>';
     $(panelId).querySelector('.panel').append(g); chipsQ.push(g);
-    g.addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; modeQ = b.dataset.mode; seanceQ = nouvelleSeance(); try { localStorage.setItem(CLE_MODE, modeQ); } catch (er) { /* ignoré */ } majModeQ(); relancer(); });
+    g.addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return;
+      if (b.classList.contains('serie')) { retirerBilan(); serieQ = serieQ ? null : { n: 0, ok: 0, rates: new Map(), debut: Date.now() }; majSerieQ(); relancer(); return; }
+      modeQ = b.dataset.mode; seanceQ = nouvelleSeance(); try { localStorage.setItem(CLE_MODE, modeQ); } catch (er) { /* ignoré */ } majModeQ(); relancer(); });
   };
   const later = (fn, ms) => { const t = setTimeout(() => { timers.delete(t); fn(); }, ms); timers.add(t); return t; };
   disposers.push(() => timers.forEach(clearTimeout));
@@ -340,12 +357,12 @@ export function renderOreille($view) {
   }
   function ivAnswer(semi, btn) {
     if (ivAnswered || !ivCur || btn.classList.contains('inactive')) return;
-    if (!ivCur.note) { ivCur.note = true; apresReponse(seanceQ, elIntervalle(ivCur.iv.short), semi === ivCur.iv.semitones); noter({ j: 'oreille-intervalles', e: elIntervalle(ivCur.iv.short), m: 'O', ok: semi === ivCur.iv.semitones, r: T.ALL_INTERVALS.find((i) => i.semitones === semi)?.short, c: ivCur.mode }); } // suivi : première réponse de la question
+    if (!ivCur.note) { ivCur.note = true; apresReponse(seanceQ, elIntervalle(ivCur.iv.short), semi === ivCur.iv.semitones); compterSerie(elIntervalle(ivCur.iv.short), semi === ivCur.iv.semitones); noter({ j: 'oreille-intervalles', e: elIntervalle(ivCur.iv.short), m: 'O', ok: semi === ivCur.iv.semitones, r: T.ALL_INTERVALS.find((i) => i.semitones === semi)?.short, c: ivCur.mode }); } // suivi : première réponse de la question
     ivScore.st.total++;
     if (semi === ivCur.iv.semitones) {
       ivAnswered = true; ivScore.st.ok++; ivScore.update(); btn.classList.add('correct');
       $('answersGrid').querySelectorAll('.ans-btn').forEach((b) => { if (b !== btn) b.disabled = true; });
-      ivFb.show(`✓ Bravo !  ${ivCur.iv.name}`, 'correct'); ivFb.soon(() => { ivFb.clear(); ivNew(true); }, nextDelay * 1000);
+      ivFb.show(`✓ Bravo !  ${ivCur.iv.name}`, 'correct'); ivFb.soon(() => { ivFb.clear(); suiteQ(() => ivNew(true), 'intervalIdentPanel'); }, nextDelay * 1000);
     } else { ivScore.update(); btn.classList.add('wrong'); btn.disabled = true; ivFb.show('✗ Essaie encore…', 'wrong'); ivFb.soon(() => { if (!ivAnswered) ivFb.clear(); }, 1200); }
   }
   function drawFamilies() {
@@ -453,9 +470,9 @@ export function renderOreille($view) {
   }
   function gaAnswer(key, btn) {
     if (gaAnswered || !gaCur || btn.classList.contains('inactive')) return;
-    if (!gaCur.note) { gaCur.note = true; apresReponse(seanceQ, elGamme(gaCur.q.key), key === gaCur.q.key); noter({ j: 'oreille-gammes', e: elGamme(gaCur.q.key), m: 'O', ok: key === gaCur.q.key, r: key, c: gaCur.mode }); }
+    if (!gaCur.note) { gaCur.note = true; apresReponse(seanceQ, elGamme(gaCur.q.key), key === gaCur.q.key); compterSerie(elGamme(gaCur.q.key), key === gaCur.q.key); noter({ j: 'oreille-gammes', e: elGamme(gaCur.q.key), m: 'O', ok: key === gaCur.q.key, r: key, c: gaCur.mode }); }
     gaScore.st.total++;
-    if (key === gaCur.q.key) { gaAnswered = true; gaScore.st.ok++; gaScore.update(); btn.classList.add('correct'); $('gaAnswersGrid').querySelectorAll('.ans-btn').forEach((b) => { if (b !== btn) b.disabled = true; }); gaFb.show(`✓ Bravo !  ${gaCur.q.label}`, 'correct'); gaFb.soon(() => { gaFb.clear(); gaNew(true); }, nextDelay * 1000); }
+    if (key === gaCur.q.key) { gaAnswered = true; gaScore.st.ok++; gaScore.update(); btn.classList.add('correct'); $('gaAnswersGrid').querySelectorAll('.ans-btn').forEach((b) => { if (b !== btn) b.disabled = true; }); gaFb.show(`✓ Bravo !  ${gaCur.q.label}`, 'correct'); gaFb.soon(() => { gaFb.clear(); suiteQ(() => gaNew(true), 'gaIdentPanel'); }, nextDelay * 1000); }
     else { gaScore.update(); btn.classList.add('wrong'); btn.disabled = true; gaFb.show('✗ Essaie encore…', 'wrong'); gaFb.soon(() => { if (!gaAnswered) gaFb.clear(); }, 1200); }
   }
   $('gaPlayBtn').onclick = gaPlayCur; $('gaResetBtn').onclick = () => { gaScore.reset(); gaNew(false); };
@@ -583,9 +600,9 @@ export function renderOreille($view) {
   const wkPlayCur = () => { if (!wkCur) return; pulse($('wkPlayBtn')); speak({ ...phraseDesc(wkCur.work), transpose: wkCur.offset }); };
   function wkAnswer(w, btn) {
     if (wkAnswered || !wkCur) return;
-    if (!wkCur.note) { wkCur.note = true; const el = elPhr; apresReponse(seanceQ, el(wkCur.work), w === wkCur.work || w.id === wkCur.work.id); noter({ j: 'oreille-phrases', e: el(wkCur.work), m: 'O', ok: w === wkCur.work || w.id === wkCur.work.id, r: el(w) }); }
+    if (!wkCur.note) { wkCur.note = true; const el = elPhr; apresReponse(seanceQ, el(wkCur.work), w === wkCur.work || w.id === wkCur.work.id); compterSerie(el(wkCur.work), w === wkCur.work || w.id === wkCur.work.id); noter({ j: 'oreille-phrases', e: el(wkCur.work), m: 'O', ok: w === wkCur.work || w.id === wkCur.work.id, r: el(w) }); }
     wkScore.st.total++;
-    if (w === wkCur.work || w.id === wkCur.work.id) { wkAnswered = true; wkScore.st.ok++; wkScore.update(); btn.classList.add('correct'); $('wkAnswersGrid').querySelectorAll('.ans-btn').forEach((b) => { if (b !== btn) b.disabled = true; }); wkFb.show(`✓ Bravo !  ${w.title}`, 'correct'); wkFb.soon(() => { wkFb.clear(); wkNew(true); }, nextDelay * 1000); }
+    if (w === wkCur.work || w.id === wkCur.work.id) { wkAnswered = true; wkScore.st.ok++; wkScore.update(); btn.classList.add('correct'); $('wkAnswersGrid').querySelectorAll('.ans-btn').forEach((b) => { if (b !== btn) b.disabled = true; }); wkFb.show(`✓ Bravo !  ${w.title}`, 'correct'); wkFb.soon(() => { wkFb.clear(); suiteQ(() => wkNew(true), 'worksIdentPanel'); }, nextDelay * 1000); }
     else { wkScore.update(); btn.classList.add('wrong'); btn.disabled = true; wkFb.show('✗ Essaie encore…', 'wrong'); wkFb.soon(() => { if (!wkAnswered) wkFb.clear(); }, 1200); }
   }
   $('wkPlayBtn').onclick = wkPlayCur; $('wkResetBtn').onclick = () => { wkScore.reset(); wkNew(false); };
@@ -593,7 +610,7 @@ export function renderOreille($view) {
   slider($('wkChoiceRange'), $('wkChoiceVal'), (v) => String(v), 4, 16, (v) => { wkChoices = v; });
 
   /* ---------- démarrage ---------- */
-  montrerModeQ('intervalIdentPanel', () => ivNew(false)); montrerModeQ('gaIdentPanel', () => gaNew(false)); montrerModeQ('worksIdentPanel', () => wkNew(false)); majModeQ();
+  montrerModeQ('intervalIdentPanel', () => ivNew(false)); montrerModeQ('gaIdentPanel', () => gaNew(false)); montrerModeQ('worksIdentPanel', () => wkNew(false)); majModeQ(); majSerieQ();
   ecPickers(); ecDraw(); drawFamilies(); drawQualities(); ivBuildAnswers(); ivAmp(); ivNew(false);
   gaPickers(); gaPool(); gaBuildAnswers(); gaNew(false); wkFilterTabs(); wkNew(false);
   // les questions d'identification se relancent quand on ouvre l'onglet (pas de question « déjà jouée » en fond)

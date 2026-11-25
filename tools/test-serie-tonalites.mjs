@@ -47,7 +47,7 @@ await p.evaluate(() => { const n = Date.now(), J = 86400000; const e = (d, el, o
 await p.goto(url + '#/oreille'); await p.waitForSelector('#ecStaffWrap svg');
 await p.locator('#intervalSubtabs .subtab2-btn[data-sub="ident"]').click();
 await p.click('#hamburgerBtn'); await p.click('#selectAllBtn'); await p.keyboard.press('Escape');
-check('oreille : sélecteur de mode présent, « Au hasard » par défaut', await p.locator('#intervalIdentPanel .mode-choix-o .chip').count() === 3 && (await p.locator('#intervalIdentPanel .chip.active').getAttribute('data-mode')) === 'libre');
+check('oreille : sélecteur de mode présent, « Au hasard » par défaut', await p.locator('#intervalIdentPanel .mode-choix-o .chip[data-mode]').count() === 3 && (await p.locator('#intervalIdentPanel .chip[data-mode].active').getAttribute('data-mode')) === 'libre');
 await p.locator('#intervalIdentPanel .chip[data-mode="adapte"]').click();
 check('oreille : mode mémorisé', (await p.evaluate(() => localStorage.getItem('solfege_mode_oreille'))) === 'adapte');
 const compte = {};

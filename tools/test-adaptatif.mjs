@@ -33,6 +33,8 @@ const avant = (await evts()).length; await lien.click(); await p.waitForSelector
 check('le bouton ouvre le jeu en mode « Mes erreurs »', (await pressed('ig')) === 'erreurs');
 await repondre('ig', 7); const nouvelles = (await evts()).slice(avant);
 check('mes erreurs : toutes les questions portent sur la quinte juste (seul élément raté)', nouvelles.length === 7 && nouvelles.every((x) => x.e === 'intervalle:P5'), nouvelles.map((x) => x.e).join(' '));
+check('réviser : une série de 10 est lancée d\'office', (await p.locator('#ig-serie').getAttribute('aria-pressed')) === 'true');
+await p.click('#ig-serie');
 // --- adapté avec un élément raté : il revient souvent mais pas deux fois de suite
 await p.click('#ig-mode [data-mode="adapte"]'); await p.waitForTimeout(200); const av2 = (await evts()).length; await repondre('ig', 14);
 const suite = (await evts()).slice(av2).map((x) => x.e); const deuxFois = suite.filter((e, i) => i && e === suite[i - 1]).length;
