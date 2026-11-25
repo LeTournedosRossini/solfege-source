@@ -12,6 +12,8 @@ export const nouvelleSeance = () => ({ dernier: null, rappels: [] });
 
 const classe = (etat) => (!etat ? 'nouveau' : etat.niveau === 'maitrise' ? 'maitrise' : 'travail');
 const erreursRecentes = (etat) => (etat ? etat.recents.filter((x) => !x).length : 0);
+/** Part d'erreurs parmi les dernières réponses (0 à 1) : un élément réussi à 20 % pèse bien plus qu'un élément réussi à 95 %. */
+const tauxErreur = (etat) => (etat && etat.recents.length ? erreursRecentes(etat) / etat.recents.length : 0);
 
 /**
  * Choisit l'élément de la prochaine question.
@@ -46,7 +48,7 @@ export function choisir({ candidats, etats, m, seance, maintenant = Date.now(), 
     if (!poids.length) groupes.nouveau = base.slice(), poids.push(['nouveau', 1]);
     let r = rnd() * poids.reduce((t, [, w]) => t + w, 0), cat = poids[0][0];
     for (const [k, w] of poids) { if (r < w) { cat = k; break; } r -= w; }
-    const liste = groupes[cat], pw = (e) => { const s = etat(e); return s ? 1 + 2 * erreursRecentes(s) + Math.min(5, (maintenant - s.dernier) / JOUR / 3) : 1; };
+    const liste = groupes[cat], pw = (e) => { const s = etat(e); return s ? 1 + 12 * erreursRecentes(s) * tauxErreur(s) + Math.min(2, (maintenant - s.dernier) / JOUR / 7) : 1; };
     const total = liste.reduce((t, e) => t + pw(e), 0); let x = rnd() * total;
     choix = liste[liste.length - 1];
     for (const e of liste) { const w = pw(e); if (x < w) { choix = e; break; } x -= w; }

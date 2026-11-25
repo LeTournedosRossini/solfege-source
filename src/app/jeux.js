@@ -5,10 +5,12 @@ import { CATALOGUE } from './data/catalogue.js';
 import { evaluateRhythm } from './rythme-eval.js';
 import { noter, etatsActuels } from './suivi-local.js';
 import { choisir, apresReponse, nouvelleSeance } from './suivi-tirage.js';
-import { elNote, elIntervalleLecture, elSimple, elRythme } from './suivi-elements.js';
+import { elNote, elIntervalleLecture, elSimple, elRythme, libelle as libelleEl } from './suivi-elements.js';
+import { noteDuDegre, intervalAuHasard } from './jeux-tonalites.js';
 import { FR_NOTE, TREBLE_POOL, BASS_POOL, INTERVAL_START, INTERVAL_POOL, CHORD_LABELS, CHORD_POOL, DURATION_POOL, DURATION_NOTE, DEGREE_POOL, SHARP_KEYS, FLAT_KEYS } from './jeux-donnees.js';
 
 const crumb = (href, label) => `<a class="crumb" href="${href}">← ${label}</a>`;
+const SERIE = 10;
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
 // Même clé de stockage que l'application actuelle
@@ -32,31 +34,41 @@ function show(host, desc, { staffwidth, scale = 1.15, play = true } = {}) {
 }
 
 /** Squelette commun d'un jeu à réponses : score, essais, partition, boutons, retour. */
-function quizShell($view, { gid, title, intro, adaptive }) {
+function quizShell($view, { gid, title, intro, adaptive, tonalite }) {
   $view.innerHTML = `
     ${crumb('#/jeux', 'Tous les jeux')}
     <div class="game-shell">
       <div class="section-head"><h2>${title}</h2></div>
       ${intro ? `<p class="game-intro">${intro}</p>` : ''}
       ${adaptive ? `<div class="mode-choix" id="${gid}-mode" role="group" aria-label="Choix des questions" style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px"><button type="button" class="chip" data-mode="libre" aria-pressed="false">Au hasard</button><button type="button" class="chip" data-mode="adapte" aria-pressed="false" title="Ce qui est à retravailler revient plus souvent, les nouveautés arrivent peu à peu">Adaptées à ma progression</button><button type="button" class="chip" data-mode="erreurs" aria-pressed="false" title="Seulement ce que tu as raté">Mes erreurs</button></div>` : ''}
+      <div class="mode-choix" id="${gid}-options" role="group" aria-label="Options de la partie" style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px">
+        ${tonalite ? `<button type="button" class="chip" id="${gid}-ton" aria-pressed="false" title="${tonalite.aide}">${tonalite.libelle}</button>` : ''}
+        <button type="button" class="chip" id="${gid}-serie" aria-pressed="false" title="Dix questions, puis un bilan : score, durée, ce qu'il reste à travailler">Série de 10 questions</button>
+      </div>
       <div class="game-hud">
         <div class="hud-stat"><b id="${gid}-score">0</b>score</div>
         <div class="hud-stat"><b id="${gid}-total">0</b>essais</div>
+        <div class="hud-stat" id="${gid}-avance" hidden><b id="${gid}-rang">0/10</b>série</div>
       </div>
       <div class="staff-box"><div class="abc-notation" id="${gid}-staff"></div></div>
       <div class="answers" id="${gid}-answers"></div>
       <div class="feedback" id="${gid}-feedback" role="status" aria-live="polite">&nbsp;</div>
     </div>`;
   configurePlayer({ sounds: new URLSearchParams(location.search).get('sounds') || undefined, onStatus: () => {} });
-  return { staff: document.getElementById(`${gid}-staff`), answers: document.getElementById(`${gid}-answers`), feedback: document.getElementById(`${gid}-feedback`), mode: document.getElementById(`${gid}-mode`), scoreEl: document.getElementById(`${gid}-score`), totalEl: document.getElementById(`${gid}-total`) };
+  return { staff: document.getElementById(`${gid}-staff`), answers: document.getElementById(`${gid}-answers`), feedback: document.getElementById(`${gid}-feedback`), mode: document.getElementById(`${gid}-mode`), scoreEl: document.getElementById(`${gid}-score`), totalEl: document.getElementById(`${gid}-total`), ton: document.getElementById(`${gid}-ton`), serie: document.getElementById(`${gid}-serie`), avance: document.getElementById(`${gid}-avance`), rang: document.getElementById(`${gid}-rang`), box: document.getElementById(`${gid}-staff`).closest('.game-shell') };
 }
 
 /** Moteur commun : `answers` = les boutons de réponse, TOUJOURS les mêmes et dans le même ordre (le joueur prend le réflexe d'appuyer au bon endroit) ;
  *  `next(staff)` prépare une question et renvoie { label } ; `good(label)` / `bad(label)` donnent le texte de retour. */
-function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, delay = 900, adaptive = null, reviser = false }) {
-  const ui = quizShell($view, { gid, title, intro, adaptive });
+function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, delay = 900, adaptive = null, reviser = false, tonalite = null }) {
+  const ui = quizShell($view, { gid, title, intro, adaptive, tonalite });
   ui.answers.innerHTML = answers.map((k) => `<button class="ans-btn" data-k="${k}">${k}</button>`).join('');
   let score = 0, total = 0, current = null, active = true, timer = 0;
+  // tonalités variées (CON-01) : choix mémorisé par jeu ; série de 10 questions avec bilan (SUI-04)
+  const cleTon = `solfege_tonalites_${scoreId ?? gid}`; let varie = false, serie = null;
+  if (tonalite) { try { varie = localStorage.getItem(cleTon) === '1'; } catch (e) { /* ignoré */ } }
+  const majTon = () => { if (ui.ton) { ui.ton.setAttribute('aria-pressed', String(varie)); ui.ton.classList.toggle('active', varie); } };
+  const majSerie = () => { ui.serie.setAttribute('aria-pressed', String(!!serie)); ui.serie.classList.toggle('active', !!serie); ui.avance.hidden = !serie; if (serie) ui.rang.textContent = `${Math.min(serie.n + 1, SERIE)}/${SERIE}`; };
   // choix des questions : au hasard (comme avant), adapté à la progression (règles 7.2), ou seulement les erreurs ; le choix est mémorisé par jeu
   const cleMode = `solfege_mode_${scoreId ?? gid}`; let mode = reviser ? 'erreurs' : 'libre', seance = nouvelleSeance();
   if (!reviser) { try { const m = localStorage.getItem(cleMode); if (m === 'adapte' || m === 'erreurs') mode = m; } catch (e) { /* ignoré */ } }
@@ -65,12 +77,12 @@ function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, 
     if (adaptive && mode !== 'libre') {
       const elements = [...new Set(adaptive.pool.map(adaptive.element))];
       const e = choisir({ candidats: elements, etats: etatsActuels(), m: 'L', seance, mode });
-      if (e !== null) { const items = adaptive.pool.filter((it) => adaptive.element(it) === e); return adaptive.render(ui.staff, pick(items)); }
+      if (e !== null) { const items = adaptive.pool.filter((it) => adaptive.element(it) === e); return adaptive.render(ui.staff, pick(items), varie); }
       ui.feedback.textContent = 'Aucune erreur à retravailler pour l’instant : questions adaptées à ta progression.'; mode = 'adapte'; try { localStorage.setItem(cleMode, mode); } catch (er) { /* ignoré */ } majMode();
       const e2 = choisir({ candidats: elements, etats: etatsActuels(), m: 'L', seance, mode });
-      return adaptive.render(ui.staff, pick(adaptive.pool.filter((it) => adaptive.element(it) === e2)));
+      return adaptive.render(ui.staff, pick(adaptive.pool.filter((it) => adaptive.element(it) === e2)), varie);
     }
-    return next(ui.staff);
+    return next(ui.staff, varie);
   }
   function round() {
     current = question();
@@ -85,10 +97,28 @@ function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, 
     else { btn.classList.add('wrong'); ui.answers.querySelectorAll('.ans-btn').forEach((b) => { if (b.dataset.k === current.label) b.classList.add('correct'); }); ui.feedback.textContent = bad(current.label); ui.feedback.className = 'feedback no'; }
     apresReponse(seance, current.element, btn.dataset.k === current.label);
     recordScore(scoreId ?? gid, score, total);
+    if (serie) {
+      serie.n++; if (btn.dataset.k === current.label) serie.ok++; else serie.rates.set(current.element, (serie.rates.get(current.element) ?? 0) + 1);
+      if (serie.n >= SERIE) { timer = setTimeout(bilan, delay); return; }
+      majSerie();
+    }
     timer = setTimeout(round, delay);
   });
+  function bilan() {
+    const s = serie, sec = Math.round((Date.now() - s.debut) / 1000), duree = sec >= 60 ? `${Math.floor(sec / 60)} min ${String(sec % 60).padStart(2, '0')} s` : `${sec} s`;
+    const rates = [...s.rates.entries()].sort((a, b) => b[1] - a[1]);
+    let panneau = document.getElementById(`${gid}-bilan`); panneau?.remove();
+    panneau = document.createElement('section'); panneau.id = `${gid}-bilan`; panneau.className = 'card'; panneau.setAttribute('aria-label', 'Bilan de la série'); panneau.style.cssText = 'margin-top:14px;padding:16px';
+    panneau.innerHTML = `<h3 style="margin:0 0 6px">Série terminée : ${s.ok} / ${SERIE}</h3><p style="margin:0 0 8px">Durée : ${duree}.</p>${rates.length ? `<p style="margin:0 0 4px">À retravailler :</p><ul style="margin:0 0 10px 18px">${rates.map(([e, n]) => `<li>${libelleEl(e)}${n > 1 ? ` (${n} erreurs)` : ''}</li>`).join('')}</ul>` : '<p style="margin:0 0 10px">Aucune erreur : bravo !</p>'}<div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn btn-accent" data-act="encore">Nouvelle série</button><button type="button" class="btn" data-act="libre">Continuer sans limite</button></div>`;
+    ui.box.append(panneau); active = false; ui.answers.querySelectorAll('.ans-btn').forEach((b) => { b.disabled = true; });
+    panneau.querySelector('[data-act=encore]').focus();
+    panneau.addEventListener('click', (e) => { const a = e.target.closest('[data-act]')?.dataset.act; if (!a) return; panneau.remove(); ui.answers.querySelectorAll('.ans-btn').forEach((b) => { b.disabled = false; }); if (a === 'encore') demarrerSerie(); else { serie = null; majSerie(); } clearTimeout(timer); round(); });
+  }
+  const demarrerSerie = () => { serie = { n: 0, ok: 0, rates: new Map(), debut: Date.now() }; majSerie(); };
+  ui.serie.addEventListener('click', () => { document.getElementById(`${gid}-bilan`)?.remove(); ui.answers.querySelectorAll('.ans-btn').forEach((b) => { b.disabled = false; }); if (serie) { serie = null; majSerie(); } else demarrerSerie(); clearTimeout(timer); round(); });
+  ui.ton?.addEventListener('click', () => { varie = !varie; try { localStorage.setItem(cleTon, varie ? '1' : '0'); } catch (er) { /* ignoré */ } majTon(); clearTimeout(timer); round(); });
   ui.mode?.addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; mode = b.dataset.mode; seance = nouvelleSeance(); try { localStorage.setItem(cleMode, mode); } catch (er) { /* ignoré */ } majMode(); clearTimeout(timer); round(); });
-  majMode();
+  majMode(); majTon(); majSerie();
   round();
   return () => { clearTimeout(timer); stopAll(); };
 }
@@ -110,7 +140,7 @@ function noteGame($view, clef, reviser) {
 
 /* ---------- Jeux à réservoir : intervalles, accords, durées et silences, degrés ---------- */
 const poolGames = {
-  intervalles: { gid: 'ig', title: 'Jeu des intervalles', intro: "Do est toujours la première note. Identifie l'intervalle qui la sépare de la seconde note affichée.",
+  intervalles: { gid: 'ig', title: 'Jeu des intervalles', intro: "Do est la première note (sauf si tu choisis « Départ sur toutes les notes »). Identifie l'intervalle qui la sépare de la seconde note affichée.",
     labels: [...new Set(INTERVAL_POOL.map((p) => p.label))], staffwidth: 260, bpm: 260, element: elIntervalleLecture,
     item: (it) => ({ label: it.label, desc: { clef: 'treble', measures: [[whole([INTERVAL_START]), whole([it.note])]] } }), pool: INTERVAL_POOL },
   accords: { gid: 'ag', title: 'Jeu des accords', intro: "Observe les notes empilées sur la portée et identifie la nature de l'accord.",
@@ -119,18 +149,28 @@ const poolGames = {
   'durees-silences': { gid: 'dg', title: 'Jeu des durées et silences', intro: "Une figure de note ou un silence s'affiche : retrouve son nom. (Un silence... ne joue rien : c'est normal !)",
     labels: [...new Set(DURATION_POOL.map((p) => p.label))], staffwidth: 150, scale: 1.2, bpm: 150, element: (l) => elSimple('duree', l),
     item: (it) => ({ label: it.label, desc: { clef: 'treble', measures: [[it.rest ? { rest: true, d: it.d } : { n: [DURATION_NOTE], d: it.d }]] } }), pool: DURATION_POOL },
-  degres: { gid: 'gg', title: 'Jeu des degrés', intro: 'Toujours en Do majeur : quelle est la fonction (le degré) de la note affichée ?',
+  degres: { gid: 'gg', title: 'Jeu des degrés', intro: 'En Do majeur (ou dans la tonalité indiquée par l’armure si tu choisis « Toutes les tonalités ») : quelle est la fonction (le degré) de la note affichée ?',
     labels: DEGREE_POOL.map((p) => p.label), staffwidth: 200, bpm: 200, element: (l) => elSimple('degre', l),
     item: (it) => ({ label: it.label, desc: { clef: 'treble', measures: [[whole([it.note])]] } }), pool: DEGREE_POOL },
 };
+const TONALITES_JEU = {
+  intervalles: { libelle: 'Départ sur toutes les notes', aide: 'La première note change : tu reconnais les intervalles quel que soit le point de départ' },
+  degres: { libelle: 'Toutes les tonalités', aide: 'La tonalité change (armure sur la portée) : tu reconnais les degrés dans chaque tonalité majeure' },
+};
+const DEGRES = ['Tonique', 'Sus-tonique', 'Médiante', 'Sous-dominante', 'Dominante', 'Sus-dominante', 'Sensible'];
 function poolGame($view, id, reviser) {
   const g = poolGames[id];
-  const rendre = (staff, raw) => { const it = g.item(raw); show(staff, { ...it.desc, bpm: g.bpm }, { staffwidth: g.staffwidth, scale: g.scale ?? 1.15 }); return { label: it.label, element: g.element(it.label) }; };
+  const rendre = (staff, raw, varie = false) => {
+    const it = g.item(raw); let desc = it.desc;
+    if (varie && id === 'degres') { const n = Math.floor(Math.random() * 15) - 7; desc = { clef: 'treble', key: n, measures: [[whole([noteDuDegre(n, DEGRES.indexOf(it.label))])]] }; }
+    else if (varie && id === 'intervalles') { const r = intervalAuHasard(it.label); if (r) desc = { clef: 'treble', measures: [[whole([r[0]]), whole([r[1]])]] }; }
+    show(staff, { ...desc, bpm: g.bpm }, { staffwidth: g.staffwidth, scale: g.scale ?? 1.15 }); return { label: it.label, element: g.element(it.label) };
+  };
   return runQuiz($view, {
     gid: g.gid, scoreId: g.gid, title: g.title, intro: g.intro, answers: g.labels,
-    next(staff) { return rendre(staff, pick(g.pool)); },
+    next(staff, varie) { return rendre(staff, pick(g.pool), varie); },
     adaptive: { pool: g.pool, element: (raw) => g.element(g.item(raw).label), render: rendre },
-    reviser,
+    reviser, tonalite: TONALITES_JEU[id],
     good: (l) => `Exact : ${l}.`, bad: (l) => `C'était : ${l}.`,
   });
 }

@@ -619,3 +619,8 @@
 .ear .name-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--card); color: var(--text); font: inherit; }
 .ear .name-input:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .ear .import-note { font-size: .74rem; color: var(--muted); }
+
+.mode-choix-o { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.mode-choix-o .chip { padding:6px 12px; border:1.5px solid var(--border); border-radius:8px; background:transparent; color:var(--muted); font-family:inherit; font-size:0.78rem; font-weight:500; cursor:pointer; }
+.mode-choix-o .chip:hover { border-color:var(--gold-dim); color:var(--text); }
+.mode-choix-o .chip.active { border-color:var(--gold); background:var(--gold-a10); color:var(--gold); }

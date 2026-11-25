@@ -7,7 +7,8 @@ import { renderDesc } from '../music/describe.js';
 import * as T from './oreille-theorie.js';
 import { lireDocumentScorsaire } from './oreille-import.js';
 import { documentScorsaire, nomDeFichier } from './oreille-export.js';
-import { noter } from './suivi-local.js';
+import { noter, etatsActuels } from './suivi-local.js';
+import { choisir, apresReponse, nouvelleSeance } from './suivi-tirage.js';
 import { elIntervalle, elGamme, elPhrase } from './suivi-elements.js';
 import { SOUNDS_URL } from '../music/player.js';
 
@@ -185,6 +186,26 @@ export function renderOreille($view) {
   let phraseRangeMin = 48, phraseRangeMax = 84;
   const pickMode = () => { const a = [...activeModes]; return a[randInt(0, a.length - 1)]; };
   const timers = new Set();
+  /* Choix des questions d'identification : au hasard, adaptées à la progression (ce qui est raté revient plus souvent, 7.2 du cahier), ou seulement les erreurs. Un seul choix pour les trois onglets. */
+  const CLE_MODE = 'solfege_mode_oreille'; let modeQ = 'libre', seanceQ = nouvelleSeance();
+  try { const m = localStorage.getItem(CLE_MODE); if (m === 'adapte' || m === 'erreurs') modeQ = m; } catch (e) { /* ignoré */ }
+  const chipsQ = [];
+  const majModeQ = () => chipsQ.forEach((g) => g.querySelectorAll('.chip').forEach((b) => { const on = b.dataset.mode === modeQ; b.setAttribute('aria-pressed', String(on)); b.classList.toggle('active', on); }));
+  /** Choisit un élément de `pool` (éléments de n'importe quel type) selon le mode ; `elOf` donne l'identifiant de suivi. Renvoie un élément du pool. */
+  function choisirQ(pool, elOf) {
+    if (modeQ === 'libre' || !pool.length) return pool[randInt(0, pool.length - 1)];
+    const ids = [...new Set(pool.map(elOf))];
+    let e = choisir({ candidats: ids, etats: etatsActuels(), m: 'O', seance: seanceQ, mode: modeQ });
+    if (e === null) { modeQ = 'adapte'; try { localStorage.setItem(CLE_MODE, modeQ); } catch (er) { /* ignoré */ } majModeQ(); e = choisir({ candidats: ids, etats: etatsActuels(), m: 'O', seance: seanceQ, mode: modeQ }); }
+    const items = pool.filter((x) => elOf(x) === e);
+    return items[randInt(0, items.length - 1)];
+  }
+  const montrerModeQ = (panelId, relancer) => {
+    const g = document.createElement('div'); g.className = 'mode-choix-o'; g.setAttribute('role', 'group'); g.setAttribute('aria-label', 'Choix des questions');
+    g.innerHTML = '<button type="button" class="chip" data-mode="libre" aria-pressed="false">Au hasard</button><button type="button" class="chip" data-mode="adapte" aria-pressed="false" title="Ce qui est à retravailler revient plus souvent">Adaptées à ma progression</button><button type="button" class="chip" data-mode="erreurs" aria-pressed="false" title="Seulement ce que tu as raté">Mes erreurs</button>';
+    $(panelId).querySelector('.panel').append(g); chipsQ.push(g);
+    g.addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; modeQ = b.dataset.mode; seanceQ = nouvelleSeance(); try { localStorage.setItem(CLE_MODE, modeQ); } catch (er) { /* ignoré */ } majModeQ(); relancer(); });
+  };
   const later = (fn, ms) => { const t = setTimeout(() => { timers.delete(t); fn(); }, ms); timers.add(t); return t; };
   disposers.push(() => timers.forEach(clearTimeout));
 
@@ -310,7 +331,7 @@ export function renderOreille($view) {
     ivAnswered = false; ivFb.clear();
     const ok = T.ALL_INTERVALS.filter((iv) => activeIntervals.has(iv.semitones) && rangeMin <= rangeMax - iv.semitones);
     if (!ok.length) { ivFb.show('⚠ Aucun intervalle possible dans cette plage !', 'wrong'); ivCur = null; return; }
-    const iv = ok[randInt(0, ok.length - 1)];
+    const iv = choisirQ(ok, (x) => elIntervalle(x.short));
     ivCur = { iv, rootMidi: randInt(rangeMin, rangeMax - iv.semitones), mode: pickMode() };
     $('answersGrid').querySelectorAll('.ans-btn').forEach((b) => { b.classList.remove('wrong', 'correct'); b.disabled = false; });
     ivSync();
@@ -319,7 +340,7 @@ export function renderOreille($view) {
   }
   function ivAnswer(semi, btn) {
     if (ivAnswered || !ivCur || btn.classList.contains('inactive')) return;
-    if (!ivCur.note) { ivCur.note = true; noter({ j: 'oreille-intervalles', e: elIntervalle(ivCur.iv.short), m: 'O', ok: semi === ivCur.iv.semitones, r: T.ALL_INTERVALS.find((i) => i.semitones === semi)?.short, c: ivCur.mode }); } // suivi : première réponse de la question
+    if (!ivCur.note) { ivCur.note = true; apresReponse(seanceQ, elIntervalle(ivCur.iv.short), semi === ivCur.iv.semitones); noter({ j: 'oreille-intervalles', e: elIntervalle(ivCur.iv.short), m: 'O', ok: semi === ivCur.iv.semitones, r: T.ALL_INTERVALS.find((i) => i.semitones === semi)?.short, c: ivCur.mode }); } // suivi : première réponse de la question
     ivScore.st.total++;
     if (semi === ivCur.iv.semitones) {
       ivAnswered = true; ivScore.st.ok++; ivScore.update(); btn.classList.add('correct');
@@ -423,7 +444,7 @@ export function renderOreille($view) {
     gaAnswered = false; gaFb.clear();
     const pool = T.QUALITIES.filter((q) => gaActive.has(q.key));
     if (!pool.length) { gaFb.show('⚠ Aucune qualité sélectionnée !', 'wrong'); gaCur = null; return; }
-    const q = pool[randInt(0, pool.length - 1)], span = Math.max(...q.intervals), lo = phraseRangeMin, hi = phraseRangeMax - span;
+    const q = choisirQ(pool, (x) => elGamme(x.key)), span = Math.max(...q.intervals), lo = phraseRangeMin, hi = phraseRangeMax - span;
     if (lo > hi) { gaFb.show('⚠ Amplitude trop étroite pour cette qualité !', 'wrong'); gaCur = null; return; }
     gaCur = { q, rootMidi: randInt(lo, hi), mode: pickMode() };
     $('gaAnswersGrid').querySelectorAll('.ans-btn').forEach((b) => { b.classList.remove('wrong', 'correct'); b.disabled = false; });
@@ -432,7 +453,7 @@ export function renderOreille($view) {
   }
   function gaAnswer(key, btn) {
     if (gaAnswered || !gaCur || btn.classList.contains('inactive')) return;
-    if (!gaCur.note) { gaCur.note = true; noter({ j: 'oreille-gammes', e: elGamme(gaCur.q.key), m: 'O', ok: key === gaCur.q.key, r: key, c: gaCur.mode }); }
+    if (!gaCur.note) { gaCur.note = true; apresReponse(seanceQ, elGamme(gaCur.q.key), key === gaCur.q.key); noter({ j: 'oreille-gammes', e: elGamme(gaCur.q.key), m: 'O', ok: key === gaCur.q.key, r: key, c: gaCur.mode }); }
     gaScore.st.total++;
     if (key === gaCur.q.key) { gaAnswered = true; gaScore.st.ok++; gaScore.update(); btn.classList.add('correct'); $('gaAnswersGrid').querySelectorAll('.ans-btn').forEach((b) => { if (b !== btn) b.disabled = true; }); gaFb.show(`✓ Bravo !  ${gaCur.q.label}`, 'correct'); gaFb.soon(() => { gaFb.clear(); gaNew(true); }, nextDelay * 1000); }
     else { gaScore.update(); btn.classList.add('wrong'); btn.disabled = true; gaFb.show('✗ Essaie encore…', 'wrong'); gaFb.soon(() => { if (!gaAnswered) gaFb.clear(); }, 1200); }
@@ -541,13 +562,14 @@ export function renderOreille($view) {
   let wkChoices = 8, wkFilter = 'mixed', wkCur = null, wkAnswered = false;
   const wkScore = bindScore({ val: 'wkScoreVal', pct: 'wkScorePct' }), wkFb = feedbackFor('wkFeedback');
   const kbWkId = piano($('keyboardWorksIdent'), () => {});
+  const elPhr = (x) => (x.id.startsWith('b') ? elPhrase(x.title) : 'phrase:perso');
   const wkPool = () => (wkFilter === 'mixed' ? allPhrases() : allPhrases().filter((w) => w.genre === wkFilter));
   function wkFilterTabs() { if (wkFilter === 'importe' && !imported.length) wkFilter = 'mixed'; genreTabs($('wkFilterTabs'), wkFilter, (k) => { wkFilter = k; wkFilterTabs(); wkNew(false); }, true); }
   function wkNew(auto) {
     wkAnswered = false; wkFb.clear();
     const pool = wkPool();
     if (pool.length < 2) { wkFb.show('⚠ Pas assez de phrases dans ce répertoire !', 'wrong'); wkCur = null; $('wkAnswersGrid').innerHTML = ''; return; }
-    const n = Math.min(wkChoices, pool.length), correct = pool[randInt(0, pool.length - 1)];
+    const n = Math.min(wkChoices, pool.length), correct = choisirQ(pool, (w) => elPhr(w));
     const choices = [correct, ...pool.filter((w) => w !== correct).sort(() => Math.random() - 0.5).slice(0, n - 1)].sort(() => Math.random() - 0.5);
     let offset = 0, first = null;
     if (correct.desc) { const [lo, hi] = T.rangeOfDesc(correct.desc); const a = phraseRangeMin - lo, b = phraseRangeMax - hi; offset = a > b ? 0 : randInt(a, b); first = T.firstMidi(correct.desc) + offset; }
@@ -561,7 +583,7 @@ export function renderOreille($view) {
   const wkPlayCur = () => { if (!wkCur) return; pulse($('wkPlayBtn')); speak({ ...phraseDesc(wkCur.work), transpose: wkCur.offset }); };
   function wkAnswer(w, btn) {
     if (wkAnswered || !wkCur) return;
-    if (!wkCur.note) { wkCur.note = true; const el = (x) => (x.id.startsWith('b') ? elPhrase(x.title) : 'phrase:perso'); noter({ j: 'oreille-phrases', e: el(wkCur.work), m: 'O', ok: w === wkCur.work || w.id === wkCur.work.id, r: el(w) }); }
+    if (!wkCur.note) { wkCur.note = true; const el = elPhr; apresReponse(seanceQ, el(wkCur.work), w === wkCur.work || w.id === wkCur.work.id); noter({ j: 'oreille-phrases', e: el(wkCur.work), m: 'O', ok: w === wkCur.work || w.id === wkCur.work.id, r: el(w) }); }
     wkScore.st.total++;
     if (w === wkCur.work || w.id === wkCur.work.id) { wkAnswered = true; wkScore.st.ok++; wkScore.update(); btn.classList.add('correct'); $('wkAnswersGrid').querySelectorAll('.ans-btn').forEach((b) => { if (b !== btn) b.disabled = true; }); wkFb.show(`✓ Bravo !  ${w.title}`, 'correct'); wkFb.soon(() => { wkFb.clear(); wkNew(true); }, nextDelay * 1000); }
     else { wkScore.update(); btn.classList.add('wrong'); btn.disabled = true; wkFb.show('✗ Essaie encore…', 'wrong'); wkFb.soon(() => { if (!wkAnswered) wkFb.clear(); }, 1200); }
@@ -571,6 +593,7 @@ export function renderOreille($view) {
   slider($('wkChoiceRange'), $('wkChoiceVal'), (v) => String(v), 4, 16, (v) => { wkChoices = v; });
 
   /* ---------- démarrage ---------- */
+  montrerModeQ('intervalIdentPanel', () => ivNew(false)); montrerModeQ('gaIdentPanel', () => gaNew(false)); montrerModeQ('worksIdentPanel', () => wkNew(false)); majModeQ();
   ecPickers(); ecDraw(); drawFamilies(); drawQualities(); ivBuildAnswers(); ivAmp(); ivNew(false);
   gaPickers(); gaPool(); gaBuildAnswers(); gaNew(false); wkFilterTabs(); wkNew(false);
   // les questions d'identification se relancent quand on ouvre l'onglet (pas de question « déjà jouée » en fond)
