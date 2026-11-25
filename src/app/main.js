@@ -4,6 +4,7 @@
 import { CATALOGUE } from './data/catalogue.js';
 import { liensLecons } from './liens.js';
 import { htmlReprise } from './reprise.js';
+import { htmlCours, brancherChoixCours } from './parcours.js';
 const { lessons: LESSONS, games: GAMES, tools: TOOLS } = CATALOGUE;
 
 /* ======================================================================
@@ -77,10 +78,14 @@ route(/^#\/$/, function home() {
 });
 
 route(/^#\/cours$/, function coursListe() {
-  $view.innerHTML = `
-    ${crumb('#/', 'Accueil')}
-    <div class="section-head"><h2>Cours &amp; leçons</h2><p>Les notions essentielles pour lire une partition, expliquées simplement et illustrées.</p></div>
-    <div class="grid">${LESSONS.map(lessonCard).join('')}</div>`;
+  const dessiner = () => {
+    $view.innerHTML = `
+      ${crumb('#/', 'Accueil')}
+      <div class="section-head"><h2>Cours &amp; leçons</h2><p>Les notions essentielles pour lire une partition, expliquées simplement et illustrées.</p></div>
+      ${htmlCours()}`;
+    brancherChoixCours($view, () => { dessiner(); $view.querySelector('.chip.active')?.focus(); });
+  };
+  dessiner();
 });
 route(/^#\/cours\/([\w-]+)$/, function coursDetail(id) {
   // le texte et les partitions des leçons (et le moteur de notation) ne se chargent qu'à l'ouverture d'une leçon

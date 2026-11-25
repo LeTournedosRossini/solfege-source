@@ -197,6 +197,16 @@ export const CATALOGUE = {
    "id": "degres",
    "title": "Jeu des degrés",
    "summary": "Retrouve le nom du degré (tonique, dominante, sensible...) d'une note en Do majeur."
+  },
+  {
+   "id": "alterations",
+   "title": "Jeu des altérations",
+   "summary": "Dièse, bémol ou bécarre : quel signe modifie la deuxième note ?"
+  },
+  {
+   "id": "gammes-mineures",
+   "title": "Jeu des gammes mineures",
+   "summary": "Gamme majeure, mineure naturelle, harmonique ou mélodique : reconnais-la à ses altérations."
   }
  ],
  "tools": [

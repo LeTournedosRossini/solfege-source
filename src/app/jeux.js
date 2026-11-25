@@ -8,6 +8,8 @@ import { choisir, apresReponse, nouvelleSeance } from './suivi-tirage.js';
 import { elNote, elIntervalleLecture, elSimple, elRythme, libelle as libelleEl } from './suivi-elements.js';
 import { noteDuDegre, intervalAuHasard } from './jeux-tonalites.js';
 import { explication } from './explications.js';
+import { ALTERATIONS, POOL_ALTERATIONS, GAMMES_LABELS, POOL_GAMMES, CLE_GAMME } from './jeux-gammes.js';
+import { elGamme } from './suivi-elements.js';
 import { jeuxARevoir, titreActivite } from './liens.js';
 import { FR_NOTE, TREBLE_POOL, BASS_POOL, INTERVAL_START, INTERVAL_POOL, CHORD_LABELS, CHORD_POOL, DURATION_POOL, DURATION_NOTE, DEGREE_POOL, SHARP_KEYS, FLAT_KEYS } from './jeux-donnees.js';
 
@@ -157,6 +159,12 @@ const poolGames = {
     labels: DEGREE_POOL.map((p) => p.label), staffwidth: 200, bpm: 200, element: (l) => elSimple('degre', l),
     item: (it) => ({ label: it.label, desc: { clef: 'treble', measures: [[whole([it.note])]] } }), pool: DEGREE_POOL },
 };
+poolGames.alterations = { gid: 'alg', title: 'Jeu des altérations', intro: 'Deux notes de même nom se suivent. Regarde le signe placé devant la deuxième : dièse, bémol, ou bécarre (qui annule le signe de la première note) ?',
+  labels: ALTERATIONS, staffwidth: 200, bpm: 120, element: (l) => elSimple('alteration', l),
+  item: (it) => ({ label: it.label, desc: { clef: 'treble', measures: [[whole([it.notes[0]]), whole([it.notes[1]])]] } }), pool: POOL_ALTERATIONS };
+poolGames['gammes-mineures'] = { gid: 'gmg', title: 'Jeu des gammes mineures', intro: 'Une gamme de huit notes monte sur la portée. Est-elle majeure, mineure naturelle, mineure harmonique (7e degré haussé) ou mineure mélodique (6e et 7e degrés haussés à la montée) ?',
+  labels: GAMMES_LABELS, staffwidth: 330, scale: 1.05, bpm: 150, element: (l) => elGamme(CLE_GAMME[l]),
+  item: (it) => ({ label: it.label, desc: { clef: 'treble', key: it.key, measures: [it.notes.map((n) => ({ n: [n], d: 'eighth', dots: 0 }))] } }), pool: POOL_GAMMES };
 const TONALITES_JEU = {
   intervalles: { libelle: 'Départ sur toutes les notes', aide: 'La première note change : tu reconnais les intervalles quel que soit le point de départ' },
   degres: { libelle: 'Toutes les tonalités', aide: 'La tonalité change (armure sur la portée) : tu reconnais les degrés dans chaque tonalité majeure' },

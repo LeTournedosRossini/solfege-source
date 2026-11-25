@@ -38,6 +38,17 @@ const DEGRES = {
   'Sous-dominante': '4e degré : juste au-dessous de la dominante.', 'Dominante': '5e degré : la note la plus importante après la tonique.', 'Sus-dominante': '6e degré : juste au-dessus de la dominante.',
   'Sensible': '7e degré : un demi-ton sous la tonique, elle « veut » monter vers elle.',
 };
+const ALTERATIONS = {
+  'Dièse': 'Le dièse (♯) hausse la note d’un demi-ton : la seconde note est un demi-ton plus haut que la première.',
+  'Bémol': 'Le bémol (♭) baisse la note d’un demi-ton : la seconde note est un demi-ton plus bas que la première.',
+  'Bécarre': 'Le bécarre (♮) annule l’altération précédente : la note redevient naturelle.',
+};
+const GAMMES = {
+  maj: 'Gamme majeure : T T ST T T T ST (tons et demi-tons), les demi-tons entre les degrés 3-4 et 7-8.',
+  min: 'Mineure naturelle : T ST T T ST T T ; aucune note haussée, c’est la gamme de la tonalité (relative) sans altération supplémentaire.',
+  harmin: 'Mineure harmonique : comme la naturelle, mais le 7e degré est haussé d’un demi-ton (la sensible) ; il y a un intervalle de 3 demi-tons entre le 6e et le 7e degré.',
+  melmin: 'Mineure mélodique (à la montée) : les 6e et 7e degrés sont haussés d’un demi-ton ; c’est une gamme majeure dont seule la tierce reste mineure.',
+};
 const DIESES = ['Fa', 'Do', 'Sol', 'Ré', 'La', 'Mi', 'Si'], BEMOLS = ['Si', 'Mi', 'La', 'Ré', 'Sol', 'Do', 'Fa'];
 
 /** Explication d'un élément suivi (identifiant « intervalle:M3 », « note:treble:G4 », « accord:Majeur »…), ou '' si on n'en a pas. */
@@ -48,6 +59,8 @@ export function explication(e) {
   if (type === 'accord') return ACCORDS[v] ?? '';
   if (type === 'duree') return DUREES[v] ?? '';
   if (type === 'degre') return DEGRES[v] ?? '';
+  if (type === 'alteration') return ALTERATIONS[v] ?? '';
+  if (type === 'gamme') return GAMMES[v] ?? '';
   if (type === 'tonalite') {
     const d = SHARP_KEYS.indexOf(v), b = FLAT_KEYS.indexOf(v);
     if (v === 'Do') return 'Do majeur : aucune altération à l’armure.';

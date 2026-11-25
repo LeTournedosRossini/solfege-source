@@ -23,8 +23,8 @@ export const elRythme = (mode, niveau) => `rythme:${mode}-${niveau}`; // mode : 
 export const slug = (t) => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 export const elPhrase = (titre) => `phrase:${slug(titre)}`;
 
-const GAMMES = { maj: 'Gamme majeure', min: 'Gamme mineure naturelle', harmin: 'Gamme mineure harmonique', majarp: 'Arpège majeur', minarp: 'Arpège mineur', dimarp: 'Arpège diminué', augarp: 'Arpège augmenté' };
-const TYPES = { intervalle: 'Intervalle', note: 'Note', accord: 'Accord', duree: 'Durée', degre: 'Degré', tonalite: 'Tonalité', gamme: 'Gamme / arpège', rythme: 'Rythme', phrase: 'Phrase' };
+const GAMMES = { maj: 'Gamme majeure', min: 'Gamme mineure naturelle', harmin: 'Gamme mineure harmonique', melmin: 'Gamme mineure mélodique', majarp: 'Arpège majeur', minarp: 'Arpège mineur', dimarp: 'Arpège diminué', augarp: 'Arpège augmenté' };
+const TYPES = { intervalle: 'Intervalle', note: 'Note', accord: 'Accord', duree: 'Durée', degre: 'Degré', tonalite: 'Tonalité', gamme: 'Gamme / arpège', alteration: 'Altération', rythme: 'Rythme', phrase: 'Phrase' };
 export const typeDe = (e) => e.split(':')[0];
 export const typeLibelle = (e) => TYPES[typeDe(e)] ?? typeDe(e);
 
@@ -37,6 +37,6 @@ export function libelle(e, phrases = []) {
   if (type === 'rythme') { const [mode, n] = v.split('-'); return `Rythme ${mode === 'vue' ? 'à vue' : 'à l’oreille'}, niveau ${n}`; }
   if (type === 'phrase') return v === 'perso' ? 'Phrase personnelle' : (phrases.find((p) => slug(p.title) === v)?.title ?? v);
   if (type === 'tonalite') return `${v} majeur`;
-  if (type === 'degre' || type === 'accord' || type === 'duree') return v;
+  if (type === 'degre' || type === 'accord' || type === 'duree' || type === 'alteration') return v;
   return v || e;
 }

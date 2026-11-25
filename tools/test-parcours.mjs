@@ -1,0 +1,27 @@
+// Parcours thématiques (NAV-03) : partition des 25 leçons (Node), puis page Cours (navigateur). Usage : node tools/test-parcours.mjs <url>
+import { PARCOURS } from '../src/app/data/parcours.js';
+import { CATALOGUE } from '../src/app/data/catalogue.js';
+import { progressionParcours } from '../src/app/parcours.js';
+let ok = true; const check = (n, c, d = '') => { if (!c) ok = false; console.log(c ? 'OK  ' : 'ECHEC', n, d); };
+const tous = PARCOURS.flatMap((p) => p.lecons), ids = CATALOGUE.lessons.map((l) => l.id);
+check('quatre parcours de 6, 6, 7, 6 leçons', PARCOURS.map((p) => p.lecons.length).join() === '6,6,7,6');
+check('chaque leçon du catalogue est dans un seul parcours', tous.length === ids.length && new Set(tous).size === ids.length && ids.every((i) => tous.includes(i)), `${tous.length}/${ids.length}`);
+const g = progressionParcours(PARCOURS[0], { 'portee-cles': { fin: 1 }, 'notes-de-musique': { debut: 1 } });
+check('progression : 1 terminée, 1 commencée, prochaine = la deuxième', g.terminees === 1 && g.commencees === 1 && g.prochaine === 'notes-de-musique');
+const { chromium } = await import('playwright-core');
+const url = process.argv[2] || 'http://localhost:8124/';
+const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
+const p = await (await b.newContext({ viewport: { width: 800, height: 900 } })).newPage(); const erreurs = []; p.on('pageerror', (e) => erreurs.push(e.message));
+await p.goto(url); await p.evaluate(() => localStorage.clear());
+await p.goto(url + '#/cours'); await p.waitForSelector('.parcours');
+check('page Cours : 4 parcours et 25 leçons', await p.locator('.parcours').count() === 4 && await p.locator('.parcours .card').count() === 25);
+check('aucune leçon terminée : 0 / 6 et « Commencer »', (await p.locator('.parcours').first().textContent()).includes('0 / 6') && (await p.locator('.parcours').first().textContent()).includes('Commencer : La portée et les clés'));
+await p.evaluate(() => localStorage.setItem('solfege_suivi', JSON.stringify({ v: 1, evts: [], lecons: { 'portee-cles': { debut: 1, fin: 2 }, 'notes-de-musique': { debut: 3 } } })));
+await p.reload(); await p.waitForSelector('.parcours');
+const t = await p.locator('.parcours').first().textContent();
+check('avancement : 1 / 6, « Continuer : Les notes de musique », marques sur les cartes', t.includes('1 / 6') && t.includes('Continuer : Les notes de musique') && t.includes('Terminée') && t.includes('Commencée'), t.slice(0, 200));
+await p.click('[data-vue="ordre"]'); await p.waitForTimeout(200);
+check('vue « Toutes les leçons » : 25 cartes sans parcours, choix mémorisé', await p.locator('.parcours').count() === 0 && await p.locator('.grid .card').count() === 25 && (await p.evaluate(() => localStorage.getItem('solfege_vue_cours'))) === 'ordre');
+await p.reload(); await p.waitForSelector('.grid .card'); check('choix conservé après rechargement', await p.locator('.parcours').count() === 0);
+check('aucune erreur JavaScript', erreurs.length === 0, erreurs.join(' | '));
+await b.close(); console.log(ok ? 'TOUT EST BON' : 'DES ECHECS'); process.exit(ok ? 0 : 1);
