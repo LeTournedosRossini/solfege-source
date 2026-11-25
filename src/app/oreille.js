@@ -136,6 +136,8 @@ const HTML = `
       <div class="settings-col">
         <div class="setting-block"><div class="drawer-section-title">Délai entre les notes</div><label for="gapRange">Temps entre les deux notes : <strong id="gapVal">0.90 s</strong></label>
           <input type="range" id="gapRange" min="0.1" max="2.0" step="0.05" value="0.90" class="gap-slider"></div>
+        <div class="setting-block"><div class="drawer-section-title">Vitesse de lecture</div><label for="phraseSpeedRangeD">Vitesse : <strong id="phraseSpeedValD">0 %</strong></label>
+          <input type="range" id="phraseSpeedRangeD" min="-50" max="50" step="5" value="0" class="gap-slider speed-slider"></div>
         <div class="setting-block"><div class="drawer-section-title">Avant la question suivante</div><label for="nextDelayRange">Pause après bonne réponse : <strong id="nextDelayVal">0.80 s</strong></label>
           <input type="range" id="nextDelayRange" min="0.2" max="3.0" step="0.1" value="0.80" class="gap-slider"></div>
         <div class="setting-block"><div class="drawer-section-title">Amplitude</div>
@@ -313,7 +315,7 @@ export function renderOreille($view) {
     ecMode = mode;
     const fam = ecF(), q = ecQ();
     $('ecTitle').textContent = `${fam.label} — ${q.qualityLabel}`;
-    ecDesc = T.sequenceDesc(T.intervalNames(60, ivOf(q.semitones)), { mode, noteSec: noteGap, long: true, width: hostWidth($('ecStaffWrap')) });
+    ecDesc = T.sequenceDesc(T.intervalNames(60, ivOf(q.semitones)), { mode, noteSec: noteGap / (1 + speedPct / 100), chordSec: 1.9 / (1 + speedPct / 100), long: true, width: hostWidth($('ecStaffWrap')) });
     draw($('ecStaffWrap'), ecDesc, ecDesc.width); kbEc.setPhrase(60);
   }
   function ecPickers() {
@@ -342,7 +344,7 @@ export function renderOreille($view) {
     T.ALL_INTERVALS.forEach((iv) => { const b = document.createElement('button'); b.className = 'ans-btn'; b.dataset.semitones = iv.semitones; b.innerHTML = `${iv.name}<span class="semitones">${iv.short}</span>`; b.onclick = () => ivAnswer(iv.semitones, b); g.append(b); });
     ivSync();
   }
-  function ivDesc() { return T.sequenceDesc(T.intervalNames(ivCur.rootMidi, ivCur.iv), { mode: ivCur.mode, noteSec: noteGap, long: true }); }
+  function ivDesc() { return T.sequenceDesc(T.intervalNames(ivCur.rootMidi, ivCur.iv), { mode: ivCur.mode, noteSec: noteGap / (1 + speedPct / 100), chordSec: 1.9 / (1 + speedPct / 100), long: true }); }
   const ivPlay = () => { if (!ivCur) return; pulse($('playBtn')); speak(ivDesc()); };
   function ivNew(auto) {
     ivAnswered = false; ivFb.clear();
@@ -440,9 +442,9 @@ export function renderOreille($view) {
   $('phraseNoteMin').onchange = () => { if (Number($('phraseNoteMin').value) >= Number($('phraseNoteMax').value)) $('phraseNoteMax').value = Math.min(Number($('phraseNoteMin').value) + 12, MIDI_MAX); phraseRangeMin = Number($('phraseNoteMin').value); phraseRangeMax = Number($('phraseNoteMax').value); gaAmp(); };
   $('phraseNoteMax').onchange = () => { if (Number($('phraseNoteMax').value) <= Number($('phraseNoteMin').value)) $('phraseNoteMin').value = Math.max(Number($('phraseNoteMax').value) - 12, MIDI_MIN); phraseRangeMin = Number($('phraseNoteMin').value); phraseRangeMax = Number($('phraseNoteMax').value); gaAmp(); };
   // les trois curseurs de vitesse (gamme, phrase, réglages) restent synchronisés
-  const speedSliders = [['phraseSpeedRangeA', 'phraseSpeedValA'], ['phraseSpeedRangeB', 'phraseSpeedValB'], ['phraseSpeedRangeC', 'phraseSpeedValC']];
+  const speedSliders = [['phraseSpeedRangeA', 'phraseSpeedValA'], ['phraseSpeedRangeB', 'phraseSpeedValB'], ['phraseSpeedRangeC', 'phraseSpeedValC'], ['phraseSpeedRangeD', 'phraseSpeedValD']];
   const setSpeed = (v) => { speedPct = v; speedSliders.forEach(([r, l]) => { $(r).value = v; $(l).textContent = `${v > 0 ? '+' : ''}${v} %`; const p = ((v + 50) / 100 * 100).toFixed(1); $(r).style.background = `linear-gradient(to right, var(--gold) 0%, var(--gold) ${p}%, var(--border) ${p}%, var(--border) 100%)`; }); };
-  speedSliders.forEach(([r]) => $(r).addEventListener('input', (e) => setSpeed(parseInt(e.target.value, 10)))); setSpeed(0);
+  speedSliders.forEach(([r]) => $(r).addEventListener('input', (e) => { setSpeed(parseInt(e.target.value, 10)); if (ecDesc) ecDraw(); })); setSpeed(0);   // la partition d'écoute des intervalles est recalculée à la nouvelle vitesse
 
   /* ======================= GAMMES — IDENTIFICATION ======================= */
   let gaActive = new Set(['maj', 'min']), gaCur = null, gaAnswered = false;

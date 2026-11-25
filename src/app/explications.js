@@ -49,6 +49,16 @@ const GAMMES = {
   harmin: 'Mineure harmonique : comme la naturelle, mais le 7e degré est haussé d’un demi-ton (la sensible) ; il y a un intervalle de 3 demi-tons entre le 6e et le 7e degré.',
   melmin: 'Mineure mélodique (à la montée) : les 6e et 7e degrés sont haussés d’un demi-ton ; c’est une gamme majeure dont seule la tierce reste mineure.',
 };
+const MODES = {
+  Ionien: 'Ionien : c’est la gamme majeure (T T ST T T T ST).', Dorien: 'Dorien : mineur avec une sixte majeure (T ST T T T ST T) ; tierce mineure et septième mineure.',
+  Phrygien: 'Phrygien : mineur avec une seconde mineure (ST T T T ST T T), couleur andalouse.', Lydien: 'Lydien : majeur avec une quarte augmentée (T T T ST T T ST).',
+  Mixolydien: 'Mixolydien : majeur avec une septième mineure (T T ST T T ST T), couleur blues et rock.', 'Éolien': 'Éolien : c’est la gamme mineure naturelle (T ST T T ST T T).',
+  Locrien: 'Locrien : mineur avec une seconde mineure et une quinte diminuée (ST T T ST T T T), très instable.',
+};
+const CADENCES = {
+  Parfaite: 'Cadence parfaite : V → I, la dominante revient sur la tonique ; la conclusion la plus franche.', Plagale: 'Cadence plagale : IV → I, plus douce, la « cadence d’Amen ».',
+  'Demi-cadence': 'Demi-cadence : la phrase s’arrête sur l’accord de dominante (V), en suspens, sans revenir à la tonique.', Rompue: 'Cadence rompue : V → VI, on attendait la tonique, la musique part vers la relative mineure.',
+};
 const DIESES = ['Fa', 'Do', 'Sol', 'Ré', 'La', 'Mi', 'Si'], BEMOLS = ['Si', 'Mi', 'La', 'Ré', 'Sol', 'Do', 'Fa'];
 
 /** Explication d'un élément suivi (identifiant « intervalle:M3 », « note:treble:G4 », « accord:Majeur »…), ou '' si on n'en a pas. */
@@ -61,6 +71,9 @@ export function explication(e) {
   if (type === 'degre') return DEGRES[v] ?? '';
   if (type === 'alteration') return ALTERATIONS[v] ?? '';
   if (type === 'gamme') return GAMMES[v] ?? '';
+  if (type === 'mode') return MODES[v] ?? '';
+  if (type === 'cadence') return CADENCES[v] ?? '';
+  if (type === 'transposition') { const m = /^(.+) vers le (haut|bas)$/.exec(v); return m ? `Transposer d’une ${m[1].toLowerCase()} vers le ${m[2]} : toutes les notes se déplacent du même intervalle (le dessin du motif ne change pas) et l’armure de la nouvelle tonalité est recalculée.` : ''; }
   if (type === 'tonalite') {
     const d = SHARP_KEYS.indexOf(v), b = FLAT_KEYS.indexOf(v);
     if (v === 'Do') return 'Do majeur : aucune altération à l’armure.';

@@ -13,7 +13,7 @@ let ok = true; const check = (nom, cond, detail = '') => { if (!cond) ok = false
 await p.goto(url); await p.waitForSelector('.card');
 check('accueil : 3 cartes + 3 outils', (await p.locator('.card').count()) === 6, String(await p.locator('.card').count()));
 await p.goto(url + '#/cours'); await p.waitForSelector('.card'); check('cours : 25 leçons', (await p.locator('.card').count()) === 25);
-await p.goto(url + '#/jeux'); await p.waitForSelector('.card'); check('jeux : 11 (dont deux jeux de rythme)', (await p.locator('.card').count()) === 11);
+await p.goto(url + '#/jeux'); await p.waitForSelector('.card'); check('jeux : 14 (dont deux jeux de rythme)', (await p.locator('.card').count()) === 14);
 await p.goto(url + '#/outils'); await p.waitForSelector('.card'); check('outils : 3', (await p.locator('.card').count()) === 3);
 await p.goto(url + '#/cours/portee-cles'); check('détail leçon', (await p.locator('h2').first().textContent()).includes('portée'));
 // thèmes
@@ -29,7 +29,7 @@ await p.waitForFunction(() => navigator.serviceWorker.controller || navigator.se
 await p.evaluate(() => navigator.serviceWorker.ready); await p.reload(); await p.waitForTimeout(800);
 await ctx.setOffline(true);
 await p.goto(url + '#/jeux'); await p.reload(); await p.waitForSelector('.card', { timeout: 10000 }).catch(() => {});
-check('hors-ligne : la page se recharge', (await p.locator('.card').count()) === 11, 'cartes=' + (await p.locator('.card').count()));
+check('hors-ligne : la page se recharge', (await p.locator('.card').count()) === 14, 'cartes=' + (await p.locator('.card').count()));
 await ctx.setOffline(false);
 if (process.argv[3]) { await p.goto(url); await p.waitForSelector('.card'); await p.screenshot({ path: process.argv[3] }); }
 check('aucune ressource externe', externes.length === 0, externes.join(' ') || '');

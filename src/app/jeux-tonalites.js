@@ -30,8 +30,8 @@ export { nameToMidi };
 
 const double = (n) => /^[A-G](x|bb|##)/.test(n);
 /** Départ pris au hasard parmi ceux qui n'obligent à aucune double altération (repli : Do5). `rnd` : générateur dans [0,1[. */
-export function intervalAuHasard(libelle, rnd = Math.random) {
-  const ordre = DEPARTS.slice().sort(() => rnd() - 0.5);
+export function intervalAuHasard(libelle, rnd = Math.random, departs = DEPARTS) {
+  const ordre = departs.slice().sort(() => rnd() - 0.5);
   for (const d of ordre) { const r = intervalDepuis(libelle, d); if (r && !double(r[0]) && !double(r[1])) return r; }
-  return intervalDepuis(libelle, 72);
+  return intervalDepuis(libelle, departs[0] ?? 72);
 }

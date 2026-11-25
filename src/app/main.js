@@ -105,7 +105,7 @@ route(/^#\/jeux\/([\w-]+)(?:\?(.*))?$/, function jeuDetail(id, query = '') {
   // les jeux (et le moteur de notation) ne se chargent qu'à l'ouverture d'un jeu
   let cleanup = null, gone = false;
   $view.innerHTML = '<p style="padding:24px 0">Chargement du jeu…</p>';
-  import('./jeux.js').then((m) => { if (!gone) { cleanup = m.renderJeu($view, id, /(^|&)reviser=1(&|$)/.test(query || '')); $view.insertAdjacentHTML('beforeend', liensLecons(id)); } }).catch(() => { $view.innerHTML = '<p>Le jeu n’a pas pu être chargé. Vérifiez la connexion puis réessayez.</p>'; });
+  import('./jeux.js').then((m) => { if (!gone) { cleanup = m.renderJeu($view, id, /(^|&)reviser=1(&|$)/.test(query || ''), query || ''); $view.insertAdjacentHTML('beforeend', liensLecons(id)); } }).catch(() => { $view.innerHTML = '<p>Le jeu n’a pas pu être chargé. Vérifiez la connexion puis réessayez.</p>'; });
   return () => { gone = true; if (cleanup) cleanup(); };
 });
 

@@ -207,6 +207,21 @@ export const CATALOGUE = {
    "id": "gammes-mineures",
    "title": "Jeu des gammes mineures",
    "summary": "Gamme majeure, mineure naturelle, harmonique ou mélodique : reconnais-la à ses altérations."
+  },
+  {
+   "id": "modes-grecs",
+   "title": "Jeu des modes grecs",
+   "summary": "Ionien, dorien, phrygien, lydien… : reconnais le mode d'une gamme à sa succession de tons et de demi-tons."
+  },
+  {
+   "id": "transposition",
+   "title": "Jeu de la transposition",
+   "summary": "Un motif est recopié plus haut ou plus bas : de quel intervalle a-t-il été transposé ?"
+  },
+  {
+   "id": "cadences",
+   "title": "Jeu des cadences",
+   "summary": "Parfaite, plagale, demi-cadence ou rompue : reconnais la cadence d'après ses deux accords."
   }
  ],
  "tools": [

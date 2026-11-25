@@ -25,7 +25,7 @@ await p.click('#gg-serie'); await p.waitForTimeout(200);
 check('série quittée : compteur masqué', await p.locator('#gg-avance').isHidden());
 // --- tonalités variées : degrés
 await p.click('#gg-ton'); await p.waitForTimeout(300);
-check('degrés : option « Toutes les tonalités » activée et mémorisée', (await p.locator('#gg-ton').getAttribute('aria-pressed')) === 'true' && (await p.evaluate(() => localStorage.getItem('solfege_tonalites_gg'))) === '1');
+check('degrés : option « Toutes les tonalités » activée et mémorisée', (await p.locator('#gg-ton').getAttribute('aria-pressed')) === 'true' && JSON.parse(await p.evaluate(() => localStorage.getItem('solfege_tonalites_gg'))).length === 15);
 const armures = new Set();
 for (let i = 0; i < 24; i++) {
   armures.add(await p.evaluate(() => document.querySelector('#gg-staff svg')?.innerHTML.length));
