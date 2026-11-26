@@ -10,6 +10,7 @@ import { noteDuDegre, intervalAuHasard } from './jeux-tonalites.js';
 import { explication } from './explications.js';
 import { ALTERATIONS, POOL_ALTERATIONS, GAMMES_LABELS, POOL_GAMMES, CLE_GAMME } from './jeux-gammes.js';
 import { elGamme } from './suivi-elements.js';
+import { ARTICULATIONS, POOL_ARTICULATIONS, ORNEMENTS, POOL_ORNEMENTS, REPRISES, POOL_REPRISES, NUANCES_TEMPO, POOL_NUANCES_TEMPO, NOTES_ETRANGERES, POOL_NOTES_ETRANGERES, FORMES, POOL_FORMES, FONCTIONS, POOL_FONCTIONS, CHIFFRAGES, POOL_CHIFFRAGES } from './jeux-contenu3.js';
 import { MODES_LABELS, POOL_MODES, TRANSPOSITIONS_LABELS, POOL_TRANSPOSITIONS, CADENCES_LABELS, POOL_CADENCES, accordDuDegre } from './jeux-contenu2.js';
 import { TONALITES, DEPARTS_NOTES, RACCOURCIS, lireConfig, requeteConfig, filtrer } from './jeux-config.js';
 import { jeuxARevoir, titreActivite } from './liens.js';
@@ -114,6 +115,7 @@ function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, 
     return next(ui.staff, choix);
   }
   function round() {
+    document.getElementById(`${gid}-ok`)?.remove();
     current = question();
     ui.answers.querySelectorAll('.ans-btn').forEach((b) => b.classList.remove('correct', 'wrong'));
     if (!ui.feedback.textContent.startsWith('Aucune erreur')) ui.feedback.innerHTML = '&nbsp;'; ui.feedback.className = 'feedback'; active = true;
@@ -126,12 +128,13 @@ function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, 
     else { btn.classList.add('wrong'); ui.answers.querySelectorAll('.ans-btn').forEach((b) => { if (b.dataset.k === current.label) b.classList.add('correct'); }); ui.feedback.textContent = `${bad(current.label)} ${explication(current.element)}`.trim(); ui.feedback.className = 'feedback no'; }
     apresReponse(seance, current.element, btn.dataset.k === current.label);
     recordScore(scoreId ?? gid, score, total);
-    if (serie) {
-      serie.n++; if (btn.dataset.k === current.label) serie.ok++; else serie.rates.set(current.element, (serie.rates.get(current.element) ?? 0) + 1);
-      if (serie.n >= SERIE) { timer = setTimeout(bilan, delay); return; }
-      majSerie();
-    }
-    timer = setTimeout(round, delay);
+    const juste = btn.dataset.k === current.label;
+    if (serie) { serie.n++; if (juste) serie.ok++; else serie.rates.set(current.element, (serie.rates.get(current.element) ?? 0) + 1); if (serie.n < SERIE) majSerie(); }
+    const apres = () => { document.getElementById(`${gid}-ok`)?.remove(); if (serie && serie.n >= SERIE) bilan(); else round(); };
+    if (juste) { timer = setTimeout(apres, delay); return; }
+    // après une erreur, la correction reste affichée aussi longtemps que l'élève veut : il passe à la suite avec le bouton « OK » (ou la touche Entrée)
+    const ok = document.createElement('button'); ok.type = 'button'; ok.id = `${gid}-ok`; ok.className = 'btn btn-accent'; ok.textContent = 'OK, question suivante'; ok.style.marginTop = '10px';
+    ok.addEventListener('click', apres); ui.feedback.after(ok); ok.focus();
   });
   function bilan() {
     const s = serie, sec = Math.round((Date.now() - s.debut) / 1000), duree = sec >= 60 ? `${Math.floor(sec / 60)} min ${String(sec % 60).padStart(2, '0')} s` : `${sec} s`;
@@ -228,6 +231,24 @@ poolGames.transposition = { gid: 'tg', title: 'Jeu de la transposition', intro: 
 poolGames.cadences = { gid: 'cg', title: 'Jeu des cadences', intro: 'Deux accords se suivent dans une tonalité majeure. Quelle cadence forment-ils ? Parfaite (V → I), plagale (IV → I), demi-cadence (qui s’arrête sur V) ou rompue (V → VI).',
   labels: CADENCES_LABELS, staffwidth: 200, bpm: 80, element: (l) => elSimple('cadence', l),
   item: (it) => ({ label: it.label, desc: { clef: 'treble', measures: [[whole(accordDuDegre(0, it.deg[0])), whole(accordDuDegre(0, it.deg[1]))]] } }), pool: POOL_CADENCES };
+const identite = (it) => it;
+const TEMPOS = new Set(['Très lent', 'Lent', 'Modéré', 'Vif', 'Très rapide']);
+poolGames.articulations = { gid: 'arg', title: 'Jeu des articulations', intro: 'Les notes sont les mêmes, mais pas la façon de les jouer. Regarde les signes au-dessus des notes : points, traits, accents, liaison.',
+  labels: ARTICULATIONS, staffwidth: 260, bpm: 120, element: (l) => elSimple('articulation', l), item: identite, pool: POOL_ARTICULATIONS };
+poolGames.ornements = { gid: 'org', title: 'Jeu des ornements', intro: 'Une note est décorée. Trille (alternance répétée avec la note au-dessus), mordant (un aller-retour avec la note du dessous), mordant supérieur (avec celle du dessus) ou appoggiature (petite note d’appui) ?',
+  labels: ORNEMENTS, staffwidth: 200, bpm: 100, element: (l) => elSimple('ornement', l), item: identite, pool: POOL_ORNEMENTS };
+poolGames['signes-reprise'] = { gid: 'rg', title: 'Jeu des signes de reprise', intro: 'Quel est le signe de reprise ou le renvoi représenté sur cette portée ?',
+  labels: REPRISES, staffwidth: 420, bpm: 120, element: (l) => elSimple('reprise', l), item: identite, pool: POOL_REPRISES };
+poolGames['nuances-tempo'] = { gid: 'ntg', title: 'Jeu des nuances et du tempo', intro: 'Une nuance (volume) ou un terme de tempo (vitesse) s’affiche. Que signifie-t-il ?',
+  labels: NUANCES_TEMPO, staffwidth: 200, bpm: 120, element: (l) => elSimple(TEMPOS.has(l) ? 'tempo' : 'nuance', l), item: identite, pool: POOL_NUANCES_TEMPO };
+poolGames.chromatisme = { gid: 'chg', title: 'Jeu des notes étrangères', intro: 'Le nom de l’accord est écrit sous la première note. Que fait la note du milieu : note de passage (relie deux notes de l’accord), note voisine (s’écarte puis revient), note de l’accord ? Ou bien tout le fragment avance-t-il par demi-tons (gamme chromatique) ?',
+  labels: NOTES_ETRANGERES, staffwidth: 240, bpm: 110, element: (l) => elSimple('note-etrangere', l), item: identite, pool: POOL_NOTES_ETRANGERES };
+poolGames['forme-musicale'] = { gid: 'fg', title: 'Jeu de la forme musicale', intro: 'Quelle forme musicale ce schéma ou cette description représente-t-il ?',
+  labels: FORMES, staffwidth: 200, bpm: 120, element: (l) => elSimple('forme', l), item: identite, pool: POOL_FORMES };
+poolGames['substitution-accords'] = { gid: 'sg', title: 'Jeu des fonctions d’accords', intro: 'Un accord de trois sons est écrit dans une tonalité majeure. Quelle est sa fonction : tonique (repos : I, vi, iii), sous-dominante (tension légère : IV, ii) ou dominante (tension forte : V, vii°) ?',
+  labels: FONCTIONS, staffwidth: 200, bpm: 80, element: (l) => elSimple('fonction', l), item: (it) => ({ label: it.label, desc: { clef: 'treble', key: 0, measures: [[whole(accordDuDegre(0, it.deg))]] } }), pool: POOL_FONCTIONS };
+poolGames['basse-chiffree'] = { gid: 'bg', title: 'Jeu de la basse chiffrée', intro: 'Un accord de trois sons est écrit en clé de Fa. Regarde la note la plus grave (la basse) : est-ce la fondamentale (aucun chiffre), la tierce (6) ou la quinte (6/4) ?',
+  labels: CHIFFRAGES, staffwidth: 200, bpm: 80, element: (l) => elSimple('chiffrage', l), item: identite, pool: POOL_CHIFFRAGES };
 const SPEC_TON = {
   intervalles: { univers: DEPARTS_NOTES, raccourcis: RACCOURCIS.departs, defaut: 'C', libelle: 'Départ sur toutes les notes', choisir: 'Choisir les notes de départ…', titre: 'Notes de départ',
     aide: 'La première note change : tu reconnais les intervalles quel que soit le point de départ', aide2: 'Coche les notes sur lesquelles peut commencer l’intervalle.' },
@@ -235,6 +256,8 @@ const SPEC_TON = {
     aide: 'La tonalité change (armure sur la portée) : tu reconnais les degrés dans chaque tonalité majeure', aide2: 'Coche les tonalités majeures dans lesquelles tu veux t’exercer : l’armure change à chaque question.' },
   cadences: { univers: TONALITES, raccourcis: RACCOURCIS.tonalites, defaut: 'C', libelle: 'Toutes les tonalités', choisir: 'Choisir les tonalités…', titre: 'Tonalités proposées',
     aide: 'La tonalité change (armure sur la portée) : tu reconnais les cadences dans chaque tonalité majeure', aide2: 'Coche les tonalités majeures dans lesquelles tu veux t’exercer : l’armure change à chaque question.' },
+  'substitution-accords': { univers: TONALITES, raccourcis: RACCOURCIS.tonalites, defaut: 'C', libelle: 'Toutes les tonalités', choisir: 'Choisir les tonalités…', titre: 'Tonalités proposées',
+    aide: 'La tonalité change (armure sur la portée)', aide2: 'Coche les tonalités majeures dans lesquelles tu veux t’exercer : l’armure change à chaque question.' },
   tonalites: { univers: TONALITES, raccourcis: RACCOURCIS.tonalites, defautTout: true, choisir: 'Choisir les tonalités…', titre: 'Tonalités proposées',
     aide: 'Limite les tonalités posées dans ce jeu', aide2: 'Coche les tonalités majeures que tu veux reconnaître. Les 15 réponses restent affichées.' },
   'gammes-mineures': { univers: TONALITES, raccourcis: RACCOURCIS.tonalites, defautTout: true, choisir: 'Choisir les armures…', titre: 'Armures proposées',
@@ -246,7 +269,13 @@ function poolGame($view, id, reviser) {
   const g = poolGames[id];
   const rendre = (staff, raw, choix = null) => {
     const it = g.item(raw); let desc = it.desc;
+    if (it.html) {   // question écrite (nuances, tempo, formes) : pas de portée
+      stopAll(); derniere = null;
+      staff.innerHTML = `<div class="invite" style="display:flex;justify-content:center;align-items:center;min-height:130px;text-align:center;padding:14px">${it.html}</div>`;
+      return { label: it.label, element: g.element(it.label) };
+    }
     if (choix && id === 'degres') { const liste = [...ns(choix)], n = liste[Math.floor(Math.random() * liste.length)]; desc = { clef: 'treble', key: n, measures: [[whole([noteDuDegre(n, DEGRES.indexOf(it.label))])]] }; }
+    else if (id === 'substitution-accords') { const liste = choix ? [...ns(choix)] : [0], n = liste[Math.floor(Math.random() * liste.length)]; desc = { clef: 'treble', key: n, measures: [[whole(accordDuDegre(n, raw.deg))]] }; }
     else if (id === 'cadences') { const liste = choix ? [...ns(choix)] : [0], n = liste[Math.floor(Math.random() * liste.length)]; desc = { clef: 'treble', key: n, measures: [[whole(accordDuDegre(n, raw.deg[0])), whole(accordDuDegre(n, raw.deg[1]))]] }; }
     else if (choix && id === 'intervalles') { const r = intervalAuHasard(it.label, Math.random, DEPARTS_NOTES.filter((d) => choix.includes(d.id)).map((d) => d.midi)); if (r) desc = { clef: 'treble', measures: [[whole([r[0]]), whole([r[1]])]] }; }
     show(staff, { ...desc, bpm: g.bpm }, { staffwidth: g.staffwidth, scale: g.scale ?? 1.15 }); return { label: it.label, element: g.element(it.label) };

@@ -1,5 +1,6 @@
 // Jeux « Altérations » et « Gammes mineures » (CON-02) : données (Node) puis jeux dans le navigateur. Usage : node tools/test-jeux-gammes.mjs <url>
 import { POOL_GAMMES, POOL_ALTERATIONS, GAMMES_LABELS, notesDeGamme } from '../src/app/jeux-gammes.js';
+import { autoOk } from './aide-tests.mjs';
 import { nameToMidi } from '../src/app/oreille-theorie.js';
 let ok = true; const check = (n, c, d = '') => { if (!c) ok = false; console.log(c ? 'OK  ' : 'ECHEC', n, d); };
 const demi = (g) => g.notes.map((n, i) => nameToMidi(n) - nameToMidi(g.notes[0]));
@@ -16,6 +17,7 @@ const { chromium } = await import('playwright-core');
 const url = process.argv[2] || 'http://localhost:8124/';
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
 const p = await (await b.newContext({ viewport: { width: 800, height: 900 } })).newPage(); const erreurs = []; p.on('pageerror', (e) => erreurs.push(e.message));
+await autoOk(p);
 const evts = () => p.evaluate(() => JSON.parse(localStorage.getItem('solfege_suivi') || '{"evts":[]}').evts);
 await p.goto(url); await p.evaluate(() => localStorage.clear());
 for (const [id, gid, nb, prefixe, motif] of [['alterations', 'alg', 3, 'alteration:', /♯|♭|♮/], ['gammes-mineures', 'gmg', 4, 'gamme:', /Gamme|Mineure|majeure|degré/]]) {

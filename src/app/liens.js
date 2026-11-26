@@ -3,7 +3,7 @@ import { CATALOGUE } from './data/catalogue.js';
 
 /** Leçon (identifiant) → jeux associés (identifiants de route : #/jeux/<id>, ou « oreille »). */
 export const JEUX_DE_LECON = {
-  'portee-cles': ['clef-sol', 'clef-fa'], 'notes-de-musique': ['clef-sol', 'clef-fa'], 'figures-de-note': ['durees-silences'], 'gammes-majeures': ['tonalites'], alterations: ['alterations'], 'gammes-mineures': ['gammes-mineures'], 'modes-grecs': ['modes-grecs'], transposition: ['transposition'], cadences: ['cadences'],
+  'portee-cles': ['clef-sol', 'clef-fa'], 'notes-de-musique': ['clef-sol', 'clef-fa'], 'figures-de-note': ['durees-silences'], 'gammes-majeures': ['tonalites'], alterations: ['alterations'], 'gammes-mineures': ['gammes-mineures'], 'modes-grecs': ['modes-grecs'], transposition: ['transposition'], cadences: ['cadences'], articulations: ['articulations'], ornements: ['ornements'], 'signes-reprise': ['signes-reprise'], 'nuances-tempo': ['nuances-tempo'], chromatisme: ['chromatisme'], 'forme-musicale': ['forme-musicale'], 'substitution-accords': ['substitution-accords'], 'basse-chiffree': ['basse-chiffree'],
   intervalles: ['intervalles', 'oreille'], 'mesure-temps': ['rythme', 'rythme-vue'], 'cercle-quintes': ['tonalites'], 'accords-base': ['accords'], 'degres-gamme': ['degres'],
   'silences-liaisons': ['durees-silences'], 'accords-septieme': ['accords'], 'harmonisation-degres': ['degres', 'accords'],
 };
@@ -14,9 +14,10 @@ export const routeJeu = (id) => (id === 'oreille' ? '#/oreille' : `#/jeux/${id}`
 export const titreActivite = (id) => (id === 'oreille' ? 'Jeu d’oreille' : titreJeu(id) ?? id);
 
 /** Activité enregistrée par le suivi (champ « j » des événements) → { titre, route }. */
-const IDS_JEU = { ig: 'intervalles', ag: 'accords', dg: 'durees-silences', gg: 'degres', alg: 'alterations', gmg: 'gammes-mineures', mg: 'modes-grecs', tg: 'transposition', cg: 'cadences', rythme: 'rythme', 'rythme-vue': 'rythme-vue', tonalites: 'tonalites', 'clef-sol': 'clef-sol', 'clef-fa': 'clef-fa' };
+const IDS_JEU = { ig: 'intervalles', ag: 'accords', dg: 'durees-silences', gg: 'degres', alg: 'alterations', gmg: 'gammes-mineures', mg: 'modes-grecs', tg: 'transposition', cg: 'cadences', arg: 'articulations', org: 'ornements', rg: 'signes-reprise', ntg: 'nuances-tempo', chg: 'chromatisme', fg: 'forme-musicale', sg: 'substitution-accords', bg: 'basse-chiffree', rythme: 'rythme', 'rythme-vue': 'rythme-vue', tonalites: 'tonalites', 'clef-sol': 'clef-sol', 'clef-fa': 'clef-fa' };
 const OREILLE = { 'oreille-intervalles': 'Oreille : intervalles', 'oreille-gammes': 'Oreille : gammes et arpèges', 'oreille-phrases': 'Oreille : phrases' };
 export function activite(j) {
+  if (j.startsWith('quiz-')) return { titre: `Quiz : ${titreLecon(j.slice(5))}`, route: `#/cours/${j.slice(5)}` };
   if (OREILLE[j]) return { titre: OREILLE[j], route: '#/oreille' };
   const id = IDS_JEU[j] ?? j;
   return { titre: titreJeu(id) ?? j, route: routeJeu(id) };
@@ -36,7 +37,7 @@ export function liensLecons(jeuId) {
 }
 
 /** Jeu de lecture qui travaille un élément suivi (pour « Réviser ») ; null si l'élément n'appartient à aucun jeu de lecture (rythme, oreille…). */
-const JEU_DE = { intervalle: 'intervalles', accord: 'accords', duree: 'durees-silences', degre: 'degres', tonalite: 'tonalites', alteration: 'alterations', gamme: 'gammes-mineures', mode: 'modes-grecs', transposition: 'transposition', cadence: 'cadences' };
+const JEU_DE = { intervalle: 'intervalles', accord: 'accords', duree: 'durees-silences', degre: 'degres', tonalite: 'tonalites', alteration: 'alterations', gamme: 'gammes-mineures', mode: 'modes-grecs', transposition: 'transposition', cadence: 'cadences', articulation: 'articulations', ornement: 'ornements', reprise: 'signes-reprise', nuance: 'nuances-tempo', tempo: 'nuances-tempo', 'note-etrangere': 'chromatisme', forme: 'forme-musicale', fonction: 'substitution-accords', chiffrage: 'basse-chiffree' };
 export const jeuDeLecture = (e) => (e.startsWith('note:bass') ? 'clef-fa' : e.startsWith('note:') ? 'clef-sol' : JEU_DE[e.split(':')[0]] ?? null);
 /** Jeux de lecture ayant des éléments à retravailler ou à revoir, du plus chargé au moins chargé : [[jeu, nombre], …]. `et` : Map des états (suivi.js, `etats`). */
 export function jeuxARevoir(et) {

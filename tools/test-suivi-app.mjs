@@ -1,10 +1,12 @@
 // Suivi dans l'application : chaque réponse des jeux, du rythme et du jeu d'oreille est enregistrée une fois (élément, modalité, juste ou faux), les leçons sont commencées / terminées,
 // et les scores existants (clé solfege_progress) sont toujours tenus à jour. Usage : node tools/test-suivi-app.mjs <url>
 import { chromium } from 'playwright-core';
+import { autoOk } from './aide-tests.mjs';
 setTimeout(() => { console.log('ARRET FORCE'); process.exit(2); }, 170000);
 const url = process.argv[2] || 'http://localhost:8123/';
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--autoplay-policy=no-user-gesture-required', '--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
 const p = await (await b.newContext({ viewport: { width: 700, height: 900 } })).newPage();
+await autoOk(p);
 const erreurs = []; p.on('pageerror', (e) => erreurs.push(e.message));
 let ok = true; const check = (n, c, d = '') => { if (!c) ok = false; console.log(c ? 'OK  ' : 'ECHEC', n, d); };
 const evts = () => p.evaluate(() => JSON.parse(localStorage.getItem('solfege_suivi') || '{"evts":[]}').evts);

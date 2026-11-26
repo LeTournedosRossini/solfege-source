@@ -59,6 +59,20 @@ const CADENCES = {
   Parfaite: 'Cadence parfaite : V → I, la dominante revient sur la tonique ; la conclusion la plus franche.', Plagale: 'Cadence plagale : IV → I, plus douce, la « cadence d’Amen ».',
   'Demi-cadence': 'Demi-cadence : la phrase s’arrête sur l’accord de dominante (V), en suspens, sans revenir à la tonique.', Rompue: 'Cadence rompue : V → VI, on attendait la tonique, la musique part vers la relative mineure.',
 };
+const ARTIC = { Staccato: 'Staccato : un point au-dessus ou en dessous de la note ; elle est jouée courte et détachée.', Legato: 'Legato : une liaison d’expression ; les notes s’enchaînent sans coupure.',
+  Tenuto: 'Tenuto : un petit trait horizontal ; la note est tenue pour toute sa durée.', Accent: 'Accent : un signe « > » ; la note est jouée nettement plus fort que ses voisines.' };
+const ORNEM = { Trille: 'Trille : alternance rapide et répétée avec la note juste au-dessus, noté « tr » ou par une petite vague.', Mordant: 'Mordant : un seul aller-retour très rapide avec la note du dessous.',
+  'Mordant supérieur': 'Mordant supérieur (pincé) : un seul aller-retour très rapide avec la note du dessus.', Appoggiature: 'Appoggiature : une petite note d’appui avant la note principale, qui lui prend un peu de son temps.' };
+const REPR = { 'Barres de reprise': 'Barres de reprise : le passage entre les deux barres se joue deux fois.', 'Première et deuxième fins': 'Première et deuxième fins : on joue la mesure du crochet 1, on reprend, puis on saute au crochet 2.',
+  Segno: 'Segno : un signe auquel le « D.S. » (Dal Segno) renvoie.', Coda: 'Coda : la section finale vers laquelle on saute (« al Coda »).', 'D.C. (Da Capo)': 'D.C. (Da Capo) : « depuis le début » ; on revient tout au début du morceau.', 'D.S. (Dal Segno)': 'D.S. (Dal Segno) : « depuis le signe » ; on revient au segno.' };
+const NUAN = { 'Très doux': 'pp, pianissimo : très doux.', Doux: 'p, piano : doux.', 'Assez doux': 'mp, mezzo-piano : assez doux.', 'Assez fort': 'mf, mezzo-forte : assez fort.', Fort: 'f, forte : fort.', 'Très fort': 'ff, fortissimo : très fort.',
+  Crescendo: 'Crescendo (cresc. ou soufflet qui s’ouvre) : on augmente peu à peu le volume.', Decrescendo: 'Decrescendo ou diminuendo (dim. ou soufflet qui se referme) : on diminue peu à peu le volume.',
+  'Très lent': 'Largo : très lent, large (40 à 60 pulsations par minute).', Lent: 'Adagio : lent, posé (60 à 76).', 'Modéré': 'Andante (76 à 108) et Moderato (108 à 120) : un tempo modéré, allant.', Vif: 'Allegro : vif, joyeux (120 à 156).', 'Très rapide': 'Presto : très rapide (168 à 200).' };
+const ETRA = { 'Note de passage': 'Note de passage : elle comble l’espace d’une tierce entre deux notes de l’accord, par mouvement conjoint.', 'Note voisine': 'Note voisine (broderie) : elle s’écarte d’un degré puis revient sur la note de départ.',
+  'Note de l’accord': 'Note de l’accord : une note de l’accord indiqué (fondamentale, tierce, quinte).', 'Gamme chromatique': 'Gamme chromatique : elle n’avance que par demi-tons, touches noires comprises.' };
+const FORM = { 'Binaire (A B)': 'Forme binaire : deux sections contrastées, sans retour à la première.', 'Ternaire (A B A)': 'Forme ternaire : la première section revient après la section contrastante.', 'Thème et variations': 'Thème et variations : un thème repris plusieurs fois en étant transformé.' };
+const FONC = { Tonique: 'Fonction tonique (repos) : les accords I, vi et iii.', 'Sous-dominante': 'Fonction sous-dominante (tension légère) : les accords IV et ii.', Dominante: 'Fonction dominante (forte tension, veut résoudre) : les accords V et vii°.' };
+const CHIF = { 'Position fondamentale': 'La fondamentale est à la basse : aucun chiffre (5 3 sous-entendu).', 'Premier renversement (6)': 'La tierce est à la basse : chiffre 6 (une sixte et une tierce au-dessus de la basse).', 'Second renversement (6/4)': 'La quinte est à la basse : chiffre 6/4 (une sixte et une quarte au-dessus de la basse).' };
 const DIESES = ['Fa', 'Do', 'Sol', 'Ré', 'La', 'Mi', 'Si'], BEMOLS = ['Si', 'Mi', 'La', 'Ré', 'Sol', 'Do', 'Fa'];
 
 /** Explication d'un élément suivi (identifiant « intervalle:M3 », « note:treble:G4 », « accord:Majeur »…), ou '' si on n'en a pas. */
@@ -72,6 +86,14 @@ export function explication(e) {
   if (type === 'alteration') return ALTERATIONS[v] ?? '';
   if (type === 'gamme') return GAMMES[v] ?? '';
   if (type === 'mode') return MODES[v] ?? '';
+  if (type === 'articulation') return ARTIC[v] ?? '';
+  if (type === 'ornement') return ORNEM[v] ?? '';
+  if (type === 'reprise') return REPR[v] ?? '';
+  if (type === 'nuance' || type === 'tempo') return NUAN[v] ?? '';
+  if (type === 'note-etrangere') return ETRA[v] ?? '';
+  if (type === 'forme') return FORM[v] ?? '';
+  if (type === 'fonction') return FONC[v] ?? '';
+  if (type === 'chiffrage') return CHIF[v] ?? '';
   if (type === 'cadence') return CADENCES[v] ?? '';
   if (type === 'transposition') { const m = /^(.+) vers le (haut|bas)$/.exec(v); return m ? `Transposer d’une ${m[1].toLowerCase()} vers le ${m[2]} : toutes les notes se déplacent du même intervalle (le dessin du motif ne change pas) et l’armure de la nouvelle tonalité est recalculée.` : ''; }
   if (type === 'tonalite') {

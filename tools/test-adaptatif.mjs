@@ -1,9 +1,11 @@
 // Choix des questions dans les jeux de lecture : au hasard / adapté à la progression / mes erreurs, et « Réviser maintenant » depuis la page Progrès. Usage : node tools/test-adaptatif.mjs <url>
 import { chromium } from 'playwright-core';
+import { autoOk } from './aide-tests.mjs';
 setTimeout(() => { console.log('ARRET FORCE'); process.exit(2); }, 150000);
 const url = process.argv[2] || 'http://localhost:8123/';
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
 const p = await (await b.newContext({ viewport: { width: 800, height: 900 } })).newPage();
+await autoOk(p);
 const erreurs = []; p.on('pageerror', (e) => erreurs.push(e.message));
 let ok = true; const check = (n, c, d = '') => { if (!c) ok = false; console.log(c ? 'OK  ' : 'ECHEC', n, d); };
 const evts = () => p.evaluate(() => JSON.parse(localStorage.getItem('solfege_suivi') || '{"evts":[]}').evts);

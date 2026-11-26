@@ -1,5 +1,6 @@
 // Jeux « Modes grecs », « Transposition » et « Cadences » (CON-02) : données (Node) puis jeux dans le navigateur. Usage : node tools/test-jeux-contenu2.mjs <url>
 import { POOL_MODES, FORMULES_MODES, MODES_LABELS, POOL_TRANSPOSITIONS, TRANSPOSITIONS_LABELS, POOL_CADENCES, CADENCES_LABELS, accordDuDegre } from '../src/app/jeux-contenu2.js';
+import { autoOk } from './aide-tests.mjs';
 import { nameToMidi } from '../src/app/oreille-theorie.js';
 let ok = true; const check = (n, c, d = '') => { if (!c) ok = false; console.log(c ? 'OK  ' : 'ECHEC', n, d); };
 check('modes : chaque gamme suit la formule de son mode', POOL_MODES.every((m) => m.notes.map((n) => nameToMidi(n) - nameToMidi(m.notes[0])).join() === FORMULES_MODES[m.label].join()));
@@ -13,6 +14,7 @@ const { chromium } = await import('playwright-core');
 const url = process.argv[2] || 'http://localhost:8124/';
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
 const p = await (await b.newContext({ viewport: { width: 800, height: 900 } })).newPage(); const erreurs = []; p.on('pageerror', (e) => erreurs.push(e.message));
+await autoOk(p);
 const evts = () => p.evaluate(() => JSON.parse(localStorage.getItem('solfege_suivi') || '{"evts":[]}').evts);
 await p.goto(url); await p.evaluate(() => localStorage.clear());
 for (const [id, gid, nb, prefixe, motif] of [['modes-grecs', 'mg', 7, 'mode:', /Mode|T ST|ST T|majeur|mineur|gamme/i], ['transposition', 'tg', 10, 'transposition:', /Transposer/], ['cadences', 'cg', 4, 'cadence:', /V|dominante|tonique/]]) {

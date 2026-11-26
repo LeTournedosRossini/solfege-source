@@ -222,6 +222,46 @@ export const CATALOGUE = {
    "id": "cadences",
    "title": "Jeu des cadences",
    "summary": "Parfaite, plagale, demi-cadence ou rompue : reconnais la cadence d'après ses deux accords."
+  },
+  {
+   "id": "articulations",
+   "title": "Jeu des articulations",
+   "summary": "Staccato, legato, tenuto, accent : reconnais l'articulation d'un motif."
+  },
+  {
+   "id": "ornements",
+   "title": "Jeu des ornements",
+   "summary": "Trille, mordant, appoggiature : reconnais l'ornement qui décore la note."
+  },
+  {
+   "id": "signes-reprise",
+   "title": "Jeu des signes de reprise",
+   "summary": "Barres de reprise, fins 1 et 2, segno, coda, D.C., D.S. : reconnais le signe."
+  },
+  {
+   "id": "nuances-tempo",
+   "title": "Jeu des nuances et du tempo",
+   "summary": "pp, mf, crescendo, Allegro, Largo… : retrouve le sens de l'indication."
+  },
+  {
+   "id": "chromatisme",
+   "title": "Jeu des notes étrangères",
+   "summary": "Note de passage, note voisine, note de l'accord ou gamme chromatique : que fait la note ?"
+  },
+  {
+   "id": "forme-musicale",
+   "title": "Jeu de la forme musicale",
+   "summary": "Binaire, ternaire ou thème et variations : reconnais la forme d'un morceau."
+  },
+  {
+   "id": "substitution-accords",
+   "title": "Jeu des fonctions d'accords",
+   "summary": "Tonique, sous-dominante ou dominante : quelle est la fonction de l'accord ?"
+  },
+  {
+   "id": "basse-chiffree",
+   "title": "Jeu de la basse chiffrée",
+   "summary": "Position fondamentale, 6 ou 6/4 : reconnais la position de l'accord."
   }
  ],
  "tools": [

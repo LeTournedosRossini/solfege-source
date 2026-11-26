@@ -1,10 +1,12 @@
 // Les jeux : affichage, boutons de réponse, retour, score, nouvelle question (un seul bouton ▶), son, rythme. Usage : node tools/test-jeux.mjs <url> [dossier de captures]
 import { chromium } from 'playwright-core';
+import { autoOk } from './aide-tests.mjs';
 import fs from 'node:fs';
 setTimeout(() => { console.log('ARRET FORCE'); process.exit(2); }, 170000);
 const url = process.argv[2] || 'http://localhost:8123/'; const cap = process.argv[3];
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--autoplay-policy=no-user-gesture-required', '--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
 const p = await b.newPage({ viewport: { width: 760, height: 900 } });
+await autoOk(p);
 const externes = [], erreurs = [];
 p.on('request', (r) => { if (!r.url().startsWith(new URL(url).origin) && !r.url().startsWith('data:') && !/\.sf3/.test(r.url())) externes.push(r.url()); });
 p.on('console', (m) => { if (m.type() === 'error' && !/favicon|404/.test(m.text())) erreurs.push(m.text()); });

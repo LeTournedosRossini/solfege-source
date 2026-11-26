@@ -1,6 +1,7 @@
 // Éléments musicaux suivis : identifiants stables (« intervalle:M3 », « note:treble:G4 ») communs aux jeux de lecture et au jeu d'oreille, et libellés d'affichage.
 // Un identifiant désigne la nature musicale de ce qui est travaillé, jamais son rendu (SUI-02).
 import { FR_NOTE } from './jeux-donnees.js';
+import { CATALOGUE } from './data/catalogue.js';
 
 /** Les 13 intervalles : code (celui du jeu d'oreille), nom complet, nom abrégé du jeu de lecture. */
 export const INTERVALLES = [
@@ -24,7 +25,7 @@ export const slug = (t) => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').to
 export const elPhrase = (titre) => `phrase:${slug(titre)}`;
 
 const GAMMES = { maj: 'Gamme majeure', min: 'Gamme mineure naturelle', harmin: 'Gamme mineure harmonique', melmin: 'Gamme mineure mélodique', majarp: 'Arpège majeur', minarp: 'Arpège mineur', dimarp: 'Arpège diminué', augarp: 'Arpège augmenté' };
-const TYPES = { intervalle: 'Intervalle', note: 'Note', accord: 'Accord', duree: 'Durée', degre: 'Degré', tonalite: 'Tonalité', gamme: 'Gamme / arpège', alteration: 'Altération', mode: 'Mode', transposition: 'Transposition', cadence: 'Cadence', rythme: 'Rythme', phrase: 'Phrase' };
+const TYPES = { intervalle: 'Intervalle', note: 'Note', accord: 'Accord', duree: 'Durée', degre: 'Degré', tonalite: 'Tonalité', gamme: 'Gamme / arpège', alteration: 'Altération', mode: 'Mode', transposition: 'Transposition', cadence: 'Cadence', articulation: 'Articulation', ornement: 'Ornement', reprise: 'Signe de reprise', nuance: 'Nuance', tempo: 'Tempo', 'note-etrangere': 'Note étrangère', forme: 'Forme', fonction: 'Fonction d’accord', chiffrage: 'Chiffrage', quiz: 'Quiz', rythme: 'Rythme', phrase: 'Phrase' };
 export const typeDe = (e) => e.split(':')[0];
 export const typeLibelle = (e) => TYPES[typeDe(e)] ?? typeDe(e);
 
@@ -37,6 +38,7 @@ export function libelle(e, phrases = []) {
   if (type === 'rythme') { const [mode, n] = v.split('-'); return `Rythme ${mode === 'vue' ? 'à vue' : 'à l’oreille'}, niveau ${n}`; }
   if (type === 'phrase') return v === 'perso' ? 'Phrase personnelle' : (phrases.find((p) => slug(p.title) === v)?.title ?? v);
   if (type === 'tonalite') return `${v} majeur`;
-  if (type === 'degre' || type === 'accord' || type === 'duree' || type === 'alteration' || type === 'mode' || type === 'transposition' || type === 'cadence') return v;
+  if (type === 'quiz') { const [l, n] = v.split(':'); return `Quiz « ${CATALOGUE.lessons.find((x) => x.id === l)?.title ?? l} », question ${n}`; }
+  if (type === 'degre' || type === 'accord' || type === 'duree' || type === 'alteration' || type === 'mode' || type === 'transposition' || type === 'cadence' || ['articulation', 'ornement', 'reprise', 'nuance', 'tempo', 'note-etrangere', 'forme', 'fonction', 'chiffrage'].includes(type)) return v;
   return v || e;
 }

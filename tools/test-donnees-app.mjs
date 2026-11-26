@@ -1,10 +1,12 @@
 // Page « Mes données » : information, protection du stockage, téléchargement et rechargement de la progression, effacement en deux temps. Usage : node tools/test-donnees-app.mjs <url>
 import { chromium } from 'playwright-core';
+import { autoOk } from './aide-tests.mjs';
 import fs from 'node:fs';
 setTimeout(() => { console.log('ARRET FORCE'); process.exit(2); }, 100000);
 const url = process.argv[2] || 'http://localhost:8123/';
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
 const p = await (await b.newContext({ viewport: { width: 800, height: 900 }, acceptDownloads: true })).newPage();
+await autoOk(p);
 const erreurs = []; p.on('pageerror', (e) => erreurs.push(e.message));
 let ok = true; const check = (n, c, d = '') => { if (!c) ok = false; console.log(c ? 'OK  ' : 'ECHEC', n, d); };
 const suivi = () => p.evaluate(() => JSON.parse(localStorage.getItem('solfege_suivi') || '{"evts":[],"lecons":{}}'));

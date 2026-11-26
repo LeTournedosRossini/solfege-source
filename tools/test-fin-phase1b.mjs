@@ -1,9 +1,11 @@
 // Explication après erreur (REV-05), séries de 10 dans l'oreille (SUI-04), enchaînement « Tout réviser » (REV-04). Usage : node tools/test-fin-phase1b.mjs <url>
 import { chromium } from 'playwright-core';
+import { autoOk } from './aide-tests.mjs';
 setTimeout(() => { console.log('ARRET FORCE'); process.exit(2); }, 170000);
 const url = process.argv[2] || 'http://localhost:8124/';
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
 const p = await (await b.newContext({ viewport: { width: 800, height: 900 } })).newPage();
+await autoOk(p);
 const erreurs = []; p.on('pageerror', (e) => erreurs.push(e.message));
 let ok = true; const check = (n, c, d = '') => { if (!c) ok = false; console.log(c ? 'OK  ' : 'ECHEC', n, d); };
 await p.goto(url); await p.evaluate(() => localStorage.clear());

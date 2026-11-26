@@ -1,5 +1,6 @@
 // Choix des tonalités (fenêtre), lien partageable, vitesse du son, vitesse des intervalles à l'oreille. Usage : node tools/test-reglages-jeux.mjs <url>
 import { lireConfig, requeteConfig, filtrer, TONALITES, DEPARTS_NOTES, RACCOURCIS } from '../src/app/jeux-config.js';
+import { autoOk } from './aide-tests.mjs';
 import { intervalAuHasard } from '../src/app/jeux-tonalites.js';
 let ok = true; const check = (n, c, d = '') => { if (!c) ok = false; console.log(c ? 'OK  ' : 'ECHEC', n, d); };
 check('config : lecture d\'une adresse', JSON.stringify(lireConfig('tonalites=C,G,F%23&serie=1&mode=adapte')) === JSON.stringify({ tonalites: ['C', 'G', 'F#'], serie: true, mode: 'adapte' }));
@@ -12,6 +13,7 @@ const url = process.argv[2] || 'http://localhost:8124/';
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
 const ctx = await b.newContext({ viewport: { width: 800, height: 900 }, permissions: ['clipboard-read', 'clipboard-write'] });
 const p = await ctx.newPage(); const erreurs = []; p.on('pageerror', (e) => erreurs.push(e.message));
+await autoOk(p);
 await p.goto(url); await p.evaluate(() => localStorage.clear());
 const dessin = () => p.evaluate(() => document.querySelector('#gg-staff svg')?.innerHTML.length);
 // --- degrés : fenêtre de choix
