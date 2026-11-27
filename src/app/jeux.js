@@ -12,6 +12,7 @@ import { ALTERATIONS, POOL_ALTERATIONS, GAMMES_LABELS, POOL_GAMMES, CLE_GAMME } 
 import { elGamme } from './suivi-elements.js';
 import { ARTICULATIONS, POOL_ARTICULATIONS, ORNEMENTS, POOL_ORNEMENTS, REPRISES, POOL_REPRISES, NUANCES_TEMPO, POOL_NUANCES_TEMPO, NOTES_ETRANGERES, POOL_NOTES_ETRANGERES, FORMES, POOL_FORMES, FONCTIONS, POOL_FONCTIONS, CHIFFRAGES, POOL_CHIFFRAGES } from './jeux-contenu3.js';
 import { MODES_LABELS, POOL_MODES, TRANSPOSITIONS_LABELS, POOL_TRANSPOSITIONS, CADENCES_LABELS, POOL_CADENCES, accordDuDegre } from './jeux-contenu2.js';
+import { NIVEAUX, filtrerNiveau } from './jeux-niveaux.js';
 import { TONALITES, DEPARTS_NOTES, RACCOURCIS, lireConfig, requeteConfig, filtrer } from './jeux-config.js';
 import { jeuxARevoir, titreActivite } from './liens.js';
 import { FR_NOTE, TREBLE_POOL, BASS_POOL, INTERVAL_START, INTERVAL_POOL, CHORD_LABELS, CHORD_POOL, DURATION_POOL, DURATION_NOTE, DEGREE_POOL, SHARP_KEYS, FLAT_KEYS } from './jeux-donnees.js';
@@ -35,7 +36,7 @@ function recordScore(gameId, score, total) {
 const whole = (notes, extra = {}) => ({ n: notes, d: 'whole', ...extra });
 /** Dessine une question dans `host` (un bouton ▶ est ajouté juste après). `scale` : agrandissement, `staffwidth` : largeur d'origine d'abcjs. */
 // Vitesse du son (−50 % à +50 %) commune aux jeux de lecture avec son ; mémorisée sur l'appareil.
-let vitesse = 0, derniere = null, requeteCourante = '';
+let vitesse = 0, derniere = null, requeteCourante = '', niveauCourant = null;   // niveauCourant : '1', '2' ou null (tous les niveaux), lu par les filtres de réservoir
 try { const v = parseInt(localStorage.getItem('solfege_vitesse'), 10); if (v >= -50 && v <= 50) vitesse = v; } catch (e) { /* ignoré */ }
 function show(host, desc, opts = {}) {
   const { staffwidth, scale = 1.15, play = true } = opts;
@@ -47,13 +48,14 @@ function show(host, desc, opts = {}) {
 }
 
 /** Squelette commun d'un jeu à réponses : score, essais, partition, boutons, retour. */
-function quizShell($view, { gid, title, intro, adaptive, tonalite, son }) {
+function quizShell($view, { gid, title, intro, adaptive, tonalite, son, niveaux }) {
   $view.innerHTML = `
     ${crumb('#/jeux', 'Tous les jeux')}
     <div class="game-shell">
       <div class="section-head"><h2>${title}</h2></div>
       ${intro ? `<p class="game-intro">${intro}</p>` : ''}
       ${adaptive ? `<div class="mode-choix" id="${gid}-mode" role="group" aria-label="Choix des questions" style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px"><button type="button" class="chip" data-mode="libre" aria-pressed="false">Au hasard</button><button type="button" class="chip" data-mode="adapte" aria-pressed="false" title="Ce qui est à retravailler revient plus souvent, les nouveautés arrivent peu à peu">Adaptées à ma progression</button><button type="button" class="chip" data-mode="erreurs" aria-pressed="false" title="Seulement ce que tu as raté">Mes erreurs</button></div>` : ''}
+      ${niveaux ? `<div class="mode-choix" id="${gid}-niveau" role="group" aria-label="Niveau de difficulté" style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px"><button type="button" class="chip" data-niveau="" aria-pressed="true">Tous les niveaux</button>${niveaux.map((n) => `<button type="button" class="chip" data-niveau="${n.id}" aria-pressed="false">${n.label}</button>`).join('')}</div>` : ''}
       <div class="mode-choix" id="${gid}-options" role="group" aria-label="Options de la partie" style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px">
         ${tonalite && !tonalite.defautTout ? `<button type="button" class="chip" id="${gid}-ton" aria-pressed="false" title="${tonalite.aide}">${tonalite.libelle}</button>` : ''}
         ${tonalite ? `<button type="button" class="chip" id="${gid}-choisir" aria-haspopup="dialog" title="${tonalite.aide}">${tonalite.choisir}</button>` : ''}
@@ -73,14 +75,14 @@ function quizShell($view, { gid, title, intro, adaptive, tonalite, son }) {
       <dialog id="${gid}-dlg" class="dlg-choix"></dialog>
     </div>`;
   configurePlayer({ sounds: new URLSearchParams(location.search).get('sounds') || undefined, onStatus: () => {} });
-  return { staff: document.getElementById(`${gid}-staff`), answers: document.getElementById(`${gid}-answers`), feedback: document.getElementById(`${gid}-feedback`), mode: document.getElementById(`${gid}-mode`), scoreEl: document.getElementById(`${gid}-score`), totalEl: document.getElementById(`${gid}-total`), ton: document.getElementById(`${gid}-ton`), choisir: document.getElementById(`${gid}-choisir`), lien: document.getElementById(`${gid}-lien`), info: document.getElementById(`${gid}-info`), dlg: document.getElementById(`${gid}-dlg`), vit: document.getElementById(`${gid}-vit`), vitval: document.getElementById(`${gid}-vitval`), serie: document.getElementById(`${gid}-serie`), avance: document.getElementById(`${gid}-avance`), rang: document.getElementById(`${gid}-rang`), box: document.getElementById(`${gid}-staff`).closest('.game-shell') };
+  return { staff: document.getElementById(`${gid}-staff`), answers: document.getElementById(`${gid}-answers`), feedback: document.getElementById(`${gid}-feedback`), mode: document.getElementById(`${gid}-mode`), scoreEl: document.getElementById(`${gid}-score`), totalEl: document.getElementById(`${gid}-total`), niv: document.getElementById(`${gid}-niveau`), ton: document.getElementById(`${gid}-ton`), choisir: document.getElementById(`${gid}-choisir`), lien: document.getElementById(`${gid}-lien`), info: document.getElementById(`${gid}-info`), dlg: document.getElementById(`${gid}-dlg`), vit: document.getElementById(`${gid}-vit`), vitval: document.getElementById(`${gid}-vitval`), serie: document.getElementById(`${gid}-serie`), avance: document.getElementById(`${gid}-avance`), rang: document.getElementById(`${gid}-rang`), box: document.getElementById(`${gid}-staff`).closest('.game-shell') };
 }
 
 /** Moteur commun : `answers` = les boutons de réponse, TOUJOURS les mêmes et dans le même ordre (le joueur prend le réflexe d'appuyer au bon endroit) ;
  *  `next(staff)` prépare une question et renvoie { label } ; `good(label)` / `bad(label)` donnent le texte de retour. */
-function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, delay = 900, adaptive = null, reviser = false, tonalite = null, son = true }) {
-  derniere = null;
-  const ui = quizShell($view, { gid, title, intro, adaptive, tonalite, son });
+function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, delay = 900, adaptive = null, reviser = false, tonalite = null, son = true, niveaux = null }) {
+  derniere = null; niveauCourant = null;
+  const ui = quizShell($view, { gid, title, intro, adaptive, tonalite, son, niveaux });
   ui.answers.innerHTML = answers.map((k) => `<button class="ans-btn" data-k="${k}">${k}</button>`).join('');
   let score = 0, total = 0, current = null, active = true, timer = 0;
   // tonalités (CON-01) : `choix` = null (réglage par défaut du jeu) ou liste d'identifiants choisis dans `tonalite.univers` ; mémorisé par jeu, ou repris de l'adresse (lien partagé)
@@ -92,6 +94,10 @@ function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, 
     if (cfg.tonalites) choix = cfg.tonalites;
     if (tonalite.defautTout && choix && choix.length === tousIds.length) choix = null;
   }
+  // niveau de difficulté (CON-03) : '1', '2' ou null (tous) ; mémorisé par jeu, ou repris de l'adresse
+  const cleNiv = `solfege_niveau_${scoreId ?? gid}`; let niveau = null;
+  if (niveaux) { try { const v = localStorage.getItem(cleNiv); if (v === '1' || v === '2') niveau = v; } catch (e) { /* ignoré */ } if (cfg.niveau) niveau = cfg.niveau; }
+  const majNiveau = () => ui.niv?.querySelectorAll('.chip').forEach((b) => { const on = (b.dataset.niveau || null) === niveau; b.setAttribute('aria-pressed', String(on)); b.classList.toggle('active', on); });
   const defini = (liste) => { choix = liste && liste.length ? liste : null; if (tonalite?.defautTout && choix && choix.length === tousIds.length) choix = null; try { localStorage.setItem(cleTon, choix ? JSON.stringify(choix) : '0'); } catch (er) { /* ignoré */ } majTon(); };
   const majTon = () => {
     if (ui.ton) { ui.ton.setAttribute('aria-pressed', String(!!choix)); ui.ton.classList.toggle('active', !!choix); }
@@ -116,6 +122,7 @@ function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, 
   }
   function round() {
     document.getElementById(`${gid}-ok`)?.remove();
+    niveauCourant = niveau;
     current = question();
     ui.answers.querySelectorAll('.ans-btn').forEach((b) => b.classList.remove('correct', 'wrong'));
     if (!ui.feedback.textContent.startsWith('Aucune erreur')) ui.feedback.innerHTML = '&nbsp;'; ui.feedback.className = 'feedback'; active = true;
@@ -149,6 +156,7 @@ function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, 
   }
   const demarrerSerie = () => { serie = { n: 0, ok: 0, rates: new Map(), debut: Date.now() }; majSerie(); };
   ui.serie.addEventListener('click', () => { document.getElementById(`${gid}-bilan`)?.remove(); ui.answers.querySelectorAll('.ans-btn').forEach((b) => { b.disabled = false; }); if (serie) { serie = null; majSerie(); } else demarrerSerie(); clearTimeout(timer); round(); });
+  ui.niv?.addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; niveau = b.dataset.niveau || null; seance = nouvelleSeance(); try { localStorage.setItem(cleNiv, niveau ?? '0'); } catch (er) { /* ignoré */ } majNiveau(); clearTimeout(timer); round(); });
   ui.ton?.addEventListener('click', () => { defini(choix ? null : tousIds.slice()); clearTimeout(timer); round(); });
   ui.choisir?.addEventListener('click', () => {
     const base = choix ?? (tonalite.defautTout ? tousIds : [tonalite.defaut ?? tousIds[0]]);
@@ -170,7 +178,7 @@ function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, 
     ui.dlg.showModal(); ui.dlg.querySelector('input')?.focus();
   });
   ui.lien.addEventListener('click', async () => {
-    const jeu = (location.hash.match(/^#\/jeux\/([^?]+)/) || [])[1] || '', q = requeteConfig({ tonalites: choix, serie: !!serie, mode: mode === 'libre' ? null : mode });
+    const jeu = (location.hash.match(/^#\/jeux\/([^?]+)/) || [])[1] || '', q = requeteConfig({ tonalites: choix, serie: !!serie, mode: mode === 'libre' ? null : mode, niveau });
     const url = `${location.origin}${location.pathname}#/jeux/${jeu}${q ? `?${q}` : ''}`;
     try { await navigator.clipboard.writeText(url); ui.info.textContent = 'Lien copié : il ouvre cet exercice avec les mêmes réglages.'; }
     catch (er) { ui.info.innerHTML = 'Copie le lien ci-dessous :<br>'; const i = document.createElement('input'); i.readOnly = true; i.value = url; i.setAttribute('aria-label', 'Adresse de l’exercice'); i.style.cssText = 'width:100%;max-width:560px'; ui.info.append(i); i.select(); }
@@ -179,7 +187,7 @@ function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, 
   ui.mode?.addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; mode = b.dataset.mode; seance = nouvelleSeance(); try { localStorage.setItem(cleMode, mode); } catch (er) { /* ignoré */ } majMode(); clearTimeout(timer); round(); });
   if (!reviser && cfg.mode) { mode = cfg.mode; seance = nouvelleSeance(); }
   if (reviser || cfg.serie) demarrerSerie();   // une séance de révision est une série de 10 : on enchaîne ensuite avec le jeu suivant à réviser
-  majMode(); majTon(); majSerie();
+  majMode(); majTon(); majNiveau(); majSerie();
   round();
   return () => { clearTimeout(timer); stopAll(); };
 }
@@ -188,13 +196,14 @@ function runQuiz($view, { gid, scoreId, title, intro, answers, next, good, bad, 
 function noteGame($view, clef, reviser) {
   const pool = clef === 'treble' ? TREBLE_POOL : BASS_POOL;
   const names = ['C', 'D', 'E', 'F', 'G', 'A', 'B'].map((l) => FR_NOTE[l]); // Do Ré Mi Fa Sol La Si, toujours dans cet ordre
+  const idJeu = clef === 'treble' ? 'clef-sol' : 'clef-fa', reserve = () => filtrerNiveau(idJeu, pool, niveauCourant);
   const rendreNote = (staff, n) => { show(staff, { clef, measures: [[whole([n])]] }, { staffwidth: 260 }); return { label: FR_NOTE[n[0]], element: elNote(clef, n) }; };
   return runQuiz($view, {
     answers: names,
     gid: 'ng', scoreId: clef === 'treble' ? 'clef-sol' : 'clef-fa', title: clef === 'treble' ? 'Lecture de notes — Clé de Sol' : 'Lecture de notes — Clé de Fa',
-    next(staff) { return rendreNote(staff, pick(pool)); },
-    adaptive: { pool, element: (n) => elNote(clef, n), render: (staff, n) => rendreNote(staff, n) },
-    reviser,
+    next(staff) { return rendreNote(staff, pick(reserve())); },
+    adaptive: { pool, filtre: reserve, element: (n) => elNote(clef, n), render: (staff, n) => rendreNote(staff, n) },
+    reviser, niveaux: NIVEAUX[clef === 'treble' ? 'clef-sol' : 'clef-fa'].liste,
     good: (l) => `Exact : ${l}.`, bad: (l) => `C'était ${l}.`, delay: 750,
   });
 }
@@ -267,6 +276,7 @@ const ns = (choix) => new Set(TONALITES.filter((t) => choix.includes(t.id)).map(
 const DEGRES = ['Tonique', 'Sus-tonique', 'Médiante', 'Sous-dominante', 'Dominante', 'Sus-dominante', 'Sensible'];
 function poolGame($view, id, reviser) {
   const g = poolGames[id];
+  const reserve = (choix) => filtrerNiveau(id, g.filtre ? g.filtre(choix) : g.pool, niveauCourant);
   const rendre = (staff, raw, choix = null) => {
     const it = g.item(raw); let desc = it.desc;
     if (it.html) {   // question écrite (nuances, tempo, formes) : pas de portée
@@ -282,9 +292,9 @@ function poolGame($view, id, reviser) {
   };
   return runQuiz($view, {
     gid: g.gid, scoreId: g.gid, title: g.title, intro: g.intro, answers: g.labels,
-    next(staff, choix) { return rendre(staff, pick(g.filtre ? g.filtre(choix) : g.pool), choix); },
-    adaptive: { pool: g.pool, filtre: g.filtre, element: (raw) => g.element(g.item(raw).label), render: rendre },
-    reviser, tonalite: SPEC_TON[id], son: true,
+    next(staff, choix) { return rendre(staff, pick(reserve(choix)), choix); },
+    adaptive: { pool: g.pool, filtre: reserve, element: (raw) => g.element(g.item(raw).label), render: rendre },
+    reviser, tonalite: SPEC_TON[id], son: true, niveaux: NIVEAUX[id]?.liste ?? null,
     good: (l) => `Exact : ${l}.`, bad: (l) => `C'était : ${l}.`,
   });
 }
@@ -585,5 +595,17 @@ export function renderJeu($view, id, reviser = false, query = '') {
   if (id === 'rythme-vue') return rhythmSightGame($view);
   if (id === 'tonalites') return keyGame($view, reviser);
   if (poolGames[id]) return poolGame($view, id, reviser);
+  if (id === 'chant-note') {   // jeu au micro : module chargé à la demande
+    let fin = null, parti = false;
+    $view.innerHTML = '<p style="padding:24px 0">Chargement…</p>';
+    import('./chant.js').then((m) => { if (!parti) fin = m.renderChant($view); }).catch(() => { $view.innerHTML = '<p>Le jeu n’a pas pu être chargé. Vérifiez la connexion puis réessayez.</p>'; });
+    return () => { parti = true; if (fin) fin(); };
+  }
+  if (id === 'dictee-rythme' || id === 'dictee-melodie') {   // dictées : module chargé à la demande
+    let fin = null, parti = false;
+    $view.innerHTML = '<p style="padding:24px 0">Chargement…</p>';
+    import('./dictee.js').then((m) => { if (!parti) fin = m.renderDictee($view, id); }).catch(() => { $view.innerHTML = '<p>Le jeu n’a pas pu être chargé. Vérifiez la connexion puis réessayez.</p>'; });
+    return () => { parti = true; if (fin) fin(); };
+  }
   $view.innerHTML = '<p>Jeu introuvable.</p>'; return null;
 }

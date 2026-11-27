@@ -1,5 +1,6 @@
 // Les 3 outils (métronome, accordeur, piano virtuel), repris de l'application actuelle sans changement de fonctionnement :
 // ils n'utilisent pas de partition ; leur son est produit directement par l'API audio du navigateur (aucun délai de chargement).
+import { autoCorrelate, freqToNote } from './micro.js';
 import { FR_NOTE } from './jeux-donnees.js';
 
 const crumb = (href, label) => `<a class="crumb" href="${href}">← ${label}</a>`;
@@ -83,34 +84,6 @@ function renderMetronome($view) {
 }
 
 /* ---------- Accordeur ---------- */
-function autoCorrelate(buf, sampleRate) {
-  const SIZE = buf.length;
-  let rms = 0;
-  for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
-  rms = Math.sqrt(rms / SIZE);
-  if (rms < 0.01) return -1;
-  let r1 = 0, r2 = SIZE - 1; const thres = 0.2;
-  for (let i = 0; i < SIZE / 2; i++) { if (Math.abs(buf[i]) < thres) { r1 = i; break; } }
-  for (let i = 1; i < SIZE / 2; i++) { if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; } }
-  const trimmed = buf.slice(r1, r2), n = trimmed.length;
-  const c = new Array(n).fill(0);
-  for (let lag = 0; lag < n; lag++) { let sum = 0; for (let i = 0; i < n - lag; i++) sum += trimmed[i] * trimmed[i + lag]; c[lag] = sum; }
-  let d = 0; while (d < n - 1 && c[d] > c[d + 1]) d++;
-  let maxval = -1, maxpos = -1;
-  for (let i = d; i < n; i++) { if (c[i] > maxval) { maxval = c[i]; maxpos = i; } }
-  let T0 = maxpos;
-  if (T0 > 0 && T0 < n - 1) {
-    const x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
-    const a = (x1 + x3 - 2 * x2) / 2, b = (x3 - x1) / 2;
-    if (a) T0 = T0 - b / (2 * a);
-  }
-  return T0 > 0 ? sampleRate / T0 : -1;
-}
-const NOTE_NAMES_FR = ['Do', 'Do♯', 'Ré', 'Ré♯', 'Mi', 'Fa', 'Fa♯', 'Sol', 'Sol♯', 'La', 'La♯', 'Si'];
-function freqToNote(freq) {
-  const midi = 69 + 12 * Math.log2(freq / 440), rounded = Math.round(midi);
-  return { name: NOTE_NAMES_FR[((rounded % 12) + 12) % 12], octave: Math.floor(rounded / 12) - 1, cents: Math.round((midi - rounded) * 100) };
-}
 function renderTuner($view) {
   $view.innerHTML = `
     ${crumb('#/outils', 'Outils')}

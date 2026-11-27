@@ -30,14 +30,16 @@ export function lireConfig(query, univers = TONALITES) {
   const q = new URLSearchParams(query || '');
   const t = q.get('tonalites');
   const mode = q.get('mode');
-  return { tonalites: t ? filtrer(t.split(','), univers) : null, serie: q.get('serie') === '1', mode: mode === 'adapte' || mode === 'erreurs' ? mode : null };
+  const niveau = q.get('niveau');
+  return { tonalites: t ? filtrer(t.split(','), univers) : null, serie: q.get('serie') === '1', mode: mode === 'adapte' || mode === 'erreurs' ? mode : null, niveau: niveau === '1' || niveau === '2' ? niveau : null };
 }
 
 /** Fabrique la partie « requête » d'une adresse d'exercice ; `tonalites` : ids choisis (null = ne rien préciser). Renvoie '' si rien n'est réglé. */
-export function requeteConfig({ tonalites = null, serie = false, mode = null } = {}) {
+export function requeteConfig({ tonalites = null, serie = false, mode = null, niveau = null } = {}) {
   const q = [];
   if (tonalites && tonalites.length) q.push(`tonalites=${tonalites.map(encodeURIComponent).join(',')}`);
   if (serie) q.push('serie=1');
   if (mode === 'adapte' || mode === 'erreurs') q.push(`mode=${mode}`);
+  if (niveau === '1' || niveau === '2') q.push(`niveau=${niveau}`);
   return q.join('&');
 }

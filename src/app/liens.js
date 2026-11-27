@@ -3,8 +3,8 @@ import { CATALOGUE } from './data/catalogue.js';
 
 /** Leçon (identifiant) → jeux associés (identifiants de route : #/jeux/<id>, ou « oreille »). */
 export const JEUX_DE_LECON = {
-  'portee-cles': ['clef-sol', 'clef-fa'], 'notes-de-musique': ['clef-sol', 'clef-fa'], 'figures-de-note': ['durees-silences'], 'gammes-majeures': ['tonalites'], alterations: ['alterations'], 'gammes-mineures': ['gammes-mineures'], 'modes-grecs': ['modes-grecs'], transposition: ['transposition'], cadences: ['cadences'], articulations: ['articulations'], ornements: ['ornements'], 'signes-reprise': ['signes-reprise'], 'nuances-tempo': ['nuances-tempo'], chromatisme: ['chromatisme'], 'forme-musicale': ['forme-musicale'], 'substitution-accords': ['substitution-accords'], 'basse-chiffree': ['basse-chiffree'],
-  intervalles: ['intervalles', 'oreille'], 'mesure-temps': ['rythme', 'rythme-vue'], 'cercle-quintes': ['tonalites'], 'accords-base': ['accords'], 'degres-gamme': ['degres'],
+  'portee-cles': ['clef-sol', 'clef-fa'], 'notes-de-musique': ['clef-sol', 'clef-fa', 'chant-note'], 'figures-de-note': ['durees-silences', 'dictee-rythme'], 'gammes-majeures': ['tonalites', 'dictee-melodie'], alterations: ['alterations'], 'gammes-mineures': ['gammes-mineures'], 'modes-grecs': ['modes-grecs'], transposition: ['transposition'], cadences: ['cadences'], articulations: ['articulations'], ornements: ['ornements'], 'signes-reprise': ['signes-reprise'], 'nuances-tempo': ['nuances-tempo'], chromatisme: ['chromatisme'], 'forme-musicale': ['forme-musicale'], 'substitution-accords': ['substitution-accords'], 'basse-chiffree': ['basse-chiffree'],
+  intervalles: ['intervalles', 'oreille'], 'mesure-temps': ['rythme', 'rythme-vue', 'dictee-rythme'], 'cercle-quintes': ['tonalites'], 'accords-base': ['accords'], 'degres-gamme': ['degres', 'dictee-melodie'],
   'silences-liaisons': ['durees-silences'], 'accords-septieme': ['accords'], 'harmonisation-degres': ['degres', 'accords'],
 };
 export const LECONS_DE_JEU = (() => { const m = {}; for (const [l, js] of Object.entries(JEUX_DE_LECON)) for (const j of js) (m[j] ||= []).push(l); return m; })();
@@ -37,7 +37,7 @@ export function liensLecons(jeuId) {
 }
 
 /** Jeu de lecture qui travaille un élément suivi (pour « Réviser ») ; null si l'élément n'appartient à aucun jeu de lecture (rythme, oreille…). */
-const JEU_DE = { intervalle: 'intervalles', accord: 'accords', duree: 'durees-silences', degre: 'degres', tonalite: 'tonalites', alteration: 'alterations', gamme: 'gammes-mineures', mode: 'modes-grecs', transposition: 'transposition', cadence: 'cadences', articulation: 'articulations', ornement: 'ornements', reprise: 'signes-reprise', nuance: 'nuances-tempo', tempo: 'nuances-tempo', 'note-etrangere': 'chromatisme', forme: 'forme-musicale', fonction: 'substitution-accords', chiffrage: 'basse-chiffree' };
+const JEU_DE = { intervalle: 'intervalles', accord: 'accords', duree: 'durees-silences', degre: 'degres', tonalite: 'tonalites', chant: 'chant-note', alteration: 'alterations', gamme: 'gammes-mineures', mode: 'modes-grecs', transposition: 'transposition', cadence: 'cadences', articulation: 'articulations', ornement: 'ornements', reprise: 'signes-reprise', nuance: 'nuances-tempo', tempo: 'nuances-tempo', 'note-etrangere': 'chromatisme', forme: 'forme-musicale', fonction: 'substitution-accords', chiffrage: 'basse-chiffree' };
 export const jeuDeLecture = (e) => (e.startsWith('note:bass') ? 'clef-fa' : e.startsWith('note:') ? 'clef-sol' : JEU_DE[e.split(':')[0]] ?? null);
 /** Jeux de lecture ayant des éléments à retravailler ou à revoir, du plus chargé au moins chargé : [[jeu, nombre], …]. `et` : Map des états (suivi.js, `etats`). */
 export function jeuxARevoir(et) {

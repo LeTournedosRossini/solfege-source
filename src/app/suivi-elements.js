@@ -25,7 +25,7 @@ export const slug = (t) => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').to
 export const elPhrase = (titre) => `phrase:${slug(titre)}`;
 
 const GAMMES = { maj: 'Gamme majeure', min: 'Gamme mineure naturelle', harmin: 'Gamme mineure harmonique', melmin: 'Gamme mineure mélodique', majarp: 'Arpège majeur', minarp: 'Arpège mineur', dimarp: 'Arpège diminué', augarp: 'Arpège augmenté' };
-const TYPES = { intervalle: 'Intervalle', note: 'Note', accord: 'Accord', duree: 'Durée', degre: 'Degré', tonalite: 'Tonalité', gamme: 'Gamme / arpège', alteration: 'Altération', mode: 'Mode', transposition: 'Transposition', cadence: 'Cadence', articulation: 'Articulation', ornement: 'Ornement', reprise: 'Signe de reprise', nuance: 'Nuance', tempo: 'Tempo', 'note-etrangere': 'Note étrangère', forme: 'Forme', fonction: 'Fonction d’accord', chiffrage: 'Chiffrage', quiz: 'Quiz', rythme: 'Rythme', phrase: 'Phrase' };
+const TYPES = { intervalle: 'Intervalle', note: 'Note', accord: 'Accord', duree: 'Durée', degre: 'Degré', tonalite: 'Tonalité', gamme: 'Gamme / arpège', alteration: 'Altération', mode: 'Mode', transposition: 'Transposition', cadence: 'Cadence', articulation: 'Articulation', ornement: 'Ornement', reprise: 'Signe de reprise', nuance: 'Nuance', tempo: 'Tempo', 'note-etrangere': 'Note étrangère', forme: 'Forme', fonction: 'Fonction d’accord', chiffrage: 'Chiffrage', quiz: 'Quiz', dictee: 'Dictée', chant: 'Chant', rythme: 'Rythme', phrase: 'Phrase' };
 export const typeDe = (e) => e.split(':')[0];
 export const typeLibelle = (e) => TYPES[typeDe(e)] ?? typeDe(e);
 
@@ -38,6 +38,8 @@ export function libelle(e, phrases = []) {
   if (type === 'rythme') { const [mode, n] = v.split('-'); return `Rythme ${mode === 'vue' ? 'à vue' : 'à l’oreille'}, niveau ${n}`; }
   if (type === 'phrase') return v === 'perso' ? 'Phrase personnelle' : (phrases.find((p) => slug(p.title) === v)?.title ?? v);
   if (type === 'tonalite') return `${v} majeur`;
+  if (type === 'chant') { const m = /^([A-G])(#?)$/.exec(v); const FRN = { C: 'Do', D: 'Ré', E: 'Mi', F: 'Fa', G: 'Sol', A: 'La', B: 'Si' }; return m ? `Chanter ${FRN[m[1]]}${m[2] ? '♯' : ''}` : `Chanter ${v}`; }
+  if (type === 'dictee') { const [g, n] = v.split('-'); return `Dictée ${g === 'melodie' ? 'mélodique' : 'rythmique'}, niveau ${n}`; }
   if (type === 'quiz') { const [l, n] = v.split(':'); return `Quiz « ${CATALOGUE.lessons.find((x) => x.id === l)?.title ?? l} », question ${n}`; }
   if (type === 'degre' || type === 'accord' || type === 'duree' || type === 'alteration' || type === 'mode' || type === 'transposition' || type === 'cadence' || ['articulation', 'ornement', 'reprise', 'nuance', 'tempo', 'note-etrangere', 'forme', 'fonction', 'chiffrage'].includes(type)) return v;
   return v || e;

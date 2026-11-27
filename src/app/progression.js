@@ -28,12 +28,16 @@ export function renderProgression($view) {
   const lignesActivites = [...act.entries()].sort((a, b) => b[1].dernier - a[1].dernier).map(([j, a]) => { const { titre, route } = activite(j); return `<tr><th scope="row"><a href="${route}">${esc(titre)}</a></th><td>${a.n}</td><td>${pct(a.ok, a.n)}</td><td>${date(a.dernier)}</td></tr>`; }).join('');
 
   // oreille et lecture côte à côte pour les intervalles
+  // à l'oreille, le sens dans lequel l'intervalle a été joué (montant, descendant, simultané) est enregistré avec chaque réponse : on le détaille par intervalle (SUI-06)
+  const SENS = [['montant', '↑ montant'], ['descendant', '↓ descendant'], ['simultane', '⇅ simultané']], parSens = new Map();
+  for (const ev of d.evts) { if (ev.j !== 'oreille-intervalles' || !SENS.some(([k]) => k === ev.c)) continue; const k = `${ev.e}|${ev.c}`, x = parSens.get(k) || { n: 0, ok: 0 }; x.n++; x.ok += ev.ok; parSens.set(k, x); }
+  const detailSens = (el) => { const l = SENS.filter(([k]) => parSens.has(`${el}|${k}`)).map(([k, nom]) => { const x = parSens.get(`${el}|${k}`); return `<span class="sens-detail"><span class="sr-only">Sens </span>${nom} : ${x.ok}/${x.n}</span>`; }); return l.length ? `<br><span class="petit">${l.join(' · ')}</span>` : ''; };
   const ligneInterv = INTERVALLES.map((iv) => {
     const L = et.get(`L|${elIntervalle(iv.code)}`), O = et.get(`O|${elIntervalle(iv.code)}`);
     if (!L && !O) return '';
     const cell = (x) => (x ? `${chip(x.niveau)} <span class="petit">${x.reussites}/${x.essais}</span>` : '<span class="petit">pas encore travaillé</span>');
     const rattrape = (L?.niveau === 'maitrise' && !O) ? 'À l’oreille' : (O?.niveau === 'maitrise' && !L) ? 'En lecture' : '';
-    return `<tr><th scope="row">${esc(iv.nom)}</th><td>${cell(L)}</td><td>${cell(O)}</td><td>${rattrape ? `<span class="petit">à essayer : ${rattrape}</span>` : ''}</td></tr>`;
+    return `<tr><th scope="row">${esc(iv.nom)}</th><td>${cell(L)}</td><td>${cell(O)}${O ? detailSens(elIntervalle(iv.code)) : ''}</td><td>${rattrape ? `<span class="petit">à essayer : ${rattrape}</span>` : ''}</td></tr>`;
   }).join('');
 
   // activité récente : les sept derniers jours, par jour et par activité
@@ -43,7 +47,7 @@ export function renderProgression($view) {
 
   // « Réviser maintenant » : une séance ciblée par jeu de lecture (les éléments à retravailler y reviennent), et le jeu d'oreille pour les éléments entendus
   const parJeu = new Map(); let nOreille = 0;
-  for (const x of aRevoir) { if (x.m === 'O') { nOreille++; continue; } const j = jeuDeLecture(x.e); if (j) parJeu.set(j, (parJeu.get(j) || 0) + 1); }
+  for (const x of aRevoir) { if (x.e.startsWith('dictee:')) { const j = x.e.startsWith('dictee:melodie') ? 'dictee-melodie' : 'dictee-rythme'; parJeu.set(j, (parJeu.get(j) || 0) + 1); continue; } if (x.m === 'O') { nOreille++; continue; } const j = jeuDeLecture(x.e); if (j) parJeu.set(j, (parJeu.get(j) || 0) + 1); }
   const tout = jeuxARevoir(et), boutonToutReviser = tout.length > 1 ? `<a class="btn btn-accent" href="#/jeux/${tout[0][0]}?reviser=1">Tout réviser (${tout.length} jeux à la suite)</a> ` : '';
   const boutonsRevision = boutonToutReviser + [...parJeu.entries()].map(([j, n]) => `<a class="btn btn-accent" href="#/jeux/${j}?reviser=1">Réviser : ${esc(titreActivite(j))} (${n})</a>`).join(' ') + (nOreille ? ` <a class="btn btn-ghost" href="#/oreille">Retravailler à l’oreille (${nOreille})</a>` : '');
 

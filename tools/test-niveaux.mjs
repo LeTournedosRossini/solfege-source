@@ -1,0 +1,37 @@
+// Niveaux de difficulté (CON-03) : réservoirs filtrés (Node), puis sélecteur de niveau dans les jeux. Usage : node tools/test-niveaux.mjs <url>
+import { autoOk } from './aide-tests.mjs';
+import { NIVEAUX, filtrerNiveau } from '../src/app/jeux-niveaux.js';
+import { TREBLE_POOL, BASS_POOL, INTERVAL_POOL, CHORD_POOL, DURATION_POOL } from '../src/app/jeux-donnees.js';
+import { POOL_GAMMES } from '../src/app/jeux-gammes.js';
+let ok = true; const check = (n, c, d = '') => { if (!c) ok = false; console.log(c ? 'OK  ' : 'ECHEC', n, d); };
+const POOLS = { 'clef-sol': TREBLE_POOL, 'clef-fa': BASS_POOL, intervalles: INTERVAL_POOL, accords: CHORD_POOL, 'durees-silences': DURATION_POOL, 'gammes-mineures': POOL_GAMMES };
+check('six jeux ont deux niveaux', Object.keys(NIVEAUX).length === 6 && Object.values(NIVEAUX).every((n) => n.liste.length === 2));
+check('chaque niveau pose des éléments, le niveau 1 est inclus dans le 2, le 2 dans « tous »', Object.entries(POOLS).every(([j, p]) => { const a = filtrerNiveau(j, p, '1'), b = filtrerNiveau(j, p, '2'); return a.length > 0 && a.length < b.length && b.length < p.length && a.every((x) => b.includes(x)); }));
+check('chaque niveau couvre toutes les réponses du jeu (clés : 7 noms de notes ; gammes : 2 types au moins)', ['1', '2'].every((n) => new Set(filtrerNiveau('clef-sol', TREBLE_POOL, n).map((x) => x[0])).size === 7 && new Set(filtrerNiveau('clef-fa', BASS_POOL, n).map((x) => x[0])).size === 7));
+const { chromium } = await import('playwright-core');
+const url = process.argv[2] || 'http://localhost:8124/';
+const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
+const p = await (await b.newContext({ viewport: { width: 800, height: 900 }, permissions: ['clipboard-read', 'clipboard-write'] })).newPage(); await autoOk(p); const erreurs = []; p.on('pageerror', (e) => erreurs.push(e.message));
+const evts = () => p.evaluate(() => JSON.parse(localStorage.getItem('solfege_suivi') || '{"evts":[]}').evts);
+const rep = async (gid, n) => { for (let i = 0; i < n; i++) { await p.locator(`#${gid}-answers .ans-btn`).nth(i % 5).click(); await p.waitForTimeout(1000); } };
+await p.goto(url); await p.evaluate(() => localStorage.clear());
+await p.goto(url + '#/jeux/clef-sol'); await p.waitForSelector('#ng-answers .ans-btn');
+check('sélecteur : « Tous les niveaux » actif par défaut, deux niveaux proposés', (await p.locator('#ng-niveau .chip').count()) === 3 && (await p.locator('#ng-niveau .chip.active').textContent()) === 'Tous les niveaux');
+await p.click('#ng-niveau [data-niveau="1"]'); await rep('ng', 10);
+const sol = (await evts()).map((x) => x.e.split(':')[2]);
+const portee = new Set(['E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5']);
+check('clé de Sol niveau 1 : seulement des notes de la portée (Mi4 à Fa5)', sol.length === 10 && sol.every((n) => portee.has(n)), sol.join(' '));
+check('niveau mémorisé', (await p.evaluate(() => localStorage.getItem('solfege_niveau_clef-sol'))) === '1');
+await p.goto(url + '#/jeux/intervalles?niveau=1'); await p.waitForSelector('#ig-answers .ans-btn');
+check('lien avec niveau : chip actif sans rien en mémoire', await p.evaluate(() => { localStorage.removeItem('solfege_niveau_intervalles'); return true; }) && (await p.locator('#ig-niveau .chip.active').getAttribute('data-niveau')) === '1');
+await p.evaluate(() => localStorage.setItem('solfege_suivi', '{"v":1,"evts":[],"lecons":{}}')); await rep('ig', 10);
+const iv = (await evts()).map((x) => x.e);
+check('intervalles niveau 1 : seconde majeure, tierces, quarte, quinte seulement', iv.length === 10 && iv.every((e) => ['intervalle:M2', 'intervalle:m3', 'intervalle:M3', 'intervalle:P4', 'intervalle:P5'].includes(e)), [...new Set(iv)].join(' '));
+await p.click('#ig-niveau [data-niveau="2"]'); await p.click('#ig-lien'); await p.waitForTimeout(300);
+check('lien copié : contient le niveau', /niveau=2/.test(await p.evaluate(() => navigator.clipboard.readText())));
+await p.click('#ig-niveau [data-niveau=""]'); check('retour à « Tous les niveaux »', (await p.locator('#ig-niveau .chip.active').textContent()) === 'Tous les niveaux');
+for (const [id, g] of [['accords', 'ag'], ['durees-silences', 'dg'], ['gammes-mineures', 'gmg'], ['clef-fa', 'ng']]) { await p.goto(url + '#/jeux/' + id); await p.waitForSelector(`#${g}-niveau`); }
+check('les autres jeux concernés ont aussi le sélecteur', true);
+check('un jeu sans niveau n\'en propose pas', await (async () => { await p.goto(url + '#/jeux/cadences'); await p.waitForSelector('#cg-answers .ans-btn'); return (await p.locator('#cg-niveau').count()) === 0; })());
+check('aucune erreur JavaScript', erreurs.length === 0, erreurs.join(' | '));
+await b.close(); console.log(ok ? 'TOUT EST BON' : 'DES ECHECS'); process.exit(ok ? 0 : 1);

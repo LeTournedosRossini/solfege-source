@@ -3,9 +3,9 @@ import { lireConfig, requeteConfig, filtrer, TONALITES, DEPARTS_NOTES, RACCOURCI
 import { autoOk } from './aide-tests.mjs';
 import { intervalAuHasard } from '../src/app/jeux-tonalites.js';
 let ok = true; const check = (n, c, d = '') => { if (!c) ok = false; console.log(c ? 'OK  ' : 'ECHEC', n, d); };
-check('config : lecture d\'une adresse', JSON.stringify(lireConfig('tonalites=C,G,F%23&serie=1&mode=adapte')) === JSON.stringify({ tonalites: ['C', 'G', 'F#'], serie: true, mode: 'adapte' }));
-check('config : valeurs inconnues ignorées', JSON.stringify(lireConfig('tonalites=Zz&mode=nimporte')) === JSON.stringify({ tonalites: null, serie: false, mode: null }));
-check('config : aller-retour', JSON.stringify(lireConfig(requeteConfig({ tonalites: ['C', 'F#', 'Bb'], serie: true, mode: 'erreurs' }))) === JSON.stringify({ tonalites: ['C', 'F#', 'Bb'], serie: true, mode: 'erreurs' }));
+check('config : lecture d\'une adresse', JSON.stringify(lireConfig('tonalites=C,G,F%23&serie=1&mode=adapte')) === JSON.stringify({ tonalites: ['C', 'G', 'F#'], serie: true, mode: 'adapte', niveau: null }));
+check('config : valeurs inconnues ignorées', JSON.stringify(lireConfig('tonalites=Zz&mode=nimporte')) === JSON.stringify({ tonalites: null, serie: false, mode: null, niveau: null }));
+check('config : aller-retour', JSON.stringify(lireConfig(requeteConfig({ tonalites: ['C', 'F#', 'Bb'], serie: true, mode: 'erreurs' }))) === JSON.stringify({ tonalites: ['C', 'F#', 'Bb'], serie: true, mode: 'erreurs', niveau: null }));
 check('config : raccourcis valides', Object.values(RACCOURCIS).every((l) => l.every((r) => r.ids.length)) && RACCOURCIS.tonalites.every((r) => filtrer(r.ids, TONALITES)?.length === r.ids.length));
 const r = intervalAuHasard('3ce majeure', Math.random, [72]); check('intervalles : départ imposé', r[0] === 'C5' && r[1] === 'E5', r.join());
 const { chromium } = await import('playwright-core');

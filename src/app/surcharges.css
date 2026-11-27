@@ -63,3 +63,13 @@ progress{ width:100%; height:14px; accent-color:var(--accent-deep); }
 .dlg-erreur{ color:var(--brick); min-height:1.2em; margin:4px 0; font-weight:600; }
 .dlg-actions{ display:flex; gap:10px; flex-wrap:wrap; }
 .reglage-vitesse input[type=range]{ accent-color:var(--accent-deep); }
+
+/* dictées : trois propositions de partition, à choisir après écoute */
+.dictee-grille{ display:grid; gap:12px; margin:0 0 12px; }
+.dictee-option{ display:flex; align-items:center; gap:14px; padding:10px 14px; border:2px solid var(--rule-strong); border-radius:12px; background:var(--bg-2); color:var(--fg); cursor:pointer; text-align:left; min-height:64px; }
+.dictee-option:hover:not(:disabled){ border-color:var(--accent-deep); }
+.dictee-option:focus-visible{ outline:3px solid var(--accent-deep); outline-offset:2px; }
+.dictee-lettre{ font:700 1.3rem/1 'Fraunces',Georgia,serif; width:28px; text-align:center; }
+.dictee-portee{ flex:1; min-width:0; overflow:hidden; }
+.dictee-option.correct{ border-color:var(--sage); background:var(--sage-soft); }
+.dictee-option.wrong{ border-color:var(--brick); background:var(--brick-soft); }

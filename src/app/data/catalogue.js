@@ -262,6 +262,21 @@ export const CATALOGUE = {
    "id": "basse-chiffree",
    "title": "Jeu de la basse chiffrée",
    "summary": "Position fondamentale, 6 ou 6/4 : reconnais la position de l'accord."
+  },
+  {
+   "id": "dictee-rythme",
+   "title": "Dictée rythmique",
+   "summary": "Écoute un rythme, puis retrouve sa partition parmi trois propositions (trois niveaux)."
+  },
+  {
+   "id": "dictee-melodie",
+   "title": "Dictée mélodique",
+   "summary": "Écoute une petite mélodie, puis retrouve sa partition parmi trois propositions (trois niveaux)."
+  },
+  {
+   "id": "chant-note",
+   "title": "Chante la note",
+   "summary": "Une note est écrite : chante-la ou joue-la, le micro reconnaît la hauteur (trois niveaux)."
   }
  ],
  "tools": [
