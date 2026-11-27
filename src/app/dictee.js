@@ -2,7 +2,7 @@
 // La réponse est suivie comme une activité d'oreille (modalité « O »), élément « dictee:rythme-<niveau> » ou « dictee:melodie-<niveau> ».
 import { mountScore, play, stopAll, configurePlayer } from '../music/player.js';
 import { noter } from './suivi-local.js';
-import { NIVEAUX_RYTHME, NIVEAUX_MELODIE, question, descOption } from './dictee-donnees.js';
+import { NIVEAUX_RYTHME, NIVEAUX_MELODIE, question, descOption, descEcoute } from './dictee-donnees.js';
 
 const crumb = (href, label) => `<a class="crumb" href="${href}">← ${label}</a>`;
 const LETTRES = ['A', 'B', 'C'];
@@ -16,6 +16,7 @@ export function renderDictee($view, id) {
   const cleNiv = `solfege_niveau_${id}`;
   let niveau = 1; try { const v = parseInt(localStorage.getItem(cleNiv), 10); if (v >= 1 && v <= 3) niveau = v; } catch (e) { /* ignoré */ }
   const cfg = new URLSearchParams((location.hash.split('?')[1]) || '').get('niveau'); if (cfg === '1' || cfg === '2' || cfg === '3') niveau = Number(cfg);
+  let precompte = true; try { if (localStorage.getItem('solfege_dictee_precompte') === '0') precompte = false; } catch (e) { /* ignoré */ }
   let vitesse = 0; try { const v = parseInt(localStorage.getItem('solfege_vitesse'), 10); if (v >= -50 && v <= 50) vitesse = v; } catch (e) { /* ignoré */ }
   $view.innerHTML = `
     ${crumb('#/jeux', 'Tous les jeux')}
@@ -23,6 +24,7 @@ export function renderDictee($view, id) {
       <div class="section-head"><h2>${T.titre}</h2></div>
       <p class="game-intro">${T.intro}</p>
       <div class="mode-choix" id="${gid}-niveau" role="group" aria-label="Niveau de difficulté" style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px">${[1, 2, 3].map((n) => `<button type="button" class="chip" data-niveau="${n}" aria-pressed="false">${T.niveaux[n].label}</button>`).join('')}</div>
+      ${genre === 'rythme' ? `<div class="mode-choix" style="display:flex;gap:8px;margin:0 0 12px"><button type="button" class="chip" id="${gid}-precompte" aria-pressed="true" title="Quatre clics au même tempo avant le rythme, pour savoir où l'on va">Précompte de 4 temps</button></div>` : ''}
       <div class="reglage-vitesse" style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:0 0 12px"><label for="${gid}-vit">Vitesse du son : <output id="${gid}-vitval" for="${gid}-vit">${vitesse > 0 ? '+' : ''}${vitesse} %</output></label><input type="range" id="${gid}-vit" min="-50" max="50" step="5" value="${vitesse}" style="flex:1;min-width:160px;max-width:320px"></div>
       <div class="game-hud"><div class="hud-stat"><b id="${gid}-score">0</b>score</div><div class="hud-stat"><b id="${gid}-total">0</b>essais</div></div>
       <div style="margin:14px 0"><button type="button" class="btn btn-accent" id="${gid}-ecouter" style="font-size:1.05rem;padding:12px 22px">▶ Écouter</button></div>
@@ -31,13 +33,13 @@ export function renderDictee($view, id) {
     </div>`;
   configurePlayer({ sounds: new URLSearchParams(location.search).get('sounds') || undefined, onStatus: () => {} });
   const $ = (s) => document.getElementById(`${gid}-${s}`);
-  let q = null, score = 0, total = 0, active = true, nQ = 0, timer = 0;
+  let q = null, score = 0, total = 0, active = true, nQ = 0, timer = 0; const historique = [];   // places successives de la bonne proposition (A, B, C)
   const bpm = () => 80 * (1 + vitesse / 100);
-  const jouer = (motif) => play({ ...descOption(genre, motif, bpm()), width: undefined }, { button: $('ecouter') });
+  const jouer = (motif) => play({ ...descEcoute(genre, motif, bpm(), precompte), width: undefined }, { button: $('ecouter') });
   const majNiveau = () => $('niveau').querySelectorAll('.chip').forEach((b) => { const on = Number(b.dataset.niveau) === niveau; b.setAttribute('aria-pressed', String(on)); b.classList.toggle('active', on); });
   function nouvelle() {
     clearTimeout(timer); document.getElementById(`${gid}-ok`)?.remove(); document.getElementById(`${gid}-rejouer`)?.remove(); stopAll();
-    q = question(genre, niveau); active = true; nQ++;
+    q = question(genre, niveau, Math.random, historique); historique.push(q.bonne); active = true; nQ++;
     const grille = $('options'); grille.innerHTML = '';
     q.options.forEach((motif, i) => {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'dictee-option'; b.dataset.i = String(i); b.setAttribute('aria-label', `Proposition ${LETTRES[i]}`);
@@ -64,6 +66,8 @@ export function renderDictee($view, id) {
   $('ecouter').addEventListener('click', (e) => { e.preventDefault(); if (q) jouer(q.options[q.bonne]); });
   $('niveau').addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; niveau = Number(b.dataset.niveau); try { localStorage.setItem(cleNiv, String(niveau)); } catch (er) { /* ignoré */ } majNiveau(); document.getElementById(`${gid}-rejouer`)?.remove(); nQ = 0; nouvelle(); });
   $('vit').addEventListener('input', () => { vitesse = parseInt($('vit').value, 10); $('vitval').textContent = `${vitesse > 0 ? '+' : ''}${vitesse} %`; try { localStorage.setItem('solfege_vitesse', String(vitesse)); } catch (er) { /* ignoré */ } });
-  majNiveau(); nouvelle();
+  const majPrecompte = () => { const b = $('precompte'); if (b) { b.setAttribute('aria-pressed', String(precompte)); b.classList.toggle('active', precompte); } };
+  $('precompte')?.addEventListener('click', () => { precompte = !precompte; try { localStorage.setItem('solfege_dictee_precompte', precompte ? '1' : '0'); } catch (er) { /* ignoré */ } majPrecompte(); });
+  majPrecompte(); majNiveau(); nouvelle();
   return () => { clearTimeout(timer); stopAll(); };
 }

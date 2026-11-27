@@ -13,6 +13,17 @@ check('générateurs : 3 propositions distinctes, mesures complètes (4 temps), 
 check('rythme niveau 1 : seulement noires et croches', Array.from({ length: 200 }, () => D.question('rythme', 1)).every((q) => q.options.flat().every((c) => c === 'Q' || c === 'EE')));
 check('rythme niveau 3 : toutes les cellules apparaissent', ['H', 'R', 'SSSS', 'ESS', 'SSE', 'QPE'].every((c) => Array.from({ length: 300 }, () => D.question('rythme', 3)).some((q) => q.options.flat().includes(c))));
 check('mélodie niveau 1 : trois notes par degrés conjoints', Array.from({ length: 200 }, () => D.question('melodie', 1)).every((q) => q.options.every((m) => m.length === 3)));
+// la place de la bonne proposition (A, B, C) doit être équilibrée, jamais plus de deux fois de suite la même
+for (const g of ['rythme', 'melodie']) for (const n of [1, 2, 3]) {
+  const c = [0, 0, 0], h = []; let serie = 0, maxi = 0, prec = -1;
+  for (let i = 0; i < 6000; i++) { const q = D.question(g, n, Math.random, h); h.push(q.bonne); c[q.bonne]++; serie = q.bonne === prec ? serie + 1 : 1; prec = q.bonne; maxi = Math.max(maxi, serie); }
+  check(`${g} niveau ${n} : bonne proposition équilibrée (chaque place entre 30 % et 37 %) et jamais plus de 2 fois de suite la même`, c.every((x) => x / 6000 > 0.30 && x / 6000 < 0.37) && maxi <= 2, `${c.map((x) => Math.round(x / 60) + '%').join(' / ')} · série max ${maxi}`);
+}
+const melU = Array(30000).fill(0).map(() => D.melange([0, 1, 2]).join()).reduce((a, k) => (a[k] = (a[k] || 0) + 1, a), {});
+check('le mélange est uniforme : les six ordres de 3 éléments sortent chacun entre 15 % et 18 %', Object.keys(melU).length === 6 && Object.values(melU).every((x) => x / 30000 > 0.15 && x / 30000 < 0.18));
+const ec = D.descEcoute('rythme', ['Q', 'EE', 'H'], 80, true), sans = D.descEcoute('rythme', ['Q', 'EE', 'H'], 80, false);
+check('précompte : une mesure de 4 clics aigus (staccato) précède le rythme, au même tempo ; sans précompte rien n\'est ajouté', ec.measures.length === 2 && ec.measures[0].length === 4 && ec.measures[0].every((e) => e.d === 'quarter' && e.art?.[0] === 'staccato') && ec.bpm === sans.bpm && sans.measures.length === 1);
+check('la dictée mélodique n\'a pas de précompte', D.descEcoute('melodie', [0, 1, 2], 80, true).measures.length === 1);
 const { chromium } = await import('playwright-core');
 const url = process.argv[2] || 'http://localhost:8124/';
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
@@ -41,6 +52,12 @@ for (const [id, gid, genre] of [['dictee-rythme', 'drg', 'rythme'], ['dictee-mel
   await p.click(`#${gid}-niveau [data-niveau="3"]`); await p.waitForTimeout(300);
   check(`${id} : niveau 3 choisi et mémorisé`, (await p.evaluate((i) => localStorage.getItem('solfege_niveau_' + i), id)) === '3' && (await p.locator(`#${gid}-niveau .chip.active`).getAttribute('data-niveau')) === '3');
 }
+await p.goto(url + '#/jeux/dictee-rythme'); await p.waitForSelector('#drg-precompte');
+check('rythme : bouton « Précompte de 4 temps » actif par défaut, désactivable et mémorisé', (await p.locator('#drg-precompte').getAttribute('aria-pressed')) === 'true' && await (async () => { await p.click('#drg-precompte'); return (await p.locator('#drg-precompte').getAttribute('aria-pressed')) === 'false' && (await p.evaluate(() => localStorage.getItem('solfege_dictee_precompte'))) === '0'; })());
+await p.click('#drg-precompte');
+check('mélodie : pas de bouton de précompte', await (async () => { await p.goto(url + '#/jeux/dictee-melodie'); await p.waitForSelector('#dmg-options'); return (await p.locator('#dmg-precompte').count()) === 0; })());
+const lettres = []; await p.goto(url + '#/jeux/dictee-rythme'); await p.waitForSelector('#drg-options .dictee-option');
+for (let i = 0; i < 12; i++) { lettres.push(await p.evaluate(() => 0)); await p.locator('#drg-options .dictee-option').first().click(); await p.waitForTimeout(150); if (await p.locator('#drg-ok').count()) await p.click('#drg-ok'); else await p.waitForTimeout(1300); }
 await p.goto(url + '#/jeux/dictee-melodie?niveau=2'); await p.waitForSelector('#dmg-options .dictee-option'); 
 check('lien avec niveau : niveau 2 actif', (await p.locator('#dmg-niveau .chip.active').getAttribute('data-niveau')) === '2');
 await p.goto(url + '#/progression'); await p.waitForTimeout(500);

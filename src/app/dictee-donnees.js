@@ -1,5 +1,16 @@
 // Dictées simples (CON-04) : on écoute un court motif, puis on retrouve celui qui a été joué parmi trois partitions. Générateurs purs (sans navigateur), testables sous Node.
 
+/** Mélange uniforme (Fisher-Yates). Trier avec un comparateur aléatoire n'est PAS uniforme : la première proposition sortait presque une fois sur deux. */
+export function melange(liste, rnd = Math.random) { const a = liste.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+/** Place de la bonne proposition (0, 1 ou 2) : au hasard, mais jamais plus de deux fois de suite à la même place, et les places les moins sorties récemment sont favorisées. `historique` : places des dernières questions. */
+export function placeBonne(historique = [], rnd = Math.random) {
+  const h = historique.slice(-2), interdite = h.length === 2 && h[0] === h[1] ? h[0] : -1;
+  const recents = historique.slice(-9), poids = [0, 1, 2].map((p) => (p === interdite ? 0 : 1 / (1 + recents.filter((x) => x === p).length)));
+  let r = rnd() * poids.reduce((t, w) => t + w, 0);
+  for (let p = 0; p < 3; p++) { if (r < poids[p]) return p; r -= poids[p]; }
+  return [0, 1, 2].find((p) => p !== interdite);
+}
+
 /* ---------------------------------------------------------------- rythme */
 // Cellules rythmiques d'une mesure à 4 temps : id → { temps, événements }. Tous les sons sont joués sur la même note (Si4) : seul le rythme compte.
 const N = 'B4';
@@ -33,12 +44,19 @@ export function suiteRythme(autorises, rnd = Math.random, temps = 4) {
 }
 /** Variante : une cellule est remplacée par une autre de même durée (et le premier son reste un son). */
 function varianteRythme(cells, autorises, rnd) {
-  const idx = cells.map((_, i) => i).sort(() => rnd() - 0.5);
+  const idx = melange(cells.map((_, i) => i), rnd);
   for (const i of idx) {
     const alt = autorises.filter((c) => c !== cells[i] && dureeCell(c) === dureeCell(cells[i]) && !(i === 0 && c === 'R'));
     if (alt.length) { const r = cells.slice(); r[i] = alt[Math.floor(rnd() * alt.length)]; return r; }
   }
   return null;
+}
+/** Mesure de précompte : quatre clics sur une note aiguë, au même tempo, pour savoir où l'on va avant que le rythme ne commence. */
+const CLICS = { events: [0, 1, 2, 3].map(() => ({ n: ['G6'], d: 'quarter', dots: 0, art: ['staccato'] })) };
+/** Description à JOUER (non dessinée) : le motif précédé, si `precompte`, d'une mesure de quatre clics. */
+export function descEcoute(genre, motif, bpm, precompte = false) {
+  const d = descOption(genre, motif, bpm);
+  return genre === 'rythme' && precompte ? { ...d, measures: [CLICS.events.map((e) => ({ ...e })), ...d.measures] } : d;
 }
 export const descRythme = (cells, bpm = 80) => ({ clef: 'treble', key: 0, time: [4, 4], bpm, measures: [cells.flatMap((c) => CELLULES[c].events.map((e) => ({ ...e })))], width: 300, scale: 1.05 });
 
@@ -64,9 +82,9 @@ export function melodie(niveau, rnd = Math.random) {
 }
 function varianteMelodie(m, niveau, rnd) {
   const cfg = NIVEAUX_MELODIE[niveau];
-  const idx = m.map((_, i) => i).filter((i) => !(cfg.fixePremiere && i === 0)).sort(() => rnd() - 0.5);
+  const idx = melange(m.map((_, i) => i).filter((i) => !(cfg.fixePremiere && i === 0)), rnd);
   for (const i of idx) {
-    const deltas = [-2, -1, 1, 2].sort(() => rnd() - 0.5);
+    const deltas = melange([-2, -1, 1, 2], rnd);
     for (const d of deltas) { const n = m[i] + d; if (n >= 0 && n < cfg.ambitus) { const r = m.slice(); r[i] = n; return r; } }
   }
   return null;
@@ -75,7 +93,7 @@ export const descMelodie = (m, bpm = 80) => ({ clef: 'treble', key: 0, time: nul
 
 /* ---------------------------------------------------------------- question : trois propositions, une seule est celle qui a été jouée */
 /** `genre` : 'rythme' | 'melodie' ; renvoie { genre, niveau, options: [motif, motif, motif], bonne (indice), id (élément suivi) }. */
-export function question(genre, niveau, rnd = Math.random) {
+export function question(genre, niveau, rnd = Math.random, historique = []) {
   const options = []; let bonne;
   if (genre === 'rythme') {
     const autorises = NIVEAUX_RYTHME[niveau].cellules, base = suiteRythme(autorises, rnd), vus = new Set([cle(base)]), liste = [base];
@@ -88,8 +106,9 @@ export function question(genre, niveau, rnd = Math.random) {
     while (liste.length < 3) { const s = melodie(niveau, rnd); if (!vus.has(s.join())) { vus.add(s.join()); liste.push(s); } }
     options.push(...liste);
   }
-  // la bonne réponse est la première générée ; on mélange les propositions
-  const ordre = [0, 1, 2].sort(() => rnd() - 0.5); const mel = ordre.map((i) => options[i]); bonne = ordre.indexOf(0);
+  // la bonne réponse est la première générée ; elle est placée selon `placeBonne`, les deux autres propositions dans un ordre aléatoire
+  bonne = placeBonne(historique, rnd); const autres = melange([1, 2], rnd), mel = [];
+  for (let p = 0, k = 0; p < 3; p++) mel.push(p === bonne ? options[0] : options[autres[k++]]);
   return { genre, niveau, options: mel, bonne, id: `dictee:${genre}-${niveau}` };
 }
 export const descOption = (genre, motif, bpm) => (genre === 'rythme' ? descRythme(motif, bpm) : descMelodie(motif, bpm));
