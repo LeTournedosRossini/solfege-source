@@ -51,12 +51,18 @@ function varianteRythme(cells, autorises, rnd) {
   }
   return null;
 }
-/** Mesure de précompte : quatre clics sur une note aiguë, au même tempo, pour savoir où l'on va avant que le rythme ne commence. */
-const CLICS = { events: [0, 1, 2, 3].map(() => ({ n: ['G6'], d: 'quarter', dots: 0, art: ['staccato'] })) };
-/** Description à JOUER (non dessinée) : le motif précédé, si `precompte`, d'une mesure de quatre clics. */
+/** Description à JOUER au piano (non dessinée) : le motif précédé, si `precompte`, d'une mesure de quatre silences ; les quatre clics du métronome (voir clic.js) sont joués pendant ce temps. */
+const SILENCES = { events: [0, 1, 2, 3].map(() => ({ rest: true, d: 'quarter', dots: 0 })) };
 export function descEcoute(genre, motif, bpm, precompte = false) {
   const d = descOption(genre, motif, bpm);
-  return genre === 'rythme' && precompte ? { ...d, measures: [CLICS.events.map((e) => ({ ...e })), ...d.measures] } : d;
+  return genre === 'rythme' && precompte ? { ...d, measures: [SILENCES.events.map((e) => ({ ...e })), ...d.measures] } : d;
+}
+const NOIRES = { whole: 4, half: 2, quarter: 1, eighth: 0.5, sixteenth: 0.25 };
+/** Positions des attaques d'un rythme, en noires depuis son début (les silences n'ont pas d'attaque) : sert à jouer le rythme en clics. */
+export function battements(cells) {
+  const out = []; let t = 0;
+  for (const c of cells) for (const e of CELLULES[c].events) { if (!e.rest) out.push(t); t += NOIRES[e.d] * (e.dots ? 1.5 : 1); }
+  return out;
 }
 export const descRythme = (cells, bpm = 80) => ({ clef: 'treble', key: 0, time: [4, 4], bpm, measures: [cells.flatMap((c) => CELLULES[c].events.map((e) => ({ ...e })))], width: 300, scale: 1.05 });
 

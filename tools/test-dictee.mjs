@@ -22,12 +22,15 @@ for (const g of ['rythme', 'melodie']) for (const n of [1, 2, 3]) {
 const melU = Array(30000).fill(0).map(() => D.melange([0, 1, 2]).join()).reduce((a, k) => (a[k] = (a[k] || 0) + 1, a), {});
 check('le mélange est uniforme : les six ordres de 3 éléments sortent chacun entre 15 % et 18 %', Object.keys(melU).length === 6 && Object.values(melU).every((x) => x / 30000 > 0.15 && x / 30000 < 0.18));
 const ec = D.descEcoute('rythme', ['Q', 'EE', 'H'], 80, true), sans = D.descEcoute('rythme', ['Q', 'EE', 'H'], 80, false);
-check('précompte : une mesure de 4 clics aigus (staccato) précède le rythme, au même tempo ; sans précompte rien n\'est ajouté', ec.measures.length === 2 && ec.measures[0].length === 4 && ec.measures[0].every((e) => e.d === 'quarter' && e.art?.[0] === 'staccato') && ec.bpm === sans.bpm && sans.measures.length === 1);
+check('au piano, le précompte est une mesure de 4 silences (les clics de métronome sont joués pendant ce temps) ; sans précompte rien n\'est ajouté', ec.measures.length === 2 && ec.measures[0].length === 4 && ec.measures[0].every((e) => e.rest && e.d === 'quarter') && ec.bpm === sans.bpm && sans.measures.length === 1);
+check('positions des attaques en clics : Q EE H → 0, 1, 1,5, 2 ; un silence n\'a pas d\'attaque ; noire pointée + croche → 0 et 1,5', JSON.stringify(D.battements(['Q', 'EE', 'H'])) === '[0,1,1.5,2]' && JSON.stringify(D.battements(['R', 'Q', 'QPE'])) === '[1,2,3.5]' && JSON.stringify(D.battements(['QPE', 'Q', 'Q'])) === '[0,1.5,2,3]');
 check('la dictée mélodique n\'a pas de précompte', D.descEcoute('melodie', [0, 1, 2], 80, true).measures.length === 1);
 const { chromium } = await import('playwright-core');
 const url = process.argv[2] || 'http://localhost:8124/';
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox', '--disable-gpu', '--renderer-process-limit=1'] });
-const p = await (await b.newContext({ viewport: { width: 800, height: 900 }, permissions: ['clipboard-read'] })).newPage(); const erreurs = []; p.on('pageerror', (e) => erreurs.push(e.message));
+const p = await (await b.newContext({ viewport: { width: 800, height: 900 }, permissions: ['clipboard-read'] })).newPage();
+await p.addInitScript(() => { window.__claques = []; const o = AudioBufferSourceNode.prototype.start; AudioBufferSourceNode.prototype.start = function (t, ...r) { window.__claques.push(t ?? 0); return o.call(this, t, ...r); }; });   // compte les claquements de métronome
+const erreurs = []; p.on('pageerror', (e) => erreurs.push(e.message));
 const evts = () => p.evaluate(() => JSON.parse(localStorage.getItem('solfege_suivi') || '{"evts":[]}').evts);
 await p.goto(url); await p.evaluate(() => localStorage.clear());
 for (const [id, gid, genre] of [['dictee-rythme', 'drg', 'rythme'], ['dictee-melodie', 'dmg', 'melodie']]) {
@@ -58,6 +61,25 @@ await p.click('#drg-precompte');
 check('mélodie : pas de bouton de précompte', await (async () => { await p.goto(url + '#/jeux/dictee-melodie'); await p.waitForSelector('#dmg-options'); return (await p.locator('#dmg-precompte').count()) === 0; })());
 const lettres = []; await p.goto(url + '#/jeux/dictee-rythme'); await p.waitForSelector('#drg-options .dictee-option');
 for (let i = 0; i < 12; i++) { lettres.push(await p.evaluate(() => 0)); await p.locator('#drg-options .dictee-option').first().click(); await p.waitForTimeout(150); if (await p.locator('#drg-ok').count()) await p.click('#drg-ok'); else await p.waitForTimeout(1300); }
+// --- sons : piano ou clic de métronome (dictée rythmique)
+await p.goto(url + '#/jeux/dictee-rythme'); await p.waitForSelector('#drg-son-clic');
+check('sons : « Piano » actif par défaut, « Clic de métronome » proposé', (await p.locator('#drg-son-piano').getAttribute('aria-pressed')) === 'true' && (await p.locator('#drg-son-clic').getAttribute('aria-pressed')) === 'false');
+await p.click('#drg-son-clic');
+check('sons : le choix « clic » est mémorisé', (await p.evaluate(() => localStorage.getItem('solfege_dictee_son'))) === 'clic' && (await p.locator('#drg-son-clic').getAttribute('aria-pressed')) === 'true');
+const claques = () => p.evaluate(() => window.__claques.length), razClaques = () => p.evaluate(() => { window.__claques = []; });
+await p.waitForTimeout(600); await razClaques(); await p.click('#drg-ecouter'); await p.waitForTimeout(300);
+const st = await p.evaluate(() => window.__dictee.etat());
+console.log('   état :', JSON.stringify({ son: st.son, precompte: st.precompte, claques: await claques(), bouton: await p.locator('#drg-ecouter').textContent() }));
+check('en clics, avec précompte : 4 clics de précompte + une attaque par note du rythme', st.son === 'clic' && st.precompte && (await claques()) === 4 + st.battements.length, `${await claques()} = 4 + ${st.battements.length}`);
+check('pendant la lecture en clics, le bouton devient « Stop »', (await p.locator('#drg-ecouter').textContent()).includes('Stop'));
+await p.click('#drg-ecouter'); await p.waitForTimeout(150);
+check('un second appui arrête la lecture', (await p.locator('#drg-ecouter').textContent()).includes('Écouter'));
+await p.click('#drg-precompte'); await razClaques(); await p.click('#drg-ecouter'); await p.waitForTimeout(300);
+const st2 = await p.evaluate(() => window.__dictee.etat());
+check('en clics, sans précompte : seulement les attaques du rythme', !st2.precompte && (await claques()) === st2.battements.length, `${await claques()} = ${st2.battements.length}`);
+await p.click('#drg-ecouter'); await p.click('#drg-precompte');
+await p.click('#drg-son-piano'); await razClaques(); await p.click('#drg-ecouter'); await p.waitForTimeout(2500);
+check('au piano, avec précompte : 4 clics de métronome joués avant le rythme', (await claques()) >= 4 && (await p.evaluate(() => window.__claques.slice(0, 4))).every((t, i, a) => i === 0 || Math.abs(t - a[i - 1] - 60 / 80) < 0.01), JSON.stringify(await p.evaluate(() => window.__claques.slice(0, 5).map((t) => Math.round(t * 1000) / 1000))));
 await p.goto(url + '#/jeux/dictee-melodie?niveau=2'); await p.waitForSelector('#dmg-options .dictee-option'); 
 check('lien avec niveau : niveau 2 actif', (await p.locator('#dmg-niveau .chip.active').getAttribute('data-niveau')) === '2');
 await p.goto(url + '#/progression'); await p.waitForTimeout(500);
